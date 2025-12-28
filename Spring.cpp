@@ -36,6 +36,13 @@ void Spring::initialize(const std::vector<Point>& springCells,
         cells.push_back(cell);
     }
 
+    // Log all cell positions for debugging
+    DebugLog::getStream() << "[SPRING_INIT_CELLS] Spring@" << position.x << "," << position.y << " | ";
+    for (size_t i = 0; i < cells.size(); i++) {
+        DebugLog::getStream() << "Cell[" << i << "]:(" << cells[i].pos.x << "," << cells[i].pos.y << ") ";
+    }
+    DebugLog::getStream() << std::endl;
+
     // Set starting cell (first cell in the spring)
     if (!cells.empty()) {
         startingCell = &cells[0];
