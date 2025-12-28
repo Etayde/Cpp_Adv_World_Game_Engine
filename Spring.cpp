@@ -128,7 +128,7 @@ void Spring::launch(Player* p){
                           << " | ComprState: " << compressionState
                           << std::endl;
 
-    Direction launchDir;
+    Direction launchDir = Direction::STAY;
     switch (this->compressionDir) {
         case Direction::UP:
             launchDir = Direction::DOWN;
@@ -143,6 +143,7 @@ void Spring::launch(Player* p){
             launchDir = Direction::LEFT;
             break;
         default:
+            launchDir = Direction::STAY;
             break;
     }
     p->setDirection(launchDir, compressionState);
