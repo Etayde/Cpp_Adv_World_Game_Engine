@@ -74,20 +74,27 @@ bool Spring::isCompressing(const Player& p, int checkX, int checkY) const{
     bool alreadyCompressed = compressed;
     bool dirMatch = (p.getCurrentDirection() == compressionDir);
     Point checkPos(checkX, checkY);
-    bool posMatch = (checkPos == startingCell->pos);
+
+    // Check if player is on ANY spring cell, not just the starting cell
+    bool onSpringCell = false;
+    for (const SpringCell& cell : cells) {
+        if (checkPos == cell.pos) {
+            onSpringCell = true;
+            break;
+        }
+    }
 
     DebugLog::getStream() << "[SPRING_CHECK] Player at " << checkX << "," << checkY
                           << " | StartCell: " << startingCell->pos.x << "," << startingCell->pos.y
                           << " | Compressed: " << (alreadyCompressed ? "YES" : "NO")
                           << " | DirMatch: " << (dirMatch ? "YES" : "NO")
-                          << " | PosMatch: " << (posMatch ? "YES" : "NO")
+                          << " | OnSpring: " << (onSpringCell ? "YES" : "NO")
                           << std::endl;
 
     if (compressed) {
         return true;
     }
-    if (!compressed && dirMatch) {
-        if (posMatch)
+    if (!compressed && dirMatch && onSpringCell) {
         return true;
     }
     return false;
