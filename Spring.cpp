@@ -70,12 +70,13 @@ GameObject* Spring::clone() const
     return new Spring(*this);
 }
 
-bool Spring::isCompressing(const Player& p) const{
+bool Spring::isCompressing(const Player& p, int checkX, int checkY) const{
     bool alreadyCompressed = compressed;
     bool dirMatch = (p.getCurrentDirection() == compressionDir);
-    bool posMatch = (p.getPosition() == startingCell->pos);
+    Point checkPos(checkX, checkY);
+    bool posMatch = (checkPos == startingCell->pos);
 
-    DebugLog::getStream() << "[SPRING_CHECK] Player at " << p.getPosition().x << "," << p.getPosition().y
+    DebugLog::getStream() << "[SPRING_CHECK] Player at " << checkX << "," << checkY
                           << " | StartCell: " << startingCell->pos.x << "," << startingCell->pos.y
                           << " | Compressed: " << (alreadyCompressed ? "YES" : "NO")
                           << " | DirMatch: " << (dirMatch ? "YES" : "NO")

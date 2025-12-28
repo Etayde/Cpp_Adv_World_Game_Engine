@@ -523,7 +523,7 @@ bool Player::checkObjectInteraction(int nextX, int nextY, Room* room, Riddle** a
         if (spring != nullptr)
         {
             // Check if player is compressing the spring
-            if (spring->isCompressing(*this))
+            if (spring->isCompressing(*this, nextX, nextY))
             {
                 DebugLog::getStream() << "[SPRING_HIT] Player:" << playerId
                                       << " at " << pos.x << "," << pos.y

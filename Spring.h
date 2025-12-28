@@ -75,7 +75,7 @@ public:
     int getCompressionState() const { return compressionState; }
     int getCellCount() const { return cells.size(); }
 
-    bool isCompressing(const Player& p) const ;
+    bool isCompressing(const Player& p, int checkX, int checkY) const ;
 
     void sortSpringCells();
     void compressCell();
