@@ -33,7 +33,6 @@ void Spring::initialize(const std::vector<Point>& springCells,
     for (const Point& cellPos : springCells) {
         SpringCell cell;
         cell.pos = cellPos;
-        cell.compressed = false;
         cells.push_back(cell);
     }
 
