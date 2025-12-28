@@ -48,11 +48,19 @@ void Spring::initialize(const std::vector<Point>& springCells,
 
     // Debug logging
     DebugLog::getStream() << "[SPRING_INIT] Spring@" << position.x << "," << position.y
-                          << " | Cells: " << cells.size()
-                          << " | Anchor: " << anchorPosition->x << "," << anchorPosition->y
-                          << " | ComprDir: " << static_cast<int>(compressionDir)
-                          << " | StartCell: " << startingCell->pos.x << "," << startingCell->pos.y
-                          << std::endl;
+                          << " | Cells: " << cells.size();
+    if (anchorPosition != nullptr) {
+        DebugLog::getStream() << " | Anchor: " << anchorPosition->x << "," << anchorPosition->y;
+    } else {
+        DebugLog::getStream() << " | Anchor: NULL";
+    }
+    DebugLog::getStream() << " | ComprDir: " << static_cast<int>(compressionDir);
+    if (startingCell != nullptr) {
+        DebugLog::getStream() << " | StartCell: " << startingCell->pos.x << "," << startingCell->pos.y;
+    } else {
+        DebugLog::getStream() << " | StartCell: NULL";
+    }
+    DebugLog::getStream() << std::endl;
 }
 
 //////////////////////////////////////////        clone              //////////////////////////////////////////

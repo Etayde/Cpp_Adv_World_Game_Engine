@@ -47,7 +47,13 @@ public:
     }
 
     // Constructor with position
-    Spring(const Point& pos) : StaticObject(pos, '#', ObjectType::SPRING) {}
+    Spring(const Point& pos) : StaticObject(pos, '#', ObjectType::SPRING),
+                                cells(),
+                                anchorPosition(nullptr),
+                                startingCell(nullptr),
+                                compressionState(0),
+                                compressionDir(Direction::STAY),
+                                compressed(false) {}
 
     // Destructor
     ~Spring();
