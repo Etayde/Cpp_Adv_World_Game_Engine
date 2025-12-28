@@ -1,5 +1,6 @@
 #include "Spring.h"
 #include "Player.h"
+#include "DebugLog.h"
 
 //////////////////////////////////////////      Destructor          //////////////////////////////////////////
 
@@ -44,6 +45,14 @@ void Spring::initialize(const std::vector<Point>& springCells,
     // Reset compression state
     compressionState = 0;
     compressed = false;
+
+    // Debug logging
+    DebugLog::getStream() << "[SPRING_INIT] Spring@" << position.x << "," << position.y
+                          << " | Cells: " << cells.size()
+                          << " | Anchor: " << anchorPosition->x << "," << anchorPosition->y
+                          << " | ComprDir: " << static_cast<int>(compressionDir)
+                          << " | StartCell: " << startingCell->pos.x << "," << startingCell->pos.y
+                          << std::endl;
 }
 
 //////////////////////////////////////////        clone              //////////////////////////////////////////
@@ -54,11 +63,22 @@ GameObject* Spring::clone() const
 }
 
 bool Spring::isCompressing(const Player& p) const{
+    bool alreadyCompressed = compressed;
+    bool dirMatch = (p.getCurrentDirection() == compressionDir);
+    bool posMatch = (p.getPosition() == startingCell->pos);
+
+    DebugLog::getStream() << "[SPRING_CHECK] Player at " << p.getPosition().x << "," << p.getPosition().y
+                          << " | StartCell: " << startingCell->pos.x << "," << startingCell->pos.y
+                          << " | Compressed: " << (alreadyCompressed ? "YES" : "NO")
+                          << " | DirMatch: " << (dirMatch ? "YES" : "NO")
+                          << " | PosMatch: " << (posMatch ? "YES" : "NO")
+                          << std::endl;
+
     if (compressed) {
         return true;
     }
-    if (!compressed && p.getCurrentDirection() == compressionDir) {
-        if (p.getPosition() == startingCell->pos)
+    if (!compressed && dirMatch) {
+        if (posMatch)
         return true;
     }
     return false;
@@ -66,6 +86,13 @@ bool Spring::isCompressing(const Player& p) const{
 
 void Spring::compressCell() {
     this->cells[compressionState].compressed = true;
+
+    DebugLog::getStream() << "[SPRING_COMPRESS] Spring@" << position.x << "," << position.y
+                          << " | Cell: " << compressionState << "/" << cells.size()
+                          << " | CellPos: " << cells[compressionState].pos.x << "," << cells[compressionState].pos.y
+                          << " | NewState: " << (compressionState + 1)
+                          << std::endl;
+
     compressionState++;
 }
 
@@ -78,7 +105,13 @@ void Spring::reset() {
 }
 
 void Spring::launch(Player* p){
-    
+
+    DebugLog::getStream() << "[SPRING_LAUNCH] Player:" << p->playerId
+                          << " at " << p->getPosition().x << "," << p->getPosition().y
+                          << " | ComprDir: " << static_cast<int>(compressionDir)
+                          << " | ComprState: " << compressionState
+                          << std::endl;
+
     Direction launchDir;
     switch (this->compressionDir) {
         case Direction::UP:
@@ -98,6 +131,11 @@ void Spring::launch(Player* p){
     }
     p->setDirection(launchDir, compressionState);
     p->launchFramesRemaining = compressionState;
+
+    DebugLog::getStream() << "[SPRING_LAUNCH_SET] LaunchDir: " << static_cast<int>(launchDir)
+                          << " | Force: " << compressionState
+                          << " | LaunchFrames: " << p->launchFramesRemaining
+                          << std::endl;
 
     this->reset();
 

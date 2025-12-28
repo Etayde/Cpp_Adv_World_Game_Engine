@@ -65,6 +65,10 @@ public:
     bool isCompressed() const { return compressed; }
     Point getAnchorPosition() const { return *anchorPosition; }
 
+    // Debug getters
+    int getCompressionState() const { return compressionState; }
+    int getCellCount() const { return cells.size(); }
+
     bool isCompressing(const Player& p) const ;
 
     void sortSpringCells();

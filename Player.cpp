@@ -6,6 +6,7 @@
 #include "Door.h"
 #include "Spring.h"
 #include "Riddle.h"
+#include "DebugLog.h"
 
 //////////////////////////////////////////     Player Constructors     //////////////////////////////////////////
 
@@ -524,6 +525,13 @@ bool Player::checkObjectInteraction(int nextX, int nextY, Room* room, Riddle** a
             // Check if player is compressing the spring
             if (spring->isCompressing(*this))
             {
+                DebugLog::getStream() << "[SPRING_HIT] Player:" << playerId
+                                      << " at " << pos.x << "," << pos.y
+                                      << " | Spring at " << spring->getPosition().x << "," << spring->getPosition().y
+                                      << " | PlayerDir: " << static_cast<int>(getCurrentDirection())
+                                      << " | ComprState: " << spring->getCompressionState() << "/" << spring->getCellCount()
+                                      << std::endl;
+
                 spring->compressCell();  // Advance compression
 
                 // Check if fully compressed → launch
@@ -575,7 +583,19 @@ bool Player::checkObjectInteraction(int nextX, int nextY, Room* room, Riddle** a
 
 bool Player::fullyCompressedSpring(const Spring& s) const
 {
-    return pos == s.getAnchorPosition() && s.isCompressed();
+    bool posMatch = (pos == s.getAnchorPosition());
+    bool isCompr = s.isCompressed();
+    bool result = posMatch && isCompr;
+
+    DebugLog::getStream() << "[SPRING_FULL_CHECK] Player:" << playerId
+                          << " at " << pos.x << "," << pos.y
+                          << " | Anchor: " << s.getAnchorPosition().x << "," << s.getAnchorPosition().y
+                          << " | PosMatch: " << (posMatch ? "YES" : "NO")
+                          << " | Compressed: " << (isCompr ? "YES" : "NO")
+                          << " | Result: " << (result ? "LAUNCH" : "NO_LAUNCH")
+                          << std::endl;
+
+    return result;
 }
 
 //////////////////////////////////////////   getLaunchDirection   //////////////////////////////////////////
