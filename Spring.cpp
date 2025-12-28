@@ -70,11 +70,9 @@ GameObject* Spring::clone() const
 }
 
 bool Spring::isCompressing(const Player& p, int checkX, int checkY) const{
-    bool alreadyCompressed = compressed;
-    bool dirMatch = (p.getCurrentDirection() == compressionDir);
     Point checkPos(checkX, checkY);
 
-    // Check if player is on ANY spring cell, not just the starting cell
+    // Check if player is on ANY spring cell
     bool onSpringCell = false;
     for (const SpringCell& cell : cells) {
         if (checkPos == cell.pos) {
@@ -83,19 +81,40 @@ bool Spring::isCompressing(const Player& p, int checkX, int checkY) const{
         }
     }
 
+    if (!onSpringCell) {
+        return false;  // Not on spring at all
+    }
+
+    // If already fully compressed, always return true
+    if (compressed) {
+        DebugLog::getStream() << "[SPRING_CHECK] Player at " << checkX << "," << checkY
+                              << " | State: FULLY_COMPRESSED"
+                              << std::endl;
+        return true;
+    }
+
+    // If spring is actively compressing (compressionState > 0), continue compressing
+    if (compressionState > 0) {
+        DebugLog::getStream() << "[SPRING_CHECK] Player at " << checkX << "," << checkY
+                              << " | State: ACTIVELY_COMPRESSING"
+                              << " | ComprState: " << compressionState << "/" << cells.size()
+                              << std::endl;
+        return true;
+    }
+
+    // First cell: check direction matches
+    bool dirMatch = (p.getCurrentDirection() == compressionDir);
     DebugLog::getStream() << "[SPRING_CHECK] Player at " << checkX << "," << checkY
-                          << " | StartCell: " << startingCell->pos.x << "," << startingCell->pos.y
-                          << " | Compressed: " << (alreadyCompressed ? "YES" : "NO")
+                          << " | State: FIRST_CELL_CHECK"
                           << " | DirMatch: " << (dirMatch ? "YES" : "NO")
-                          << " | OnSpring: " << (onSpringCell ? "YES" : "NO")
+                          << " | PlayerDir: " << static_cast<int>(p.getCurrentDirection())
+                          << " | ComprDir: " << static_cast<int>(compressionDir)
                           << std::endl;
 
-    if (compressed) {
+    if (dirMatch && onSpringCell) {
         return true;
     }
-    if (!compressed && dirMatch && onSpringCell) {
-        return true;
-    }
+
     return false;
 }
 
