@@ -953,7 +953,7 @@ Room::WallCheckResult Room::checkWallAdjacency(const std::vector<Point>& sorted,
         if (leftChar == 'W' || leftChar == '=')
         {
             result.valid = true;
-            result.projectionDirection = Direction::RIGHT;
+            result.projectionDirection = Direction::LEFT;  // Compress TOWARD wall (left)
             result.anchorPosition = first;
             return result;
         }
@@ -963,7 +963,7 @@ Room::WallCheckResult Room::checkWallAdjacency(const std::vector<Point>& sorted,
         if (rightChar == 'W' || rightChar == '=')
         {
             result.valid = true;
-            result.projectionDirection = Direction::LEFT;
+            result.projectionDirection = Direction::RIGHT;  // Compress TOWARD wall (right)
             result.anchorPosition = last;
             return result;
         }
@@ -975,7 +975,7 @@ Room::WallCheckResult Room::checkWallAdjacency(const std::vector<Point>& sorted,
         if (topChar == 'W' || topChar == '=')
         {
             result.valid = true;
-            result.projectionDirection = Direction::DOWN;
+            result.projectionDirection = Direction::UP;  // Compress TOWARD wall (up)
             result.anchorPosition = first;
             return result;
         }
@@ -985,7 +985,7 @@ Room::WallCheckResult Room::checkWallAdjacency(const std::vector<Point>& sorted,
         if (bottomChar == 'W' || bottomChar == '=')
         {
             result.valid = true;
-            result.projectionDirection = Direction::UP;
+            result.projectionDirection = Direction::DOWN;  // Compress TOWARD wall (down)
             result.anchorPosition = last;
             return result;
         }
