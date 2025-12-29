@@ -35,12 +35,26 @@ private:
     Direction compressionDir;
     bool compressed;
 
+    // Compression tracking
+    int compressedCellCount;      // How many cells are collapsed (0 to cells.size())
+    bool isPlayerCompressing;     // Is a player currently compressing this spring?
+    Point playerLastPosition;     // Track player's last position in spring
+
 public:
+    // Launch calculation result
+    struct LaunchData {
+        bool shouldLaunch;
+        int velocityX;
+        int velocityY;
+        int frames;
+    };
     // Default constructor
     Spring() : StaticObject(), cells(),
                anchorPosition(nullptr), startingCell(nullptr),
                compressionState(0), compressionDir(Direction::STAY),
-               compressed(false)
+               compressed(false),
+               compressedCellCount(0), isPlayerCompressing(false),
+               playerLastPosition(Point(-1, -1))
     {
         sprite = '#';
         type = ObjectType::SPRING;
@@ -53,7 +67,10 @@ public:
                                 startingCell(nullptr),
                                 compressionState(0),
                                 compressionDir(Direction::STAY),
-                                compressed(false) {}
+                                compressed(false),
+                                compressedCellCount(0),
+                                isPlayerCompressing(false),
+                                playerLastPosition(Point(-1, -1)) {}
 
     // Destructor
     ~Spring();
@@ -63,10 +80,26 @@ public:
                     const Point& anchor,
                     Direction projectionDir);
 
+    // Multi-cell query
+    bool containsCell(int x, int y) const;
+    SpringCell* getCellAt(int x, int y);
+
+    // Compression management
+    bool tryCompress(int playerX, int playerY, Direction playerMoveDir);
+    void resetCompression();
+    bool isFullyCompressed() const;
+    int getCompressionLevel() const { return compressedCellCount; }
+
+    // Launch calculation
+    LaunchData calculateLaunch() const;
+
+    // Visual update
+    void updateVisuals(Room* room);
+
     // GameObject inherited interface - must be implemented
     GameObject* clone() const override;
     const char* getName() const override { return "Spring"; }
     bool isBlocking() const override { return false; }
     bool onExplosion() override { return true; }
-    
+
 };

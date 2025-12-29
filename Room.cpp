@@ -287,7 +287,17 @@ GameObject *Room::getObjectAt(int x, int y)
     {
         if (obj != nullptr && obj->isActive())
         {
-            // Check single position for all objects
+            // Multi-cell support for springs
+            if (obj->getType() == ObjectType::SPRING)
+            {
+                Spring* spring = dynamic_cast<Spring*>(obj);
+                if (spring != nullptr && spring->containsCell(x, y))
+                {
+                    return obj;
+                }
+            }
+
+            // Check single position for all other objects
             if (obj->getX() == x && obj->getY() == y)
             {
                 return obj;
@@ -303,18 +313,13 @@ const GameObject *Room::getObjectAt(int x, int y) const
     {
         if (obj != nullptr && obj->isActive())
         {
-            // Special handling for Springs - check all cells FIRST
+            // Multi-cell support for springs
             if (obj->getType() == ObjectType::SPRING)
             {
                 const Spring* spring = dynamic_cast<const Spring*>(obj);
-                if (spring != nullptr)
+                if (spring != nullptr && spring->containsCell(x, y))
                 {
-                    // TODO: Implement spring cell checking
-                    // For now, just check if it's at the spring's base position
-                    if (spring->getPosition().x == x && spring->getPosition().y == y)
-                    {
-                        return obj;
-                    }
+                    return obj;
                 }
             }
 

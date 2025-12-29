@@ -519,7 +519,60 @@ bool Player::checkObjectInteraction(int nextX, int nextY, Room* room, Riddle** a
     // Spring compression and launch
     if (objType == ObjectType::SPRING)
     {
-        // TODO: Implement spring interaction
+        Spring* spring = dynamic_cast<Spring*>(obj);
+        if (spring != nullptr)
+        {
+            Direction moveDir = getCurrentDirection();
+
+            // Try to compress spring
+            bool compressed = spring->tryCompress(nextX, nextY, moveDir);
+
+            if (compressed)
+            {
+                // Update visuals immediately
+                spring->updateVisuals(room);
+
+                // Check launch triggers
+                bool shouldLaunch = false;
+
+                // Trigger 1: Player pressed STAY while compressing
+                if (moveDir == Direction::STAY && spring->getCompressionLevel() > 0)
+                {
+                    shouldLaunch = true;
+                }
+
+                // Trigger 2: Spring fully compressed (at anchor)
+                if (spring->isFullyCompressed())
+                {
+                    shouldLaunch = true;
+                }
+
+                if (shouldLaunch)
+                {
+                    // Calculate launch parameters
+                    Spring::LaunchData launch = spring->calculateLaunch();
+
+                    if (launch.shouldLaunch)
+                    {
+                        // Set player launch state
+                        pos.diff_x = launch.velocityX;
+                        pos.diff_y = launch.velocityY;
+                        launchFramesRemaining = launch.frames;
+
+                        // Reset spring IMMEDIATELY after launch
+                        spring->resetCompression();
+                        spring->updateVisuals(room);
+
+                        // Debug logging
+                        DebugLog::getStream() << "[SPRING_LAUNCH] Player " << playerId
+                                              << " launched: vel(" << launch.velocityX
+                                              << "," << launch.velocityY
+                                              << ") frames:" << launch.frames << std::endl;
+                    }
+                }
+            }
+        }
+
         return false;  // Springs are non-blocking (allow movement through)
     }
 
