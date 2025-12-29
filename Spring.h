@@ -68,26 +68,5 @@ public:
     const char* getName() const override { return "Spring"; }
     bool isBlocking() const override { return false; }
     bool onExplosion() override { return true; }
-    bool isCompressed() const { return compressed; }
-    Point getAnchorPosition() const { return *anchorPosition; }
-
-    // Debug getters
-    int getCompressionState() const { return compressionState; }
-    int getCellCount() const { return cells.size(); }
-    Point getCellPosition(int index) const {
-        if (index >= 0 && index < static_cast<int>(cells.size())) {
-            return cells[index].pos;
-        }
-        return Point(-1, -1);
-    }
-
-    bool isCompressing(const Player& p, int checkX, int checkY) const ;
-
-    void sortSpringCells();
-    void compressCell();
-
-    void launch(Player* p);
-
-    void reset();
     
 };
