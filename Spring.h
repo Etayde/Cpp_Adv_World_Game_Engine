@@ -38,6 +38,7 @@ public:
         int velocityX;        // Launch velocity X
         int velocityY;        // Launch velocity Y
         int launchFrames;     // Frames to remain in launch state
+        Direction launchDirection;
     };
 
     // Constructor/Destructor

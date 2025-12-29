@@ -707,17 +707,6 @@ void Player::handleDoorInteraction(Door* door)
     doorId = door->getDoorId();
 }
 
-//////////////////////////////////////////   fullyCompressedSpring   //////////////////////////////////////////
-
-bool Player::fullyCompressedSpring(const Spring& s, int checkX, int checkY) const
-{
-    // TODO: Implement spring compression check
-    (void)s;
-    (void)checkX;
-    (void)checkY;
-    return false;
-}
-
 //////////////////////////////////////////   isPerpendicularToLaunch   //////////////////////////////////////////
 
 bool Player::isPerpendicularToLaunch(Direction inputDir, Direction launchDir) const
@@ -902,6 +891,3 @@ void Player::stopAtPosition(int x, int y)
     // Reset launch state
     launchFramesRemaining = 0;
 }
-
-
-
