@@ -8,6 +8,7 @@
 
 class SpringLink;
 class Room;
+class Player;
 
 //////////////////////////////////////////          Spring            //////////////////////////////////////////
 
@@ -27,6 +28,16 @@ public:
         int velocityX;
         int velocityY;
         int frames;
+        Direction direction;
+    };
+
+    // Player interaction result
+    struct InteractionResult {
+        bool compressed;      // Was compression performed?
+        bool launched;        // Was player launched?
+        int velocityX;        // Launch velocity X
+        int velocityY;        // Launch velocity Y
+        int launchFrames;     // Frames to remain in launch state
     };
 
     // Constructor/Destructor
@@ -52,6 +63,9 @@ public:
     // Launch mechanics
     LaunchData calculateLaunch() const;
     void resetCompression(Room* room);
+
+    // Player interaction - encapsulates compression and launch logic
+    InteractionResult handlePlayerInteraction(SpringLink* link, Player* player, Room* room);
 
     // Getters
     Direction getCompressionDir() const { return compressionDir; }

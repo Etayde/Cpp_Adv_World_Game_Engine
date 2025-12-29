@@ -71,6 +71,7 @@ public:
     bool waitingAtDoor; // True if player has crossed through door and is waiting
     bool requestPause; // Set when ESC pressed during riddle
     int launchFramesRemaining; // Frames remaining for spring launch animation
+    Direction launchDir; // Direction of current launch
 
 public:
     // Constructors & Destructor
@@ -89,6 +90,7 @@ public:
     // State getters
     bool isAtDoor() const { return atDoor; }
     int getDoorId() const { return doorId; }
+    int getId() const { return playerId; }
     bool isAlive() const { return alive; }
     bool hasItem() const { return inventory != nullptr && inventory->isActive(); }
     bool hasTorch() const { return inventory != nullptr && inventory->getType() == ObjectType::TORCH; }
@@ -145,6 +147,15 @@ public:
 private:
     void clearInventory();
     void copyInventoryFrom(const Player &other);
+
+    // Interaction helpers
+    void clearDoorState();
+    bool handleRiddleInteraction(class Riddle* riddle, int nextX, int nextY, Room* room,
+                                 class Riddle** activeRiddle, Player** activePlayer);
+    bool handleSwitchInteraction(class Switch* sw, Room* room);
+    bool handleSpringInteraction(class SpringLink* link, Room* room);
+    bool handlePickableInteraction(GameObject* obj, int nextX, int nextY, Room* room);
+    void handleDoorInteraction(class Door* door);
 
     // Launch control helpers
     bool canApplyInputDuringLaunch(Direction inputDir) const;

@@ -1,6 +1,7 @@
 #include "Spring.h"
 #include "SpringLink.h"
 #include "Room.h"
+#include "Player.h"
 #include "DebugLog.h"
 
 //////////////////////////////////////////      Constructor          //////////////////////////////////////////
@@ -124,23 +125,28 @@ Spring::LaunchData Spring::calculateLaunch() const
         case Direction::UP:
             launch.velocityX = 0;
             launch.velocityY = compressedCount;  // Launch DOWN
+            launch.direction = Direction::DOWN;
             break;
         case Direction::DOWN:
             launch.velocityX = 0;
             launch.velocityY = -compressedCount;  // Launch UP
+            launch.direction = Direction::UP;
             break;
         case Direction::LEFT:
             launch.velocityX = compressedCount;  // Launch RIGHT
             launch.velocityY = 0;
+            launch.direction = Direction::RIGHT;
             break;
         case Direction::RIGHT:
             launch.velocityX = -compressedCount;  // Launch LEFT
             launch.velocityY = 0;
+            launch.direction = Direction::LEFT;
             break;
         default:
             launch.shouldLaunch = false;
             launch.velocityX = 0;
             launch.velocityY = 0;
+            launch.direction = Direction::STAY;
             break;
     }
 
@@ -162,3 +168,78 @@ void Spring::resetCompression(Room* room)
 
     DebugLog::getStream() << "[SPRING_RESET] Spring reset - all links restored" << std::endl;
 }
+
+//////////////////////////////////////////  handlePlayerInteraction   //////////////////////////////////////////
+
+Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink* link, Player* player, Room* room)
+{
+    if (link == nullptr || player == nullptr)
+    {
+        DebugLog::getStream() << "[PLAYER_SPRING] ERROR: Null link or player!" << std::endl;
+        return {false, false, 0, 0, 0};
+    }
+
+    DebugLog::getStream() << "[PLAYER_SPRING] Player " << player->getId()
+                          << " stepped on SPRING_LINK at (" << link->getX() << "," << link->getY() << ")" << std::endl;
+
+    DebugLog::getStream() << "[PLAYER_SPRING] Link#" << link->getLinkIndex()
+                          << " | Collapsed: " << (link->isCollapsed() ? "YES" : "NO") << std::endl;
+
+    // Get player's current direction
+    Direction moveDir = player->getCurrentDirection();
+    DebugLog::getStream() << "[PLAYER_SPRING] Player direction: " << static_cast<int>(moveDir) << std::endl;
+
+    // Check if compression is valid
+    if (!canCompressLink(link->getLinkIndex(), moveDir))
+    {
+        DebugLog::getStream() << "[PLAYER_SPRING] Compression not valid - passing through" << std::endl;
+        return {false, false, 0, 0, 0};
+    }
+
+    DebugLog::getStream() << "[PLAYER_SPRING] Compression valid - compressing link" << std::endl;
+
+    // Compress this link
+    compressLink(link->getLinkIndex(), room);
+
+    DebugLog::getStream() << "[PLAYER_SPRING] After compression - Level: "
+                          << getCompressionLevel() << "/"
+                          << getLinkCount() << std::endl;
+
+    // Check if should launch
+    bool fullyCompressed = isFullyCompressed();
+    bool stayPressed = (moveDir == Direction::STAY);
+
+    DebugLog::getStream() << "[PLAYER_SPRING] Launch check - FullyCompressed: "
+                          << (fullyCompressed ? "YES" : "NO")
+                          << " | STAY pressed: " << (stayPressed ? "YES" : "NO") << std::endl;
+
+    if (!fullyCompressed && !stayPressed)
+    {
+        // Compressed but not ready to launch
+        return {true, false, 0, 0, 0};
+    }
+
+    // Launch triggered!
+    DebugLog::getStream() << "[PLAYER_SPRING] Launch triggered!" << std::endl;
+
+    LaunchData launch = calculateLaunch();
+
+    if (!launch.shouldLaunch)
+    {
+        DebugLog::getStream() << "[PLAYER_SPRING] WARNING: shouldLaunch=false" << std::endl;
+        return {true, false, 0, 0, 0};
+    }
+
+    DebugLog::getStream() << "[SPRING_LAUNCH] Player " << player->getId()
+                          << " launched: vel(" << launch.velocityX
+                          << "," << launch.velocityY
+                          << ") frames:" << launch.frames << std::endl;
+
+    // Reset spring IMMEDIATELY after launch
+    DebugLog::getStream() << "[PLAYER_SPRING] Resetting spring..." << std::endl;
+    resetCompression(room);
+
+    // Return launch data for Player to apply
+    return {true, true, launch.velocityX, launch.velocityY, launch.frames};
+}
+
