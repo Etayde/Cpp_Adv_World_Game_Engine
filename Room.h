@@ -9,6 +9,7 @@
 #include <vector>
 
 class Player;
+class Spring;
 
 //////////////////////////////////////////        Modification        //////////////////////////////////////////
 
@@ -117,6 +118,7 @@ public:
 
     // Objects
     std::vector<GameObject*> objects;
+    std::vector<Spring*> springs;  // Spring managers (not GameObjects)
 
     // Key counter system
     int totalKeysInRoom;

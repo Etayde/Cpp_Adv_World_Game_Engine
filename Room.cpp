@@ -8,6 +8,7 @@
 #include "StaticObjects.h"
 #include "Bomb.h"
 #include "Spring.h"
+#include "SpringLink.h"
 #include "DebugLog.h"
 #include <cmath>
 #include <algorithm>
@@ -35,6 +36,13 @@ Room::Room(int id)
 Room::~Room()
 {
     deleteAllObjects();
+
+    // Delete springs (separate from objects)
+    for (Spring* spring : springs)
+    {
+        delete spring;
+    }
+    springs.clear();
 }
 
 //////////////////////////////////////////      Room Copy Constructor   //////////////////////////////////////////
@@ -102,6 +110,11 @@ void Room::copyObjectsFrom(const Room &other)
             objects.push_back(obj->clone());
         }
     }
+
+    // Copy springs (note: this is a shallow copy of spring managers)
+    // Spring pointers will reference the original springs
+    // For deep copy, would need Spring::clone() method
+    springs = other.springs;
 }
 
 // Delete all allocated objects
@@ -287,17 +300,7 @@ GameObject *Room::getObjectAt(int x, int y)
     {
         if (obj != nullptr && obj->isActive())
         {
-            // Multi-cell support for springs
-            if (obj->getType() == ObjectType::SPRING)
-            {
-                Spring* spring = dynamic_cast<Spring*>(obj);
-                if (spring != nullptr && spring->containsCell(x, y))
-                {
-                    return obj;
-                }
-            }
-
-            // Check single position for all other objects
+            // All objects (including SpringLinks) are single-position
             if (obj->getX() == x && obj->getY() == y)
             {
                 return obj;
@@ -313,17 +316,7 @@ const GameObject *Room::getObjectAt(int x, int y) const
     {
         if (obj != nullptr && obj->isActive())
         {
-            // Multi-cell support for springs
-            if (obj->getType() == ObjectType::SPRING)
-            {
-                const Spring* spring = dynamic_cast<const Spring*>(obj);
-                if (spring != nullptr && spring->containsCell(x, y))
-                {
-                    return obj;
-                }
-            }
-
-            // Check single position for all other objects
+            // All objects (including SpringLinks) are single-position
             if (obj->getX() == x && obj->getY() == y)
             {
                 return obj;
@@ -832,24 +825,47 @@ void Room::addSpring(const std::vector<Point>& positions, int expectedLength)
         return; // No wall found at either end
     }
 
-    // Step 5: Create Spring object (simplified - just use first position)
-    Spring* spring = new Spring(sorted.empty() ? Point(0, 0) : sorted[0]);
-
-    // Step 6: Add to objects vector
-    if (addObject(spring))
+    // Step 5: Ensure sorted array has START cell first, ANCHOR cell last
+    bool anchorIsFirst = (wallCheck.anchorPosition == sorted[0]);
+    if (anchorIsFirst)
     {
-        // Success - update room's character map to show spring chars
-        // Only add modifications if the base layout doesn't already have '#'
-        for (const Point& p : sorted)
+        std::reverse(sorted.begin(), sorted.end());
+    }
+
+    // Step 6: Create Spring manager and SpringLinks
+    Spring* spring = new Spring();
+    std::vector<SpringLink*> springLinks;
+
+    bool addFailed = false;
+    for (size_t i = 0; i < sorted.size(); i++)
+    {
+        SpringLink* link = new SpringLink(sorted[i], spring, static_cast<int>(i));
+        springLinks.push_back(link);
+
+        // Add to objects vector
+        if (!addObject(link))
         {
-            if (baseLayout->getCharAt(p.x, p.y) != '#')
-            {
-                setCharAt(p.x, p.y, '#');
-            }
+            delete link;
+            addFailed = true;
+            break;
         }
+
+        // Update room's character map to show spring char
+        if (baseLayout->getCharAt(sorted[i].x, sorted[i].y) != '#')
+        {
+            setCharAt(sorted[i].x, sorted[i].y, '#');
+        }
+    }
+
+    // If all links added successfully, initialize spring and add to springs vector
+    if (!addFailed)
+    {
+        spring->initialize(springLinks, wallCheck.anchorPosition, wallCheck.projectionDirection);
+        springs.push_back(spring);
     }
     else
     {
+        // Cleanup on failure
         delete spring;
     }
 }
@@ -1051,16 +1067,55 @@ void Room::scanAndCreateSprings()
                         // Ensure sorted array has START cell first, ANCHOR cell last
                         // If anchor is at the beginning (sorted[0]), reverse the array
                         bool anchorIsFirst = (wallCheck.anchorPosition == sorted[0]);
+
+                        DebugLog::getStream() << "[ROOM_SPRING_SCAN] Found spring group with " << sorted.size()
+                                              << " cells | Orientation: " << static_cast<int>(orientation)
+                                              << " | Anchor at: (" << wallCheck.anchorPosition.x << "," << wallCheck.anchorPosition.y << ")"
+                                              << " | Projection dir: " << static_cast<int>(wallCheck.projectionDirection) << std::endl;
+
                         if (anchorIsFirst)
                         {
+                            DebugLog::getStream() << "[ROOM_SPRING_SCAN] Reversing array (anchor was first)" << std::endl;
                             std::reverse(sorted.begin(), sorted.end());
                         }
 
-                        Spring* spring = new Spring(sorted[0]);  // Now sorted[0] is START cell
-                        spring->initialize(sorted, wallCheck.anchorPosition, wallCheck.projectionDirection);
-                        if (!addObject(spring))
+                        DebugLog::getStream() << "[ROOM_SPRING_SCAN] Start cell: (" << sorted[0].x << "," << sorted[0].y << ")"
+                                              << " | End cell: (" << sorted[sorted.size()-1].x << "," << sorted[sorted.size()-1].y << ")" << std::endl;
+
+                        // Create Spring manager
+                        Spring* spring = new Spring();
+                        std::vector<SpringLink*> springLinks;
+
+                        // Create SpringLink for each cell
+                        bool addFailed = false;
+                        for (size_t i = 0; i < sorted.size(); i++)
                         {
+                            SpringLink* link = new SpringLink(sorted[i], spring, static_cast<int>(i));
+                            springLinks.push_back(link);
+
+                            // Add to objects vector
+                            if (!addObject(link))
+                            {
+                                DebugLog::getStream() << "[ROOM_SPRING_SCAN] ERROR: Failed to add SpringLink at index " << i << std::endl;
+                                delete link;
+                                addFailed = true;
+                                break;
+                            }
+                        }
+
+                        // If all links added successfully, initialize spring and add to springs vector
+                        if (!addFailed)
+                        {
+                            spring->initialize(springLinks, wallCheck.anchorPosition, wallCheck.projectionDirection);
+                            springs.push_back(spring);
+                            DebugLog::getStream() << "[ROOM_SPRING_SCAN] Spring created successfully with " << springLinks.size() << " links" << std::endl;
+                        }
+                        else
+                        {
+                            // Cleanup on failure
                             delete spring;
+                            DebugLog::getStream() << "[ROOM_SPRING_SCAN] Spring creation failed - cleaned up" << std::endl;
+                            // Links already added to objects will be cleaned up by deleteAllObjects()
                         }
                     }
                 }

@@ -5,6 +5,7 @@
 #include "Switch.h"
 #include "Door.h"
 #include "Spring.h"
+#include "SpringLink.h"
 #include "Riddle.h"
 #include "DebugLog.h"
 
@@ -199,48 +200,6 @@ bool Player::move(Room *room, Riddle** activeRiddle, Player** activePlayer, Play
     // Update position and draw
     pos.x = nextX;
     pos.y = nextY;
-
-    // Check if we landed on a spring cell (compression happens AFTER movement)
-    GameObject* landedObj = room->getObjectAt(pos.x, pos.y);
-    if (landedObj != nullptr && landedObj->getType() == ObjectType::SPRING)
-    {
-        Spring* spring = dynamic_cast<Spring*>(landedObj);
-        if (spring != nullptr)
-        {
-            Direction moveDir = getCurrentDirection();
-
-            // Try to compress spring at our CURRENT position (where we just moved to)
-            bool compressed = spring->tryCompress(pos.x, pos.y, moveDir);
-
-            if (compressed)
-            {
-                spring->updateVisuals(room);
-
-                // Check launch triggers
-                bool shouldLaunch = (moveDir == Direction::STAY && spring->getCompressionLevel() > 0)
-                                 || spring->isFullyCompressed();
-
-                if (shouldLaunch)
-                {
-                    Spring::LaunchData launch = spring->calculateLaunch();
-                    if (launch.shouldLaunch)
-                    {
-                        pos.diff_x = launch.velocityX;
-                        pos.diff_y = launch.velocityY;
-                        launchFramesRemaining = launch.frames;
-
-                        spring->resetCompression();
-                        spring->updateVisuals(room);
-
-                        DebugLog::getStream() << "[SPRING_LAUNCH] Player " << playerId
-                                              << " launched: vel(" << launch.velocityX
-                                              << "," << launch.velocityY
-                                              << ") frames:" << launch.frames << std::endl;
-                    }
-                }
-            }
-        }
-    }
 
     draw(room);
 
@@ -559,10 +518,88 @@ bool Player::checkObjectInteraction(int nextX, int nextY, Room* room, Riddle** a
         return true; // Blocks movement
     }
 
-    // Spring compression and launch
-    if (objType == ObjectType::SPRING)
+    // SpringLink compression and launch
+    if (objType == ObjectType::SPRING_LINK)
     {
-        return false;  // Springs are non-blocking - compression handled after movement
+        DebugLog::getStream() << "[PLAYER_SPRING] Player " << playerId
+                              << " stepped on SPRING_LINK at (" << nextX << "," << nextY << ")" << std::endl;
+
+        SpringLink* link = dynamic_cast<SpringLink*>(obj);
+        if (link == nullptr)
+        {
+            DebugLog::getStream() << "[PLAYER_SPRING] ERROR: Failed to cast to SpringLink!" << std::endl;
+            return false;
+        }
+
+        DebugLog::getStream() << "[PLAYER_SPRING] Link#" << link->getLinkIndex()
+                              << " | Collapsed: " << (link->isCollapsed() ? "YES" : "NO") << std::endl;
+
+        Spring* spring = link->getParentSpring();
+        if (spring == nullptr)
+        {
+            DebugLog::getStream() << "[PLAYER_SPRING] ERROR: Link has no parent Spring!" << std::endl;
+            return false;
+        }
+
+        // Get player's current direction (uses pos.diff_x and pos.diff_y)
+        Direction moveDir = getCurrentDirection();
+        DebugLog::getStream() << "[PLAYER_SPRING] Player direction: " << static_cast<int>(moveDir)
+                              << " (diff_x:" << pos.diff_x << " diff_y:" << pos.diff_y << ")" << std::endl;
+
+        // Check if compression is valid
+        if (spring->canCompressLink(link->getLinkIndex(), moveDir))
+        {
+            DebugLog::getStream() << "[PLAYER_SPRING] Compression valid - compressing link" << std::endl;
+
+            // Compress this link
+            spring->compressLink(link->getLinkIndex(), room);
+
+            DebugLog::getStream() << "[PLAYER_SPRING] After compression - Level: "
+                                  << spring->getCompressionLevel() << "/"
+                                  << spring->getLinkCount() << std::endl;
+
+            // Check if should launch
+            bool fullyCompressed = spring->isFullyCompressed();
+            bool stayPressed = (moveDir == Direction::STAY);
+
+            DebugLog::getStream() << "[PLAYER_SPRING] Launch check - FullyCompressed: "
+                                  << (fullyCompressed ? "YES" : "NO")
+                                  << " | STAY pressed: " << (stayPressed ? "YES" : "NO") << std::endl;
+
+            if (fullyCompressed || stayPressed)
+            {
+                DebugLog::getStream() << "[PLAYER_SPRING] Launch triggered!" << std::endl;
+
+                Spring::LaunchData launch = spring->calculateLaunch();
+
+                if (launch.shouldLaunch)
+                {
+                    // Apply launch velocity
+                    pos.diff_x = launch.velocityX;
+                    pos.diff_y = launch.velocityY;
+                    launchFramesRemaining = launch.frames;
+
+                    DebugLog::getStream() << "[SPRING_LAUNCH] Player " << playerId
+                                          << " launched: vel(" << launch.velocityX
+                                          << "," << launch.velocityY
+                                          << ") frames:" << launch.frames << std::endl;
+                }
+                else
+                {
+                    DebugLog::getStream() << "[PLAYER_SPRING] WARNING: shouldLaunch=false" << std::endl;
+                }
+
+                // Reset spring IMMEDIATELY after launch
+                DebugLog::getStream() << "[PLAYER_SPRING] Resetting spring..." << std::endl;
+                spring->resetCompression(room);
+            }
+        }
+        else
+        {
+            DebugLog::getStream() << "[PLAYER_SPRING] Compression not valid - passing through" << std::endl;
+        }
+
+        return false;  // SpringLinks are non-blocking
     }
 
     // Blocking objects

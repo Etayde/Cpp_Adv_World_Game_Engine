@@ -2,43 +2,23 @@
 
 //////////////////////////////////////       INCLUDES & FORWARDS       //////////////////////////////////////////
 
-#include "StaticObjects.h"
-#include "Room.h"
-#include "Screen.h"
+#include "Point.h"
+#include "Constants.h"
 #include <vector>
 
-class Player;
-
-////////////////////////////////////////        SpringCell         //////////////////////////////////////////
-struct SpringCell
-{
-    Point pos;
-    Direction projectionDirection;
-    bool collapsed;  // Set to true when player steps on this cell
-    bool startPoint;
-    bool anchor;
-
-    SpringCell() : pos(Point(-1, -1)), projectionDirection(Direction::STAY),
-                   collapsed(false), startPoint(false), anchor(false) {}
-};
+class SpringLink;
+class Room;
 
 //////////////////////////////////////////          Spring            //////////////////////////////////////////
 
-// Spring object - to be reimplemented
-class Spring : public StaticObject
+// Spring manager class - coordinates SpringLink objects for compression and launch
+class Spring
 {
 private:
-    std::vector<SpringCell> cells;
-    Point* anchorPosition;
-    SpringCell* startingCell;
-    int compressionState;
+    std::vector<SpringLink*> links;
+    Point anchorPosition;
     Direction compressionDir;
-    bool compressed;
-
-    // Compression tracking
-    int compressedCellCount;      // How many cells are collapsed (0 to cells.size())
-    bool isPlayerCompressing;     // Is a player currently compressing this spring?
-    Point playerLastPosition;     // Track player's last position in spring
+    int compressedCount;
 
 public:
     // Launch calculation result
@@ -48,58 +28,31 @@ public:
         int velocityY;
         int frames;
     };
-    // Default constructor
-    Spring() : StaticObject(), cells(),
-               anchorPosition(nullptr), startingCell(nullptr),
-               compressionState(0), compressionDir(Direction::STAY),
-               compressed(false),
-               compressedCellCount(0), isPlayerCompressing(false),
-               playerLastPosition(Point(-1, -1))
-    {
-        sprite = '#';
-        type = ObjectType::SPRING;
-    }
 
-    // Constructor with position
-    Spring(const Point& pos) : StaticObject(pos, '#', ObjectType::SPRING),
-                                cells(),
-                                anchorPosition(nullptr),
-                                startingCell(nullptr),
-                                compressionState(0),
-                                compressionDir(Direction::STAY),
-                                compressed(false),
-                                compressedCellCount(0),
-                                isPlayerCompressing(false),
-                                playerLastPosition(Point(-1, -1)) {}
-
-    // Destructor
+    // Constructor/Destructor
+    Spring();
     ~Spring();
 
-    // Initialize spring with cells, anchor, and projection direction
-    void initialize(const std::vector<Point>& springCells,
-                    const Point& anchor,
-                    Direction projectionDir);
+    // Initialization - call from Room during scanning
+    void initialize(const std::vector<SpringLink*>& springLinks,
+                   const Point& anchor,
+                   Direction projectionDir);
 
-    // Multi-cell query
-    bool containsCell(int x, int y) const;
-    SpringCell* getCellAt(int x, int y);
+    // Compression validation
+    bool canCompressLink(int linkIndex, Direction playerDir) const;
 
-    // Compression management
-    bool tryCompress(int playerX, int playerY, Direction playerMoveDir);
-    void resetCompression();
+    // Compression execution
+    void compressLink(int linkIndex, Room* room);
+
+    // State queries
     bool isFullyCompressed() const;
-    int getCompressionLevel() const { return compressedCellCount; }
+    int getCompressionLevel() const { return compressedCount; }
+    int getLinkCount() const { return static_cast<int>(links.size()); }
 
-    // Launch calculation
+    // Launch mechanics
     LaunchData calculateLaunch() const;
+    void resetCompression(Room* room);
 
-    // Visual update
-    void updateVisuals(Room* room);
-
-    // GameObject inherited interface - must be implemented
-    GameObject* clone() const override;
-    const char* getName() const override { return "Spring"; }
-    bool isBlocking() const override { return false; }
-    bool onExplosion() override { return true; }
-
+    // Getters
+    Direction getCompressionDir() const { return compressionDir; }
 };

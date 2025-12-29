@@ -1,242 +1,164 @@
 #include "Spring.h"
-#include "Player.h"
+#include "SpringLink.h"
+#include "Room.h"
 #include "DebugLog.h"
-#include "Console.h"
-#include <iostream>
+
+//////////////////////////////////////////      Constructor          //////////////////////////////////////////
+
+Spring::Spring()
+    : links(), anchorPosition(-1, -1), compressionDir(Direction::STAY), compressedCount(0)
+{
+}
 
 //////////////////////////////////////////      Destructor          //////////////////////////////////////////
 
 Spring::~Spring()
 {
-    if (anchorPosition != nullptr) {
-        delete anchorPosition;
-        anchorPosition = nullptr;
-    }
+    // Links are owned by Room's objects vector, don't delete them here
 }
 
 //////////////////////////////////////////      Initialize          //////////////////////////////////////////
 
-void Spring::initialize(const std::vector<Point>& springCells,
+void Spring::initialize(const std::vector<SpringLink*>& springLinks,
                        const Point& anchor,
                        Direction projectionDir)
 {
-    // Set anchor position
-    if (anchorPosition == nullptr) {
-        anchorPosition = new Point(anchor);
-    } else {
-        *anchorPosition = anchor;
-    }
-
-    // Set compression direction
+    links = springLinks;
+    anchorPosition = anchor;
     compressionDir = projectionDir;
+    compressedCount = 0;
 
-    // Populate cells vector
-    cells.clear();
-    for (size_t i = 0; i < springCells.size(); i++) {
-        SpringCell cell;
-        cell.pos = springCells[i];
-        cell.projectionDirection = projectionDir;
-        cell.collapsed = false;
-        cell.startPoint = (i == 0);  // First cell is the start point
-        cell.anchor = false;  // None are anchor (anchor is the wall)
-        cells.push_back(cell);
-    }
-
-    // Log all cell positions for debugging
-    DebugLog::getStream() << "[SPRING_INIT_CELLS] Spring@" << position.x << "," << position.y << " | ";
-    for (size_t i = 0; i < cells.size(); i++) {
-        DebugLog::getStream() << "Cell[" << i << "]:(" << cells[i].pos.x << "," << cells[i].pos.y << ") ";
-    }
-    DebugLog::getStream() << std::endl;
-
-    // Set starting cell (first cell in the spring)
-    if (!cells.empty()) {
-        startingCell = &cells[0];
-    }
-
-    // Reset compression state
-    compressionState = 0;
-    compressed = false;
-
-    // Debug logging
-    DebugLog::getStream() << "[SPRING_INIT] Spring@" << position.x << "," << position.y
-                          << " | Cells: " << cells.size();
-    if (anchorPosition != nullptr) {
-        DebugLog::getStream() << " | Anchor: " << anchorPosition->x << "," << anchorPosition->y;
-    } else {
-        DebugLog::getStream() << " | Anchor: NULL";
-    }
-    DebugLog::getStream() << " | ComprDir: " << static_cast<int>(compressionDir);
-    if (startingCell != nullptr) {
-        DebugLog::getStream() << " | StartCell: " << startingCell->pos.x << "," << startingCell->pos.y;
-    } else {
-        DebugLog::getStream() << " | StartCell: NULL";
-    }
-    DebugLog::getStream() << std::endl;
+    DebugLog::getStream() << "[SPRING_INIT] Spring with " << links.size()
+                          << " links | Anchor:(" << anchor.x << "," << anchor.y << ")"
+                          << " | ComprDir: " << static_cast<int>(compressionDir) << std::endl;
 }
 
-//////////////////////////////////////////        clone              //////////////////////////////////////////
+//////////////////////////////////////////    canCompressLink       //////////////////////////////////////////
 
-GameObject* Spring::clone() const
+bool Spring::canCompressLink(int linkIndex, Direction playerDir) const
 {
-    return new Spring(*this);
-}
+    DebugLog::getStream() << "[SPRING_CAN_COMPRESS] Checking link " << linkIndex
+                          << " | PlayerDir: " << static_cast<int>(playerDir)
+                          << " | CompressionDir: " << static_cast<int>(compressionDir) << std::endl;
 
-//////////////////////////////////////////    containsCell          //////////////////////////////////////////
-
-bool Spring::containsCell(int x, int y) const
-{
-    for (const SpringCell& cell : cells) {
-        if (cell.pos.x == x && cell.pos.y == y) {
-            return true;
-        }
-    }
-    return false;
-}
-
-//////////////////////////////////////////      getCellAt           //////////////////////////////////////////
-
-SpringCell* Spring::getCellAt(int x, int y)
-{
-    for (SpringCell& cell : cells) {
-        if (cell.pos.x == x && cell.pos.y == y) {
-            return &cell;
-        }
-    }
-    return nullptr;
-}
-
-//////////////////////////////////////////    tryCompress           //////////////////////////////////////////
-
-bool Spring::tryCompress(int playerX, int playerY, Direction playerMoveDir)
-{
-    SpringCell* currentCell = getCellAt(playerX, playerY);
-
-    // Player left spring - reset compression
-    if (currentCell == nullptr) {
-        if (isPlayerCompressing) {
-            resetCompression();
-        }
+    // Must be valid index
+    if (linkIndex < 0 || linkIndex >= static_cast<int>(links.size()))
+    {
+        DebugLog::getStream() << "[SPRING_CAN_COMPRESS] FAIL: Invalid link index " << linkIndex
+                              << " (size: " << links.size() << ")" << std::endl;
         return false;
     }
 
-    // First entry to spring
-    if (!isPlayerCompressing) {
-        // Must enter at start cell
-        if (!currentCell->startPoint) {
-            return false;  // Wrong entry point - pass through
-        }
+    // Must move in compression direction (or STAY for launch trigger)
+    if (playerDir != compressionDir && playerDir != Direction::STAY)
+    {
+        DebugLog::getStream() << "[SPRING_CAN_COMPRESS] FAIL: Wrong direction - player: "
+                              << static_cast<int>(playerDir) << " vs compression: "
+                              << static_cast<int>(compressionDir) << std::endl;
+        return false;
+    }
 
-        // Must move toward anchor (match compressionDir)
-        if (playerMoveDir != compressionDir) {
-            return false;  // Wrong direction - pass through
-        }
-
-        // Valid entry - start compressing
-        isPlayerCompressing = true;
-        playerLastPosition = Point(playerX, playerY);
-        currentCell->collapsed = true;
-        compressedCellCount = 1;
-
-        DebugLog::getStream() << "[SPRING_COMPRESS_START] Player entered spring at ("
-                              << playerX << "," << playerY << ") moving "
-                              << static_cast<int>(playerMoveDir) << std::endl;
+    // For first link: always allow if direction matches
+    if (linkIndex == 0)
+    {
+        DebugLog::getStream() << "[SPRING_CAN_COMPRESS] SUCCESS: First link, direction matches" << std::endl;
         return true;
     }
 
-    // Already compressing - check if player moved to new cell
-    if (playerX == playerLastPosition.x && playerY == playerLastPosition.y) {
-        return true;  // Same cell, no change
+    // For subsequent links: all previous links must be compressed
+    for (int i = 0; i < linkIndex; i++)
+    {
+        if (!links[i]->isCollapsed())
+        {
+            DebugLog::getStream() << "[SPRING_CAN_COMPRESS] FAIL: Link " << i
+                                  << " not compressed (gap in sequence)" << std::endl;
+            return false;  // Gap in compression sequence
+        }
     }
 
-    // Collapse current cell if not already collapsed
-    if (!currentCell->collapsed) {
-        currentCell->collapsed = true;
-        compressedCellCount++;
-        playerLastPosition = Point(playerX, playerY);
-
-        DebugLog::getStream() << "[SPRING_COMPRESS] Cell collapsed at ("
-                              << playerX << "," << playerY << ") | Total: "
-                              << compressedCellCount << "/" << cells.size() << std::endl;
+    // Link itself must not already be collapsed
+    if (links[linkIndex]->isCollapsed())
+    {
+        DebugLog::getStream() << "[SPRING_CAN_COMPRESS] FAIL: Link " << linkIndex
+                              << " already collapsed" << std::endl;
+        return false;
     }
 
+    DebugLog::getStream() << "[SPRING_CAN_COMPRESS] SUCCESS: All checks passed" << std::endl;
     return true;
+}
+
+//////////////////////////////////////////    compressLink          //////////////////////////////////////////
+
+void Spring::compressLink(int linkIndex, Room* room)
+{
+    if (linkIndex < 0 || linkIndex >= static_cast<int>(links.size()))
+        return;
+
+    links[linkIndex]->collapse(room);
+    compressedCount++;
+
+    DebugLog::getStream() << "[SPRING_COMPRESS] Link " << linkIndex
+                          << " compressed | Total: " << compressedCount
+                          << "/" << links.size() << std::endl;
 }
 
 //////////////////////////////////////////  isFullyCompressed       //////////////////////////////////////////
 
 bool Spring::isFullyCompressed() const
 {
-    return compressedCellCount == static_cast<int>(cells.size());
+    return compressedCount >= static_cast<int>(links.size());
 }
 
-//////////////////////////////////////////  calculateLaunch         //////////////////////////////////////////
+//////////////////////////////////////////   calculateLaunch        //////////////////////////////////////////
 
 Spring::LaunchData Spring::calculateLaunch() const
 {
-    LaunchData result;
-    result.shouldLaunch = false;
-    result.velocityX = 0;
-    result.velocityY = 0;
-    result.frames = 0;
+    LaunchData launch;
+    launch.shouldLaunch = (compressedCount > 0);
+    launch.frames = compressedCount;
 
-    if (compressedCellCount == 0) {
-        return result;
-    }
-
-    result.shouldLaunch = true;
-    result.frames = compressedCellCount;  // Duration = compression level
-
-    // Launch away from wall (opposite of compressionDir)
-    switch (compressionDir) {
-        case Direction::RIGHT:
-            result.velocityX = -compressedCellCount;  // Launch LEFT
-            break;
-        case Direction::LEFT:
-            result.velocityX = compressedCellCount;   // Launch RIGHT
+    // Launch OPPOSITE of compression direction
+    switch (compressionDir)
+    {
+        case Direction::UP:
+            launch.velocityX = 0;
+            launch.velocityY = 1;  // Launch DOWN
             break;
         case Direction::DOWN:
-            result.velocityY = -compressedCellCount;  // Launch UP
+            launch.velocityX = 0;
+            launch.velocityY = -1;  // Launch UP
             break;
-        case Direction::UP:
-            result.velocityY = compressedCellCount;   // Launch DOWN
+        case Direction::LEFT:
+            launch.velocityX = 1;  // Launch RIGHT
+            launch.velocityY = 0;
+            break;
+        case Direction::RIGHT:
+            launch.velocityX = -1;  // Launch LEFT
+            launch.velocityY = 0;
             break;
         default:
-            result.shouldLaunch = false;
+            launch.shouldLaunch = false;
+            launch.velocityX = 0;
+            launch.velocityY = 0;
+            break;
     }
 
-    return result;
+    DebugLog::getStream() << "[SPRING_CALC_LAUNCH] Velocity:(" << launch.velocityX
+                          << "," << launch.velocityY << ") Frames:" << launch.frames << std::endl;
+
+    return launch;
 }
 
 //////////////////////////////////////////  resetCompression        //////////////////////////////////////////
 
-void Spring::resetCompression()
+void Spring::resetCompression(Room* room)
 {
-    if (compressedCellCount > 0) {
-        DebugLog::getStream() << "[SPRING_RESET] Resetting spring compression from "
-                              << compressedCellCount << " cells" << std::endl;
+    for (SpringLink* link : links)
+    {
+        link->reset(room);
     }
+    compressedCount = 0;
 
-    compressedCellCount = 0;
-    isPlayerCompressing = false;
-    playerLastPosition = Point(-1, -1);
-
-    for (SpringCell& cell : cells) {
-        cell.collapsed = false;
-    }
+    DebugLog::getStream() << "[SPRING_RESET] Spring reset - all links restored" << std::endl;
 }
-
-//////////////////////////////////////////   updateVisuals          //////////////////////////////////////////
-
-void Spring::updateVisuals(Room* room)
-{
-    if (room == nullptr) return;
-
-    for (const SpringCell& cell : cells) {
-        char displayChar = cell.collapsed ? '~' : '#';
-        room->setCharAt(cell.pos.x, cell.pos.y, displayChar);
-        gotoxy(cell.pos.x, cell.pos.y);
-        std::cout << displayChar << std::flush;
-    }
-}
-
