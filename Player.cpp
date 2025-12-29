@@ -324,22 +324,34 @@ void Player::performAction(Action action, Room* room)
     // Check if currently launched
     if (launchFramesRemaining > 0)
     {
+        DebugLog::getStream() << "[PLAYER_PERFORM_ACTION] Player " << playerId
+                              << " is launched (frames:" << launchFramesRemaining
+                              << " vel:" << pos.diff_x << "," << pos.diff_y
+                              << ") | Action: " << static_cast<int>(action) << std::endl;
+
         Direction inputDir = actionToDirection(action);
 
         // Block invalid inputs (opposite direction or STAY)
         if (!canApplyInputDuringLaunch(inputDir))
+        {
+            DebugLog::getStream() << "[PLAYER_PERFORM_ACTION] Input blocked during launch" << std::endl;
             return;  // Ignore this input
+        }
 
         // Allow perpendicular movement
         Direction launchDir = getLaunchDirection();
         if (isPerpendicularToLaunch(inputDir, launchDir))
         {
+            DebugLog::getStream() << "[PLAYER_PERFORM_ACTION] Applying perpendicular velocity" << std::endl;
             applyPerpendicularVelocity(inputDir);
         }
         return;
     }
 
     // Normal movement (not launched)
+    DebugLog::getStream() << "[PLAYER_PERFORM_ACTION] Player " << playerId
+                          << " normal movement | Action: " << static_cast<int>(action) << std::endl;
+
     switch (action)
     {
     case Action::MOVE_UP:
