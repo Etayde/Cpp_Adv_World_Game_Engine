@@ -519,28 +519,7 @@ bool Player::checkObjectInteraction(int nextX, int nextY, Room* room, Riddle** a
     // Spring compression and launch
     if (objType == ObjectType::SPRING)
     {
-        Spring* spring = dynamic_cast<Spring*>(obj);
-        if (spring != nullptr)
-        {
-            // Check if player is compressing the spring
-            if (spring->isCompressing(*this, nextX, nextY))
-            {
-                DebugLog::getStream() << "[SPRING_HIT] Player:" << playerId
-                                      << " at " << pos.x << "," << pos.y
-                                      << " | Spring at " << spring->getPosition().x << "," << spring->getPosition().y
-                                      << " | PlayerDir: " << static_cast<int>(getCurrentDirection())
-                                      << " | ComprState: " << spring->getCompressionState() << "/" << spring->getCellCount()
-                                      << std::endl;
-
-                spring->compressCell();  // Advance compression
-
-                // Check if fully compressed → launch
-                if (fullyCompressedSpring(*spring, nextX, nextY))
-                {
-                    spring->launch(this);
-                }
-            }
-        }
+        // TODO: Implement spring interaction
         return false;  // Springs are non-blocking (allow movement through)
     }
 
@@ -583,20 +562,11 @@ bool Player::checkObjectInteraction(int nextX, int nextY, Room* room, Riddle** a
 
 bool Player::fullyCompressedSpring(const Spring& s, int checkX, int checkY) const
 {
-    Point checkPos(checkX, checkY);
-    bool posMatch = (checkPos == s.getAnchorPosition());
-    bool isCompr = s.isCompressed();
-    bool result = posMatch && isCompr;
-
-    DebugLog::getStream() << "[SPRING_FULL_CHECK] Player:" << playerId
-                          << " at " << checkX << "," << checkY
-                          << " | Anchor: " << s.getAnchorPosition().x << "," << s.getAnchorPosition().y
-                          << " | PosMatch: " << (posMatch ? "YES" : "NO")
-                          << " | Compressed: " << (isCompr ? "YES" : "NO")
-                          << " | Result: " << (result ? "LAUNCH" : "NO_LAUNCH")
-                          << std::endl;
-
-    return result;
+    // TODO: Implement spring compression check
+    (void)s;
+    (void)checkX;
+    (void)checkY;
+    return false;
 }
 
 //////////////////////////////////////////   getLaunchDirection   //////////////////////////////////////////

@@ -309,17 +309,11 @@ const GameObject *Room::getObjectAt(int x, int y) const
                 const Spring* spring = dynamic_cast<const Spring*>(obj);
                 if (spring != nullptr)
                 {
-                    // Check if (x,y) is on any spring cell
-                    for (int i = 0; i < spring->getCellCount(); i++)
+                    // TODO: Implement spring cell checking
+                    // For now, just check if it's at the spring's base position
+                    if (spring->getPosition().x == x && spring->getPosition().y == y)
                     {
-                        Point cellPos = spring->getCellPosition(i);
-                        if (cellPos.x == x && cellPos.y == y)
-                        {
-                            DebugLog::getStream() << "[GETOBJECT_SPRING] Found spring at (" << x << "," << y
-                                                  << ") | CellIndex: " << i
-                                                  << std::endl;
-                            return obj;
-                        }
+                        return obj;
                     }
                 }
             }
