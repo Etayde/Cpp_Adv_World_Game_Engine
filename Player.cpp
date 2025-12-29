@@ -401,18 +401,6 @@ void Player::performAction(Action action, Room* room)
                               << " vel:" << pos.diff_x << "," << pos.diff_y
                               << ") | Action: " << static_cast<int>(action) << std::endl;
 
-        if (launchFramesRemaining == 1)
-        {
-            // Last frame of launch - stop movement
-            DebugLog::getStream() << "[PLAYER_PERFORM_ACTION] Player " << playerId
-                                  << " final launch frame - stopping" << std::endl;
-            pos.diff_x = 0;
-            pos.diff_y = 0;
-            launchFramesRemaining = 0;
-            launchDir = Direction::STAY;
-            return;
-        }
-
         Direction inputDir = actionToDirection(action);
 
         // Block invalid inputs (opposite direction or STAY)
@@ -690,6 +678,7 @@ bool Player::handleSpringInteraction(SpringLink* link, Room* room)
         pos.diff_x = result.velocityX;
         pos.diff_y = result.velocityY;
         launchFramesRemaining = result.launchFrames;
+        launchDir = result.launchDirection;
     }
 
     return false;  // SpringLinks are non-blocking
