@@ -966,8 +966,24 @@ bool Player::predictCollisionAlongTrajectoryNEW(Room* room, int& stopX, int& sto
                 GameObject* obj = room->getObjectAt(checkX, checkY);
                 if (obj != nullptr && obj->isActive())
                 {
-                    // Detect any object EXCEPT doors (players can move through doors)
-                    if (obj->getType() != ObjectType::DOOR)
+                    ObjectType objType = obj->getType();
+
+                    // Doors: players can move through doors for room transitions
+                    if (objType == ObjectType::DOOR)
+                    {
+                        // Skip doors - don't detect as collision
+                    }
+                    // SpringLinks: only detect if NOT collapsed (collapsed springs are passable)
+                    else if (objType == ObjectType::SPRING_LINK)
+                    {
+                        SpringLink* link = dynamic_cast<SpringLink*>(obj);
+                        if (link != nullptr && !link->isCollapsed())
+                        {
+                            return true;  // Uncollapsed spring link detected
+                        }
+                    }
+                    // All other objects: detect them
+                    else
                     {
                         return true;  // Object detected
                     }
