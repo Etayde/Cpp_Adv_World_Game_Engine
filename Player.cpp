@@ -757,12 +757,12 @@ bool Player::canApplyInputDuringLaunch(Direction inputDir) const
 {
     // Always block STAY command during launch
     if (inputDir == Direction::STAY)
-        DebugLog::getStream() << "[DIRECTION_HANDLE] STAY"  << std::endl;
+        DebugLog::getStream() << "PAPI"  << std::endl;
         return false;
 
     // Get opposite direction of launch
     Direction oppositeDir;
-    DebugLog::getStream() << "[DIRECTION_HANDLE] oppositeDir = " << static_cast<int>(oppositeDir) << std::endl;
+    DebugLog::getStream() << "[DIRECTION_HANDLE_PAPI2] oppositeDir = " << static_cast<int>(oppositeDir) << std::endl;
 
     switch (launchDir)
     {
@@ -775,17 +775,17 @@ bool Player::canApplyInputDuringLaunch(Direction inputDir) const
 
     // Block if input is opposite to launch direction
     if (inputDir == oppositeDir)
-    DebugLog::getStream() << "[DIRECTION_HANDLE] inputDir = oppositeDir"  << std::endl;
+    DebugLog::getStream() << "[DIRECTION_HANDLE_PAPI3] inputDir = oppositeDir"  << std::endl;
 
         return false;
 
     // Block if input is same as launch direction (redundant)
     if (inputDir == launchDir)
-    DebugLog::getStream() << "[DIRECTION_HANDLE] inputDir = launchDir"  << std::endl;
+    DebugLog::getStream() << "[DIRECTION_HANDLE_PAPI4] inputDir = launchDir"  << std::endl;
         return false;
 
     // Allow perpendicular directions
-    DebugLog::getStream() << "[DIRECTION_HANDLE] perp movement approved!"  << std::endl;
+    DebugLog::getStream() << "[DIRECTION_HANDLE_PAPI5] perp movement approved!"  << std::endl;
 
     return true;
 }
