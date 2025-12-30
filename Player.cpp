@@ -954,10 +954,24 @@ bool Player::predictCollisionAlongTrajectoryNEW(Room* room, int& stopX, int& sto
                 return true;  // Collision detected
             }
 
-            // Check for wall/object collision
+            // Check for wall/blocking object collision
             if (isCellBlocking(checkX, checkY, room))
             {
                 return true;  // Collision detected
+            }
+
+            // FIX BUG 2: Check for ANY object (not just blocking ones)
+            if (room != nullptr)
+            {
+                GameObject* obj = room->getObjectAt(checkX, checkY);
+                if (obj != nullptr && obj->isActive())
+                {
+                    // Detect any object EXCEPT doors (players can move through doors)
+                    if (obj->getType() != ObjectType::DOOR)
+                    {
+                        return true;  // Object detected
+                    }
+                }
             }
 
             // Update last safe position
@@ -978,6 +992,9 @@ bool Player::handleLaunchCollisionPredictionNEW(Room* room, Player* otherPlayer,
     if (predictCollisionAlongTrajectoryNEW(room, stopX, stopY, otherPlayer, activeRiddle, activePlayer))
     {
         bool otherPlayerAlive = (otherPlayer != nullptr && otherPlayer->isAlive());
+
+        // FIX BUG 1: Erase player from current position BEFORE updating to collision stop position
+        erase(room);
 
         // Check if collision was with other player along the path
         // Calculate what the next position would have been
