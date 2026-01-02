@@ -50,6 +50,17 @@ public:
                    const Point& anchor,
                    Direction projectionDir);
 
+
+    // Player interaction - encapsulates compression and launch logic
+    InteractionResult handlePlayerInteraction(SpringLink* link, Player* player, Room* room);
+
+    // Getters
+    Direction getCompressionDir() const { return compressionDir; }
+
+private:
+
+    void sortSpringLinks();
+
     // Compression validation
     bool canCompressLink(int linkIndex, Direction playerDir) const;
 
@@ -67,10 +78,7 @@ public:
     Momentum calculateLaunchMomentum() const;
     void resetCompression(Room* room);
 
-    // Player interaction - encapsulates compression and launch logic
-    InteractionResult handlePlayerInteraction(SpringLink* link, Player* player, Room* room);
-
     // Getters
-    Direction getCompressionDir() const { return compressionDir; }
+    SpringLink* getPrevLink(const SpringLink* current) const;
 
 };

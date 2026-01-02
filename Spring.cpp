@@ -28,6 +28,7 @@ void Spring::initialize(const std::vector<SpringLink*>& springLinks,
     anchorPosition = anchor;
     compressionDir = projectionDir;
     compressedCount = 0;
+    sortSpringLinks();
 
     DebugLog::getStream() << "[SPRING_INIT] Spring with " << links.size()
                           << " links | Anchor:(" << anchor.x << "," << anchor.y << ")"
@@ -236,7 +237,8 @@ Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink* link, Play
 
     DebugLog::getStream() << "[PLAYER_SPRING] Compression valid - compressing link" << std::endl;
 
-    bool stayPressed = playerSTAYcheck(*player, *link);
+    SpringLink* prevLink = getPrevLink(link);
+    bool stayPressed = playerSTAYcheck(*player, *prevLink);
 
     // Compress this link
     compressLink(link->getLinkIndex(), room);
@@ -286,10 +288,38 @@ Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink* link, Play
 
 
 bool Spring::playerSTAYcheck(Player& p, SpringLink& link) const{
+
     if (p.getX() == link.getX() && p.getY() == link.getY() 
         && (!link.isCollapsed())
         && p.getCurrentDirection() == Direction::STAY){
         return true;
     }
     return false;
+}
+
+void Spring::sortSpringLinks(){
+    // Sort links based on their position relative to the anchor and compression direction
+    std::sort(links.begin(), links.end(), [this](SpringLink* a, SpringLink* b) {
+        switch (compressionDir)
+        {
+            case Direction::UP:
+                return a->getY() > b->getY(); // Higher Y first
+            case Direction::DOWN:
+                return a->getY() < b->getY(); // Lower Y first
+            case Direction::LEFT:
+                return a->getX() > b->getX(); // Higher X first
+            case Direction::RIGHT:
+                return a->getX() < b->getX(); // Lower X first
+            default:
+                return false;
+        }
+    });
+}
+
+SpringLink* Spring::getPrevLink(const SpringLink* current) const{
+    if (current == nullptr)
+        return nullptr;
+    
+    int curr = current->getLinkIndex();
+    return curr > 0 ? links[curr - 1] : nullptr;
 }
