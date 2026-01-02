@@ -3,6 +3,7 @@
 #include "Room.h"
 #include "Player.h"
 #include "DebugLog.h"
+#include <algorithm>
 
 //////////////////////////////////////////      Constructor          //////////////////////////////////////////
 
