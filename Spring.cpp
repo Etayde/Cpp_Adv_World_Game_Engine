@@ -238,9 +238,6 @@ Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink* link, Play
 
     DebugLog::getStream() << "[PLAYER_SPRING] Compression valid - compressing link" << std::endl;
 
-    SpringLink* prevLink = getPrevLink(link);
-    bool stayPressed = playerSTAYcheck(*player, *prevLink);
-
     // Compress this link
     compressLink(link->getLinkIndex(), room);
 
@@ -250,7 +247,7 @@ Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink* link, Play
 
     // Check if should launch
     bool fullyCompressed = isFullyCompressed();
-    
+    bool stayPressed = moveDir == Direction::STAY;
 
     DebugLog::getStream() << "[PLAYER_SPRING] Launch check - FullyCompressed: "
                           << (fullyCompressed ? "YES" : "NO")
