@@ -74,7 +74,7 @@ enum class ObjectType
     BREAKABLE_WALL = 'w',
     SPRING = '#',
     SPRING_LINK = '#',  // Individual spring link (same sprite as SPRING)
-    OBSTACLE = '*',
+    OBSTACLE_BLOCK = '*',
     TORCH = '!',
     BOMB = '@',
     KEY = 'K',

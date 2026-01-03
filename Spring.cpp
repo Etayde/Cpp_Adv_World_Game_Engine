@@ -52,7 +52,7 @@ bool Spring::canCompressLink(int linkIndex, Direction playerDir) const
     }
 
     // Must move in compression direction (or STAY for launch trigger)
-    if (playerDir != compressionDir && playerDir != Direction::STAY)
+    if (playerDir != compressionDir)
     {
         DebugLog::getStream() << "[SPRING_CAN_COMPRESS] FAIL: Wrong direction - player: "
                               << static_cast<int>(playerDir) << " vs compression: "
@@ -231,8 +231,25 @@ Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink* link, Play
     // Check if compression is valid
     if (!canCompressLink(link->getLinkIndex(), moveDir))
     {
-        DebugLog::getStream() << "[PLAYER_SPRING] Compression not valid - passing through" << std::endl;
-        return {false, false, Momentum() };
+        if (isCompressed()) 
+        {
+            DebugLog::getStream() << "[PLAYER_SPRING] Launch triggered!" << std::endl;
+            
+            Momentum launch = calculateLaunchMomentum();
+
+            DebugLog::getStream() << "[SPRING_LAUNCH] Player " << player->getId()
+                          << " launched: vel(" << launch.getDX()
+                          << "," << launch.getDY()
+                          << ") frames:" << launch.getLaunchFramesRemaining() << std::endl;
+
+            resetCompression(room);
+            return {false, true, launch };
+        } 
+        else
+        {
+            DebugLog::getStream() << "[PLAYER_SPRING] Compression not valid - passing through" << std::endl;
+            return {false, false, Momentum() };
+        }
     }
 
     DebugLog::getStream() << "[PLAYER_SPRING] Compression valid - compressing link" << std::endl;
@@ -246,13 +263,12 @@ Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink* link, Play
 
     // Check if should launch
     bool fullyCompressed = isFullyCompressed();
-    bool stayPressed = moveDir == Direction::STAY;
 
     DebugLog::getStream() << "[PLAYER_SPRING] Launch check - FullyCompressed: "
                           << (fullyCompressed ? "YES" : "NO")
-                          << " | STAY pressed: " << (stayPressed ? "YES" : "NO") << std::endl;
+                          << " | Player changed direction: " << (moveDir == compressionDir ? "NO" : "YES") << std::endl;
 
-    if (!fullyCompressed && !stayPressed)
+    if (!fullyCompressed && moveDir == compressionDir)
     {
         // Compressed but not ready to launch
         return {true, false, Momentum()};
@@ -302,3 +318,4 @@ SpringLink* Spring::getPrevLink(const SpringLink* current) const{
     int curr = current->getLinkIndex();
     return curr > 0 ? links[curr - 1] : nullptr;
 }
+

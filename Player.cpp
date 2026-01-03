@@ -9,6 +9,7 @@
 #include "SpringLink.h"
 #include "Riddle.h"
 #include "DebugLog.h"
+#include "Obstacle.h"
 #include <vector>
 
 //////////////////////////////////////////     Player Constructors     //////////////////////////////////////////
@@ -412,6 +413,11 @@ bool Player::useKey()
 
 Direction Player::getCurrentDirection() const
 {
+    if (springMomentum.isActive())
+    {
+        return springMomentum.getLaunchDir();
+    }
+
     if (pos.diff_x == 0 && pos.diff_y == 0)
         return Direction::STAY;
     if (pos.diff_y < 0)
@@ -506,6 +512,13 @@ bool Player::checkObjectInteraction(int nextX, int nextY, Room* room, Riddle** a
             if (door != nullptr)
                 handleDoorInteraction(door);
             return false;  // Doors don't block movement
+        }
+        
+        case ObjectType::OBSTACLE_BLOCK:
+        {
+            ObstacleBlock* obstacle = dynamic_cast<ObstacleBlock*>(obj);
+            if (obstacle != nullptr)
+                return handleObstacleInteraction(block, room); // Blocks movement
         }
 
         default:
@@ -884,4 +897,33 @@ void Player::transferMomentumTo(Player* otherPlayer)
     // Also transfer current velocity for consistency
     otherPlayer->pos.diff_x = pos.diff_x;
     otherPlayer->pos.diff_y = pos.diff_y;
+}
+
+////////////////////////////////////////////   handleObstacleInteraction   //////////////////////////////////////////
+bool Player::handleObstacleInteraction(class ObstacleBlock* block, Room* room)
+{
+    Obstacle* obstacle = block->getParent();
+    if (obstacle == nullptr)
+        return false;
+    
+    int dx, dy;
+    if (springMomentum.isActive())
+    {
+        dx = abs(springMomentum.getDX());
+        dy = abs(springMomentum.getDY());
+    }
+    else
+    {
+        dx = abs(pos.diff_x);
+        dy = abs(pos.diff_y);
+    }
+
+    int force = dx > dy ? dx : dy;
+
+    Direction pushDir = getCurrentDirection();
+
+    bool obstacleMoved = obstacle->move(pushDir, room);
+
+    return (!obstacleMoved);
+
 }

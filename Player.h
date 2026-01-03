@@ -150,6 +150,7 @@ private:
     bool handleSpringInteraction(class SpringLink* link, Room* room);
     bool handlePickableInteraction(GameObject* obj, int nextX, int nextY, Room* room);
     void handleDoorInteraction(class Door* door);
+    bool handleObstacleInteraction(class ObstacleBlock* block, Room* room);
 
     // Launch control helpers
     bool canApplyInputDuringLaunch(Direction inputDir) const;

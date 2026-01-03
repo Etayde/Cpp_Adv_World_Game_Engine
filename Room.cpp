@@ -9,6 +9,7 @@
 #include "Bomb.h"
 #include "Spring.h"
 #include "SpringLink.h"
+#include "Obstacle.h"
 #include "DebugLog.h"
 #include <cmath>
 #include <algorithm>
@@ -674,82 +675,6 @@ ExplosionResult Room::updateAllObjects(Player *p1, Player *p2)
     return totalResult;
 }
 
-//////////////////////////////////////////      addSpring        //////////////////////////////////////////
-
-void Room::addSpring(const std::vector<Point>& positions, int expectedLength)
-{
-    // Step 1: Validate input
-    if (positions.empty() || static_cast<int>(positions.size()) != expectedLength)
-    {
-        return; // Invalid input
-    }
-
-    // Step 2: Check if positions are consecutive
-    Direction orientation = detectOrientation(positions);
-    if (orientation == Direction::STAY)
-    {
-        return; // Not consecutive in a line
-    }
-
-    // Step 3: Sort positions based on orientation
-    std::vector<Point> sorted = sortPositions(positions, orientation);
-    if (sorted.empty())
-    {
-        return; // Failed to sort (not consecutive)
-    }
-
-    // Step 4: Verify wall adjacency and determine projection
-    WallCheckResult wallCheck = checkWallAdjacency(sorted, orientation);
-    if (!wallCheck.valid)
-    {
-        return; // No wall found at either end
-    }
-
-    // Step 5: Ensure sorted array has START cell first, ANCHOR cell last
-    bool anchorIsFirst = (wallCheck.anchorPosition == sorted[0]);
-    if (anchorIsFirst)
-    {
-        std::reverse(sorted.begin(), sorted.end());
-    }
-
-    // Step 6: Create Spring manager and SpringLinks
-    Spring* spring = new Spring();
-    std::vector<SpringLink*> springLinks;
-
-    bool addFailed = false;
-    for (size_t i = 0; i < sorted.size(); i++)
-    {
-        SpringLink* link = new SpringLink(sorted[i], spring, static_cast<int>(i));
-        springLinks.push_back(link);
-
-        // Add to objects vector
-        if (!addObject(link))
-        {
-            delete link;
-            addFailed = true;
-            break;
-        }
-
-        // Update room's character map to show spring char
-        if (baseLayout->getCharAt(sorted[i].x, sorted[i].y) != '#')
-        {
-            setCharAt(sorted[i].x, sorted[i].y, '#');
-        }
-    }
-
-    // If all links added successfully, initialize spring and add to springs vector
-    if (!addFailed)
-    {
-        spring->initialize(springLinks, wallCheck.anchorPosition, wallCheck.projectionDirection);
-        springs.push_back(spring);
-    }
-    else
-    {
-        // Cleanup on failure
-        delete spring;
-    }
-}
-
 Direction Room::detectOrientation(const std::vector<Point>& positions)
 {
     if (positions.size() < 2)
@@ -1001,5 +926,183 @@ void Room::scanAndCreateSprings()
                 }
             }
         }
+    }
+}
+
+///////////////////////////////////////////     createMultiCellObject   //////////////////////////////////////////
+
+void Room::createMultiCellObject(char ch)
+{
+    if (baseLayout == nullptr)
+        return;
+
+    // Step 1: Collect all '#' positions
+    std::vector<Point> allObjCells;
+    for (int y = 0; y < MAX_Y_INGAME; y++)
+    {
+        for (int x = 0; x < MAX_X; x++)
+        {
+            if (baseLayout->getCharAt(x, y) == ch)
+            {
+                allObjCells.push_back(Point(x, y));
+            }
+        }
+    }
+
+    // Step 2: Group adjacent cells into springs
+    bool processed[MAX_Y_INGAME][MAX_X] = {false};
+
+    for (const Point& p : allObjCells)
+    {
+        if (processed[p.y][p.x])
+            continue;
+
+        // Start new spring group
+        std::vector<Point> group;
+        group.push_back(p);
+        processed[p.y][p.x] = true;
+
+        // Collect all adjacent cells (horizontal or vertical)
+        for (size_t i = 0; i < group.size(); i++)
+        {
+            int x = group[i].x;
+            int y = group[i].y;
+
+            // Check 4 neighbors
+            Point neighbors[] = {
+                Point(x + 1, y), Point(x - 1, y),
+                Point(x, y + 1), Point(x, y - 1)
+            };
+
+            for (const Point& neighbor : neighbors)
+            {
+                if (neighbor.x >= 0 && neighbor.x < MAX_X &&
+                    neighbor.y >= 0 && neighbor.y < MAX_Y_INGAME &&
+                    !processed[neighbor.y][neighbor.x] &&
+                    baseLayout->getCharAt(neighbor.x, neighbor.y) == ch)
+                {
+                    group.push_back(neighbor);
+                    processed[neighbor.y][neighbor.x] = true;
+                }
+            }
+        }
+        // Step 3: Process the collected group based on character type
+        switch (ch)
+        {
+            case '#':
+                // Handle springs separately
+                createSpringFromGroup(group);
+                break;
+            case '*':
+                createObstacleFromGroup(group);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+///////////////////////////////////////////    createSpringFromGroup   //////////////////////////////////////////
+
+void Room::createSpringFromGroup(const std::vector<Point>& group)
+{   
+    if (group.size() > 1)
+    {
+        Direction orientation = detectOrientation(group);
+        if (orientation != Direction::STAY)
+        {
+            std::vector<Point> sorted = sortPositions(group, orientation);
+            if (!sorted.empty())
+            {
+                WallCheckResult wallCheck = checkWallAdjacency(sorted, orientation);
+                if (wallCheck.valid)
+                {
+                    // Ensure sorted array has START cell first, ANCHOR cell last
+                    // If anchor is at the beginning (sorted[0]), reverse the array
+                    bool anchorIsFirst = (wallCheck.anchorPosition == sorted[0]);
+
+                    DebugLog::getStream() << "[ROOM_SPRING_SCAN] Found spring group with " << sorted.size()
+                                            << " cells | Orientation: " << static_cast<int>(orientation)
+                                            << " | Anchor at: (" << wallCheck.anchorPosition.x << "," << wallCheck.anchorPosition.y << ")"
+                                            << " | Projection dir: " << static_cast<int>(wallCheck.projectionDirection) << std::endl;
+
+                    if (anchorIsFirst)
+                    {
+                        DebugLog::getStream() << "[ROOM_SPRING_SCAN] Reversing array (anchor was first)" << std::endl;
+                        std::reverse(sorted.begin(), sorted.end());
+                    }
+
+                    DebugLog::getStream() << "[ROOM_SPRING_SCAN] Start cell: (" << sorted[0].x << "," << sorted[0].y << ")"
+                                            << " | End cell: (" << sorted[sorted.size()-1].x << "," << sorted[sorted.size()-1].y << ")" << std::endl;
+
+                    // Create Spring manager
+                    Spring* spring = new Spring();
+                    std::vector<SpringLink*> springLinks;
+
+                    // Create SpringLink for each cell
+                    bool addFailed = false;
+                    for (size_t i = 0; i < sorted.size(); i++)
+                    {
+                        SpringLink* link = new SpringLink(sorted[i], spring, static_cast<int>(i));
+                        springLinks.push_back(link);
+
+                        // Add to objects vector
+                        if (!addObject(link))
+                        {
+                            DebugLog::getStream() << "[ROOM_SPRING_SCAN] ERROR: Failed to add SpringLink at index " << i << std::endl;
+                            delete link;
+                            addFailed = true;
+                            break;
+                        }
+                    }
+
+                    // If all links added successfully, initialize spring and add to springs vector
+                    if (!addFailed)
+                    {
+                        spring->initialize(springLinks, wallCheck.anchorPosition, wallCheck.projectionDirection);
+                        springs.push_back(spring);
+                        DebugLog::getStream() << "[ROOM_SPRING_SCAN] Spring created successfully with " << springLinks.size() << " links" << std::endl;
+                    }
+                    else
+                    {
+                        // Cleanup on failure
+                        delete spring;
+                        DebugLog::getStream() << "[ROOM_SPRING_SCAN] Spring creation failed - cleaned up" << std::endl;
+                        // Links already added to objects will be cleaned up by deleteAllObjects()
+                    }
+                }
+            }
+        }
+    }
+}
+
+//////////////////////////////////////////   createObstacleFromGroup  //////////////////////////////////////////
+
+void Room::createObstacleFromGroup(const std::vector<Point>& group)
+{
+    Obstacle* obstacle = new Obstacle();
+    std::vector<ObstacleBlock*> blocks;
+
+    bool addFailed = false;
+    for (const Point& pos : group)
+    {
+        ObstacleBlock* block = new ObstacleBlock(pos, obstacle);
+        blocks.push_back(block);
+        if (!addObject(block))
+        {
+            delete block;
+            addFailed = true;
+            break;
+        }
+    }
+
+    if (!addFailed)
+    {
+        obstacle->initialize(blocks);
+        obstacles.push_back(obstacle);
+    }
+    else
+    {
+        delete obstacle;
     }
 }

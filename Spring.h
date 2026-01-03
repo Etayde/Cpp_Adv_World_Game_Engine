@@ -71,6 +71,7 @@ private:
     int getCompressionLevel() const { return compressedCount; }
     int getLinkCount() const { return static_cast<int>(links.size()); }
     bool playerSTAYcheck(Player& p, SpringLink& link) const;
+    bool isCompressed() const { return compressedCount > 0; }
 
     // Launch mechanics
     LaunchData calculateLaunch() const;

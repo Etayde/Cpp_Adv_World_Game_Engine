@@ -87,6 +87,7 @@ public:
     // Objects
     std::vector<GameObject*> objects;
     std::vector<Spring*> springs;  // Spring managers (not GameObjects)
+    std::vector<Obstacle*> obstacles; // Obstacles in the room
 
     // Key counter system
     int totalKeysInRoom;
@@ -119,7 +120,7 @@ public:
     void initFromLayout(const Screen *layout);
     void loadObjects();
     void setDoorRequirements(int doorId, int keys, int switches = 0);
-    void addSpring(const std::vector<Point>& positions, int expectedLength);
+
 
     // Drawing
     void draw();
@@ -180,4 +181,7 @@ private:
     std::vector<Point> sortPositions(const std::vector<Point>& positions, Direction orientation);
     WallCheckResult checkWallAdjacency(const std::vector<Point>& sorted, Direction orientation);
     void scanAndCreateSprings();
+    void createMultiCellObject(char ch);
+    void createSpringFromGroup(const std::vector<Point>& group);
+    void createObstacleFromGroup(const std::vector<Point>& group);
 };
