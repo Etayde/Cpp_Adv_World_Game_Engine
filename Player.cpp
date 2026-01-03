@@ -176,6 +176,36 @@ bool Player::move(Room *room, Riddle** activeRiddle, Player** activePlayer, Play
 
     erase(room);
 
+    // Check for direction change while on compressed spring
+    if (!springMomentum.isActive())
+    {
+        GameObject* currentObj = room->getObjectAt(pos.x, pos.y);
+        if (currentObj != nullptr && currentObj->getType() == ObjectType::SPRING_LINK)
+        {
+            SpringLink* link = static_cast<SpringLink*>(currentObj);
+            Spring* spring = link->getParentSpring();
+
+            if (spring != nullptr && spring->isCompressed())
+            {
+                Direction myDirection = getCurrentDirection();
+                Direction springDirection = spring->getCompressionDir();
+
+                // Changing direction while on compressed spring? Launch!
+                if (myDirection != springDirection)
+                {
+                    Spring::InteractionResult result = spring->handlePlayerInteraction(link, this, room);
+                    if (result.launched)
+                    {
+                        this->springMomentum = result.momentum;
+                        this->springMomentum.setActive(true);
+                    }
+                    draw(room);
+                    return true;  // Don't do normal movement
+                }
+            }
+        }
+    }
+
     bool success;
 
     // 4. Check if launched using springMomentum.isActive()
