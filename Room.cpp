@@ -433,11 +433,13 @@ bool Room::isBlocked(int x, int y)
         return true;
 
     GameObject *obj = getObjectAt(x, y);
-    if (obj != nullptr)
-        return obj->isBlocking();
-
-    if (c == '*')
-        return true;
+    if (obj != nullptr){
+        if (obj->isBlocking())
+            return true;
+        if (obj->isPickable())
+            return false;
+    }
+    
     return false;
 }
 
@@ -1120,8 +1122,7 @@ void Room::createObstacleFromGroup(const std::vector<Point>& group,std::unordere
 
     if (!addFailed)
     {
-        obstacle->initialize(blocks);
-        obstacle->initEdges(neighbors);
+        obstacle->initialize(blocks, neighbors);
         obstacles.push_back(obstacle);
     }
     else

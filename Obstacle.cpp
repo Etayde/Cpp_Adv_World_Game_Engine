@@ -1,8 +1,11 @@
 #include "Obstacle.h"
+#include "GameObject.h"
+#include "PickableObject.h"
 #include "Room.h"
 
 
-void Obstacle::initialize(const std::vector<ObstacleBlock*>& obstacleBlocks)
+void Obstacle::initialize(const std::vector<ObstacleBlock*>& obstacleBlocks, 
+                            std::unordered_map<Point, std::vector<Point>>& neighbors)
 {
     blocks = obstacleBlocks;
     weight = static_cast<int>(blocks.size());
@@ -10,13 +13,16 @@ void Obstacle::initialize(const std::vector<ObstacleBlock*>& obstacleBlocks)
     {
         blocks[i]->setBlockIndex(static_cast<int>(i));
     }
+    initEdges(neighbors);
 }
 
 bool Obstacle::move(Direction dir, Room* room)
 {
     // Calculate new positions for all blocks
     std::vector<Point> newPositions;
-    for (ObstacleBlock* block : blocks)
+    // std::vector<PickableObject*> PickableObjectInTheWay; 
+    
+    for (ObstacleBlock* block : edges[dir])
     {
         Point pos = block->getPosition();
         switch (dir)
@@ -46,6 +52,12 @@ bool Obstacle::move(Direction dir, Room* room)
         if (room->isBlocked(pos.x, pos.y))
         {
             return false; // Movement blocked
+        // }
+        // GameObject* obj = room->getObjectAt(newPositions[0].x, newPositions[0].y);
+        // if (obj != nullptr && obj->isPickable())
+        // {
+        //     PickableObjectInTheWay.push_back(static_cast<PickableObject*>(obj));
+        // }
         }
     }
 
@@ -58,7 +70,8 @@ bool Obstacle::move(Direction dir, Room* room)
     return true; // Movement successful
 }
 
-void ObstacleBlock::neighborsToEdgeDirections(std::unordered_map<Point, std::vector<Point>>& neighbors)
+
+std::vector<Direction> ObstacleBlock::neighborsToEdgeDirections(std::unordered_map<Point, std::vector<Point>>& neighbors)
 {
     int x = position.x;
     int y = position.y;
@@ -67,7 +80,7 @@ void ObstacleBlock::neighborsToEdgeDirections(std::unordered_map<Point, std::vec
     std::vector<Point> neighborPositions = neighbors[Point(x, y)];
 
     if (neighborPositions.empty())
-        return;
+        return {};
 
     for (const Point& np : neighborPositions)
     {
@@ -81,7 +94,20 @@ void ObstacleBlock::neighborsToEdgeDirections(std::unordered_map<Point, std::vec
             edgeDirections.push_back(Direction::RIGHT);
     }
 
-    setEdgeDirections(edgeDirections);
-
-    return;
+    return edgeDirections;
 }
+
+void Obstacle::initEdges(std::unordered_map<Point, std::vector<Point>>& neighbors)
+    {
+        for (auto& block : blocks) 
+        { 
+            if (neighbors.find(block->getPosition()) != neighbors.end()) 
+            {
+                std::vector<Direction> blockEdges = block->neighborsToEdgeDirections(neighbors);
+                for (const Direction& dir : blockEdges) 
+                {
+                    edges[dir].push_back(block);
+                }
+            }    
+        }
+    }
