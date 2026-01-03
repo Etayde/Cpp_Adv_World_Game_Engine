@@ -4,6 +4,8 @@
 
 #include "PickableObject.h"
 
+class Room;
+
 //////////////////////////////////////////           Key              //////////////////////////////////////////
 
 // A key that unlocks doors (K)
@@ -27,24 +29,20 @@ public:
 // A light source that illuminates dark areas (!)
 class Torch : public PickableObject
 {
-private:
-    int lightRadius;
-
 public:
-    static const int DEFAULT_LIGHT_RADIUS = 5;
+    static constexpr int LIGHT_RADIUS = 2;
 
-    Torch() : PickableObject(), lightRadius(DEFAULT_LIGHT_RADIUS)
+    Torch() : PickableObject()
     {
         sprite = '!';
         type = ObjectType::TORCH;
     }
 
-    Torch(const Point &pos) : PickableObject(pos, '!', ObjectType::TORCH),
-                              lightRadius(DEFAULT_LIGHT_RADIUS) {}
+    Torch(const Point &pos) : PickableObject(pos, '!', ObjectType::TORCH) {}
 
     GameObject *clone() const override { return new Torch(*this); }
     const char *getName() const override { return "Torch"; }
 
-    int getLightRadius() const { return lightRadius; }
-    void setLightRadius(int radius) { lightRadius = radius; }
+    // Apply lighting effect at player's position in the room
+    void illuminate(Room* room, int playerX, int playerY) const;
 };

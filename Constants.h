@@ -86,13 +86,7 @@ enum class ObjectType
 };
 
 // Bomb constants moved to Bomb class for better encapsulation
-
-//////////////////////////////////////////       LIGHT CONSTANTS       //////////////////////////////////////////
-
-namespace LightConfig
-{
-    constexpr int TORCH_RADIUS = 2;
-}
+// Torch constants moved to Torch class for better encapsulation
 
 //////////////////////////////////////////        ROOM LIMITS          //////////////////////////////////////////
 

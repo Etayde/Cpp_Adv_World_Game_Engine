@@ -11,6 +11,7 @@
 #include "SpringLink.h"
 #include "Obstacle.h"
 #include "DebugLog.h"
+#include "Items.h"
 #include <vector>
 #include <unordered_map>
 #include <cmath>
@@ -623,10 +624,16 @@ void Room::updateVisibility(Player *p1, Player *p2)
     }
 
     // Players with torches light up area
-    if (p1 != nullptr && p1->hasTorch() && isInDarkZone(p1->getX(), p1->getY()))
-        lightRadius(p1->getX(), p1->getY(), LightConfig::TORCH_RADIUS);
-    if (p2 != nullptr && p2->hasTorch() && isInDarkZone(p2->getX(), p2->getY()))
-        lightRadius(p2->getX(), p2->getY(), LightConfig::TORCH_RADIUS);
+    if (p1 != nullptr && p1->hasTorch())
+    {
+        Torch* torch = static_cast<Torch*>(p1->getInventory());
+        torch->illuminate(this, p1->getX(), p1->getY());
+    }
+    if (p2 != nullptr && p2->hasTorch())
+    {
+        Torch* torch = static_cast<Torch*>(p2->getInventory());
+        torch->illuminate(this, p2->getX(), p2->getY());
+    }
 }
 
 //////////////////////////////////////////        lightRadius          //////////////////////////////////////////
