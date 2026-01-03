@@ -29,7 +29,6 @@ void Spring::initialize(const std::vector<SpringLink*>& springLinks,
     anchorPosition = anchor;
     compressionDir = projectionDir;
     compressedCount = 0;
-    sortSpringLinks();
 
     DebugLog::getStream() << "[SPRING_INIT] Spring with " << links.size()
                           << " links | Anchor:(" << anchor.x << "," << anchor.y << ")"
@@ -295,24 +294,6 @@ bool Spring::playerSTAYcheck(Player& p, SpringLink& link) const{
     return false;
 }
 
-void Spring::sortSpringLinks(){
-    // Sort links based on their position relative to the anchor and compression direction
-    std::sort(links.begin(), links.end(), [this](SpringLink* a, SpringLink* b) {
-        switch (compressionDir)
-        {
-            case Direction::UP:
-                return a->getY() > b->getY(); // Higher Y first
-            case Direction::DOWN:
-                return a->getY() < b->getY(); // Lower Y first
-            case Direction::LEFT:
-                return a->getX() > b->getX(); // Higher X first
-            case Direction::RIGHT:
-                return a->getX() < b->getX(); // Lower X first
-            default:
-                return false;
-        }
-    });
-}
 
 SpringLink* Spring::getPrevLink(const SpringLink* current) const{
     if (current == nullptr)

@@ -34,7 +34,6 @@ private:
     int fuseTimer;
     int blinkCounter;
     Room *currentRoom; // Reference to room for explosion processing
-    ExplosionResult *lastExplosion; // Pointer to avoid incomplete type issues
 
     // Constants
     static const int FUSE_TIME = 50;
@@ -42,12 +41,12 @@ private:
     static const int BLINK_RATE = 10;
 
     // Private methods
-    void explode(Player *p1, Player *p2);
+    ExplosionResult explode(Player *p1, Player *p2);
 
 public:
     // Constructors
     Bomb() : PickableObject(), state(BombState::PLACED), fuseTimer(0),
-             blinkCounter(0), currentRoom(nullptr), lastExplosion(nullptr)
+             blinkCounter(0), currentRoom(nullptr)
     {
         sprite = '@';
         type = ObjectType::BOMB;
@@ -55,10 +54,7 @@ public:
 
     Bomb(const Point &pos) : PickableObject(pos, '@', ObjectType::BOMB),
                              state(BombState::PLACED), fuseTimer(0),
-                             blinkCounter(0), currentRoom(nullptr), lastExplosion(nullptr) {}
-
-    // Destructor
-    ~Bomb() { delete lastExplosion; }
+                             blinkCounter(0), currentRoom(nullptr) {}
 
     // GameObject overrides
     GameObject *clone() const override { return new Bomb(*this); }
@@ -67,8 +63,7 @@ public:
     bool isPickable() const override;
 
     // Bomb-specific interface
-    void activate(Room *room);                  // Start countdown when dropped
-    void update(Player *p1, Player *p2);        // Overload to accept players
+    void activate(Room *room);                     // Start countdown when dropped
+    ExplosionResult update(Player *p1, Player *p2); // Overload to accept players and return result
     BombState getState() const { return state; }
-    ExplosionResult getExplosionResult() const;
 };

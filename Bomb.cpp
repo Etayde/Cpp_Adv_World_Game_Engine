@@ -17,33 +17,35 @@ void Bomb::activate(Room *room)
 
 //////////////////////////////////////////         update            //////////////////////////////////////////
 
-void Bomb::update(Player *p1, Player *p2)
+ExplosionResult Bomb::update(Player *p1, Player *p2)
 {
     // Only update when ticking
     if (state != BombState::TICKING)
-        return;
+        return ExplosionResult();
 
     blinkCounter++;
     fuseTimer--;
 
     if (fuseTimer <= 0)
     {
-        explode(p1, p2);
+        ExplosionResult result = explode(p1, p2);
         state = BombState::EXPLODED;
         active = false;
+        return result;
     }
+
+    return ExplosionResult();
 }
 
 //////////////////////////////////////////         explode           //////////////////////////////////////////
 
-void Bomb::explode(Player *p1, Player *p2)
+ExplosionResult Bomb::explode(Player *p1, Player *p2)
 {
     // Initialize explosion result
-    delete lastExplosion;
-    lastExplosion = new ExplosionResult();
+    ExplosionResult result;
 
     if (!currentRoom)
-        return;
+        return result;
 
     int centerX = position.x;
     int centerY = position.y;
@@ -84,16 +86,16 @@ void Bomb::explode(Player *p1, Player *p2)
 
             // Check player hits
             if (p1 && p1->getX() == x && p1->getY() == y)
-                lastExplosion->player1Hit = true;
+                result.player1Hit = true;
             if (p2 && p2->getX() == x && p2->getY() == y)
-                lastExplosion->player2Hit = true;
+                result.player2Hit = true;
 
             // Process objects using polymorphic onExplosion()
             GameObject *obj = currentRoom->getObjectAt(x, y);
             if (obj != nullptr && obj->isActive())
             {
                 if (obj->getType() == ObjectType::KEY)
-                    lastExplosion->keyDestroyed = true;
+                    result.keyDestroyed = true;
 
                 if (obj->onExplosion())
                 {
@@ -101,7 +103,7 @@ void Bomb::explode(Player *p1, Player *p2)
                     gotoxy(x, y);
                     std::cout << ' ';
                     obj->setActive(false);
-                    lastExplosion->objectsDestroyed++;
+                    result.objectsDestroyed++;
                 }
             }
             else if (c == 'w')
@@ -110,7 +112,7 @@ void Bomb::explode(Player *p1, Player *p2)
                 currentRoom->setCharAt(x, y, ' ');
                 gotoxy(x, y);
                 std::cout << ' ';
-                lastExplosion->objectsDestroyed++;
+                result.objectsDestroyed++;
             }
             else if (c != ' ' && c != 'W' && !(c >= '0' && c <= '9'))
             {
@@ -118,12 +120,13 @@ void Bomb::explode(Player *p1, Player *p2)
                 currentRoom->setCharAt(x, y, ' ');
                 gotoxy(x, y);
                 std::cout << ' ';
-                lastExplosion->objectsDestroyed++;
+                result.objectsDestroyed++;
             }
         }
     }
 
     std::cout.flush();
+    return result;
 }
 
 //////////////////////////////////////////          draw             //////////////////////////////////////////
@@ -163,13 +166,4 @@ bool Bomb::isPickable() const
     // Can only pick up bombs in PLACED state
     // Once ticking, they cannot be picked up again
     return (state == BombState::PLACED);
-}
-
-//////////////////////////////////////////   getExplosionResult      //////////////////////////////////////////
-
-ExplosionResult Bomb::getExplosionResult() const
-{
-    if (lastExplosion)
-        return *lastExplosion;
-    return ExplosionResult(); // Return empty result if no explosion yet
 }

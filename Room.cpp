@@ -644,44 +644,30 @@ bool Room::isVisible(int x, int y) const
 
 //////////////////////////////////////////     updateAllObjects       //////////////////////////////////////////
 
-void Room::updateAllObjects(Player *p1, Player *p2)
+ExplosionResult Room::updateAllObjects(Player *p1, Player *p2)
 {
+    ExplosionResult totalResult;
+
     for (GameObject *obj : objects)
     {
         if (obj && obj->isActive())
         {
             if (obj->getType() == ObjectType::BOMB)
             {
-                // Bombs need player references for explosion
+                // Bombs need player references and return explosion results
                 Bomb *bomb = static_cast<Bomb *>(obj);
-                bomb->update(p1, p2); // Calls overloaded version
+                ExplosionResult result = bomb->update(p1, p2);
+
+                // Accumulate bomb explosion results
+                totalResult.keyDestroyed |= result.keyDestroyed;
+                totalResult.player1Hit |= result.player1Hit;
+                totalResult.player2Hit |= result.player2Hit;
+                totalResult.objectsDestroyed += result.objectsDestroyed;
             }
             else
             {
                 obj->update(); // Standard update
             }
-        }
-    }
-}
-
-//////////////////////////////////////////    collectBombResults     //////////////////////////////////////////
-
-ExplosionResult Room::collectBombResults()
-{
-    ExplosionResult totalResult;
-
-    for (GameObject *obj : objects)
-    {
-        if (obj && obj->getType() == ObjectType::BOMB)
-        {
-            Bomb *bomb = static_cast<Bomb *>(obj);
-            ExplosionResult bombResult = bomb->getExplosionResult();
-
-            // Accumulate all bomb explosion results
-            totalResult.keyDestroyed |= bombResult.keyDestroyed;
-            totalResult.player1Hit |= bombResult.player1Hit;
-            totalResult.player2Hit |= bombResult.player2Hit;
-            totalResult.objectsDestroyed += bombResult.objectsDestroyed;
         }
     }
 

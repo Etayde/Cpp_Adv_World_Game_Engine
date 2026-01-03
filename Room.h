@@ -138,8 +138,7 @@ public:
     void removeObjectAt(int x, int y);
     std::vector<Door *> getDoors();
     std::vector<Switch *> getSwitches();
-    void updateAllObjects(Player *p1, Player *p2);
-    ExplosionResult collectBombResults();
+    ExplosionResult updateAllObjects(Player *p1, Player *p2);
 
     // Collision & movement
     bool isBlocked(int x, int y);

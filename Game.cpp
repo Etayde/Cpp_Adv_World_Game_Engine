@@ -270,11 +270,8 @@ void Game::update()
         return;
     }
 
-    // Update all objects (bombs explode themselves)
-    room->updateAllObjects(&player1, &player2);
-
-    // Collect explosion results from all bombs
-    ExplosionResult explosionResult = room->collectBombResults();
+    // Update all objects (bombs explode themselves and return results)
+    ExplosionResult explosionResult = room->updateAllObjects(&player1, &player2);
     if (explosionResult.player1Hit || explosionResult.player2Hit ||
         explosionResult.keyDestroyed)
     {

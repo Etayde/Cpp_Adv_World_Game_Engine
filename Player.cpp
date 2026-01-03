@@ -195,6 +195,10 @@ bool Player::move(Room *room, Riddle** activeRiddle, Player** activePlayer, Play
         return false;
     }
 
+    erase(room);
+
+    bool success;
+
     // 4. Check if launched using springMomentum.isActive()
     if (!springMomentum.isActive())
     {
@@ -202,14 +206,17 @@ bool Player::move(Room *room, Riddle** activeRiddle, Player** activePlayer, Play
         int nextX = pos.x + pos.diff_x;
         int nextY = pos.y + pos.diff_y;
 
-        erase(room);
-        bool success = singleStep(nextX, nextY, room, activeRiddle, activePlayer, otherPlayer);
-        draw(room);
-        return success;
+        success = singleStep(nextX, nextY, room, activeRiddle, activePlayer, otherPlayer);
+    }
+    else
+    {
+        // Launched multi-step movement
+        success = moveMultiStep(room, activeRiddle, activePlayer, otherPlayer);
     }
 
-    // 5. Multi-step launched movement - delegate to helper
-    return moveMultiStep(room, activeRiddle, activePlayer, otherPlayer);
+    draw(room);
+
+    return success;
 }
 
 //////////////////////////////////////////           draw               //////////////////////////////////////////
@@ -731,9 +738,9 @@ void Player::applyPerpendicularVelocity(Direction perpendicularDir)
         // Launch velocity in diff_x stays same
         // Apply perpendicular in diff_y
         if (perpendicularDir == Direction::UP)
-            pos.diff_y -= 1;
+            springMomentum.incrementDY(-1);
         else if (perpendicularDir == Direction::DOWN)
-            pos.diff_y += 1;
+            springMomentum.incrementDY(1);
     }
     // If launch is vertical (UP/DOWN)
     else if (launchDir == Direction::UP || launchDir == Direction::DOWN)
@@ -741,9 +748,9 @@ void Player::applyPerpendicularVelocity(Direction perpendicularDir)
         // Launch velocity in diff_y stays same
         // Apply perpendicular in diff_x
         if (perpendicularDir == Direction::LEFT)
-            pos.diff_x -= 1;
+            springMomentum.incrementDX(-1);
         else if (perpendicularDir == Direction::RIGHT)
-            pos.diff_x += 1;
+            springMomentum.incrementDX(1);
     }
 }
 
@@ -774,7 +781,10 @@ bool Player::moveMultiStep(Room* room, Riddle** activeRiddle, Player** activePla
     int dy = springMomentum.getDY();
 
     if (dx == 0 && dy == 0)
+    {
+        springMomentum.resetMomentum();
         return false;
+    }
 
     int targetX = pos.x + dx;
     int targetY = pos.y + dy;
@@ -789,11 +799,8 @@ bool Player::moveMultiStep(Room* room, Riddle** activeRiddle, Player** activePla
     int currentX = pos.x;
     int currentY = pos.y;
 
-    // Erase player from starting position ONCE
-    erase(room);
-
     // Traverse line from current position to target
-    while (springMomentum.getLaunchFramesRemaining() > 0)
+    while (currentX != targetX || currentY != targetY)
     {
         // Calculate next Bresenham point
         int nextX = currentX;
@@ -813,19 +820,23 @@ bool Player::moveMultiStep(Room* room, Riddle** activeRiddle, Player** activePla
         // Update current position for next iteration
         currentX = nextX;
         currentY = nextY;
+    }
 
+    if (springMomentum.getLaunchFramesRemaining() == 0)
+    {
+        // Reset momentum after launch completes
+        springMomentum.resetMomentum();
+        pos.diff_x = 0;
+        pos.diff_y = 0;
+    }
+    
+    else
+    {        
         // Decrement launch frames
         int remaining = springMomentum.getLaunchFramesRemaining() - 1;
         springMomentum.setLaunchFramesRemaining(remaining);
     }
 
-    // Reset momentum after launch completes
-    springMomentum.resetMomentum();
-    pos.diff_x = 0;
-    pos.diff_y = 0;
-
-    // Redraw room ONCE at the end (single frame for entire movement)
-    draw(room);
     return true;
 }
 

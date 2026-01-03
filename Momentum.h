@@ -36,4 +36,6 @@ public:
     void setLaunchFramesRemaining(int frames) { launchFramesRemaining = frames; }
     void setLaunchDir(Direction dir) { launchDir = dir; }
     void resetMomentum();
+    void incrementDX(int deltaX) { dx += deltaX; }
+    void incrementDY(int deltaY) { dy += deltaY; }
 }; 

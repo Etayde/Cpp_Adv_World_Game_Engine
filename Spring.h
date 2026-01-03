@@ -21,6 +21,7 @@ private:
     Point anchorPosition;
     Direction compressionDir;
     int compressedCount;
+
     Player* currCompressor;
 
 public:
@@ -58,8 +59,6 @@ public:
     Direction getCompressionDir() const { return compressionDir; }
 
 private:
-
-    void sortSpringLinks();
 
     // Compression validation
     bool canCompressLink(int linkIndex, Direction playerDir) const;
