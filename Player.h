@@ -37,6 +37,7 @@ static const PlayerKeyBinding keyBindings[] = {
     {'S', 1, Action::STAY}, 
     {'e', 1, Action::DROP_ITEM}, 
     {'E', 1, Action::DROP_ITEM},
+    {27, 1, Action::ESC},
 
     {'i', 2, Action::MOVE_UP},
     {'I', 2, Action::MOVE_UP},
@@ -49,7 +50,8 @@ static const PlayerKeyBinding keyBindings[] = {
     {'k', 2, Action::STAY},
     {'K', 2, Action::STAY},
     {'o', 2, Action::DROP_ITEM},
-    {'O', 2, Action::DROP_ITEM}};
+    {'O', 2, Action::DROP_ITEM},
+    {27, 2, Action::ESC}};
 
 static const int NUM_KEY_BINDINGS = sizeof(keyBindings) / sizeof(keyBindings[0]);
 

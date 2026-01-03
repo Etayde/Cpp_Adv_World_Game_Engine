@@ -6,6 +6,8 @@
 #include "Spring.h"
 #include "DebugLog.h"
 
+class Constants;
+
 //////////////////////////////////////////     Game Constructor       //////////////////////////////////////////
 
 Game::Game()
@@ -213,27 +215,18 @@ void Game::handleInput()
             continue;
         }
 
-        if (pressed == 27)
-        { // ESC
-            currentState = GameState::paused;
-            return;
-        }
-
         for (int i = 0; i < NUM_KEY_BINDINGS; i++)
         {
             if (keyBindings[i].key == pressed)
             {
+                if (keyBindings[i].action == Action::ESC)
+                {
+                    currentState = GameState::paused;
+                    return;
+                }
                 Player &player = (keyBindings[i].playerID == 1) ? player1 : player2;
 
-                if (keyBindings[i].action == Action::DROP_ITEM)
-                {
-                    if (getCurrentRoom())
-                        player.dropItem(getCurrentRoom()); // Unified drop handling
-                }
-                else
-                {
-                    player.performAction(keyBindings[i].action, getCurrentRoom());
-                }
+                player.performAction(keyBindings[i].action, getCurrentRoom());
                 break;
             }
         }

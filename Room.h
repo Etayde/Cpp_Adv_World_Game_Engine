@@ -136,8 +136,8 @@ public:
     bool addObject(GameObject *obj);
     void removeObject(int index);
     void removeObjectAt(int x, int y);
-    std::vector<Door *> getDoors();
-    std::vector<Switch *> getSwitches();
+    std::vector<Door*> getDoors();
+    std::vector<Switch*> getSwitches();
     ExplosionResult updateAllObjects(Player *p1, Player *p2);
 
     // Collision & movement

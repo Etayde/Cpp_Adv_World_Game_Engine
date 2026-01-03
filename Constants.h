@@ -52,7 +52,7 @@ enum class Action
     MOVE_RIGHT,
     STAY,
     DROP_ITEM,
-    ESC = 27
+    ESC
 };
 
 //////////////////////////////////////////        RIDDLE RESULTS        //////////////////////////////////////////

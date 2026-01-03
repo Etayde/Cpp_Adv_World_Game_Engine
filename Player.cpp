@@ -118,14 +118,6 @@ bool Player::canMoveToBoundaryPosition(int x, int y, Room* room) const
     return (obj != nullptr && obj->getType() == ObjectType::DOOR);
 }
 
-// Stop all movement and redraw player
-void Player::haltAndRedraw(Room* room)
-{
-    pos.diff_x = 0;
-    pos.diff_y = 0;
-    draw(room);
-}
-
 // Erase player from current position by querying room state
 void Player::erase(Room* room)
 {
@@ -160,20 +152,6 @@ void Player::logLaunchState() const
                               << " launchFrames: " << frames
                               << " | vel(" << pos.diff_x << "," << pos.diff_y << ")" << std::endl;
     }
-}
-
-// Handle all rendering and position update logic
-void Player::updatePosition(int nextX, int nextY, Room* room)
-{
-    // Erase from current position (queries room state)
-    erase(room);
-
-    // Update position
-    pos.x = nextX;
-    pos.y = nextY;
-
-    // Draw at new position
-    draw(room);
 }
 
 //////////////////////////////////////////           move             //////////////////////////////////////////
@@ -389,7 +367,8 @@ void Player::performAction(Action action, Room* room)
         pos.setDirection(Direction::STAY);
         break;
     case Action::DROP_ITEM:
-        break; // Handled by game loop
+        dropItem(room);
+        break;
     default:
         pos.setDirection(Direction::STAY);
         break;
