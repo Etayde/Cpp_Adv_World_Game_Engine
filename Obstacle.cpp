@@ -53,12 +53,37 @@ bool Obstacle::move(Direction dir, Room* room, int force)
         }
     }
 
-    // Move ALL blocks by the same offset
+    // Move ALL blocks by the same offset AND update visuals
+    for (ObstacleBlock* block : blocks)
+    {
+        Point oldPos = block->getPosition();
+        Point newPos(oldPos.x + dx, oldPos.y + dy);
+
+        // Clear old position visually
+        room->setCharAt(oldPos.x, oldPos.y, ' ');
+
+        // Update block's logical position
+        block->setPosition(newPos);
+
+        // Set new position visually
+        room->setCharAt(newPos.x, newPos.y, block->getSprite());
+    }
+
+    // Immediate rendering for instant visual feedback
     for (ObstacleBlock* block : blocks)
     {
         Point pos = block->getPosition();
-        block->setPosition(Point(pos.x + dx, pos.y + dy));
+        gotoxy(pos.x, pos.y);
+        std::cout << block->getSprite();
     }
+    // Clear old positions
+    for (int i = 0; i < static_cast<int>(blocks.size()); i++)
+    {
+        Point oldPos(blocks[i]->getX() - dx, blocks[i]->getY() - dy);
+        gotoxy(oldPos.x, oldPos.y);
+        std::cout << ' ';
+    }
+    std::cout.flush();
 
     return true; // Movement successful
 }
