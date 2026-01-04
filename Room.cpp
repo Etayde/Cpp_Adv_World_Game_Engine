@@ -125,7 +125,7 @@ void Room::copyObjectsFrom(const Room &other) {
 
   // Deep copy springs
   springs.clear();
-  std::unordered_map<Spring*, Spring*> springMap;
+  std::unordered_map<Spring *, Spring *> springMap;
 
   for (Spring *oldSpring : other.springs) {
     if (oldSpring != nullptr) {
@@ -141,7 +141,8 @@ void Room::copyObjectsFrom(const Room &other) {
       SpringLink *link = static_cast<SpringLink *>(obj);
       Spring *oldParent = link->getParentSpring();
 
-      if (oldParent != nullptr && springMap.find(oldParent) != springMap.end()) {
+      if (oldParent != nullptr &&
+          springMap.find(oldParent) != springMap.end()) {
         link->setParentSpring(springMap[oldParent]);
       }
     }
@@ -227,6 +228,8 @@ void Room::loadObjects(int *riddleCounter) {
   }
 
   // create springs and obstacles from grouped positions
+  DebugLog::getStream() << "[LOADOBJECTS] Found " << obstaclePositions.size()
+                        << " obstacle cells" << std::endl;
   createMultiCellObject(springPositions);
   createMultiCellObject(obstaclePositions);
 }
@@ -1161,6 +1164,13 @@ void Room::createSpringFromGroup(const std::vector<Point> &group) {
 void Room::createObstacleFromGroup(
     const std::vector<Point> &group,
     std::unordered_map<Point, std::vector<Point>> &neighbors) {
+  DebugLog::getStream() << "[OBSTACLE_CREATE] Creating obstacle with "
+                        << group.size() << " blocks" << std::endl;
+  for (const Point &p : group) {
+    DebugLog::getStream() << "  Block at (" << p.x << ", " << p.y << ")"
+                          << std::endl;
+  }
+
   Obstacle *obstacle = new Obstacle();
   std::vector<ObstacleBlock *> blocks;
 

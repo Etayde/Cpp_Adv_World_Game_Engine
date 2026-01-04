@@ -1,123 +1,121 @@
 
 #pragma once
-//////////////////////////////////////////      SCREEN DIMENSIONS      //////////////////////////////////////////
+//////////////////////////////////////////      SCREEN DIMENSIONS
+/////////////////////////////////////////////
 
-enum ScreenSize
-{
-    MAX_X = 80,       // Screen width
-    MAX_Y = 25,       // Total screen height
-    MAX_Y_INGAME = 21 // Playable area (bottom 4 rows for UI)
+enum ScreenSize {
+  MAX_X = 80,       // Screen width
+  MAX_Y = 25,       // Total screen height
+  MAX_Y_INGAME = 25 // Playable area (bottom 4 rows for UI)
 };
 
-//////////////////////////////////////////      ROOM CONFIGURATION     //////////////////////////////////////////
+//////////////////////////////////////////      ROOM CONFIGURATION
+/////////////////////////////////////////////
 
-enum RoomCount
-{
-    TOTAL_ROOMS = 2
+enum RoomCount { TOTAL_ROOMS = 2 };
+
+//////////////////////////////////////////         GAME STATES
+/////////////////////////////////////////////
+
+enum class GameState {
+  mainMenu,
+  instructions,
+  quit,
+  inGame,
+  paused,
+  gameOver,
+  victory
 };
 
-//////////////////////////////////////////         GAME STATES         //////////////////////////////////////////
+//////////////////////////////////////////          DIRECTIONS
+/////////////////////////////////////////////
 
-enum class GameState
-{
-    mainMenu,
-    instructions,
-    quit,
-    inGame,
-    paused,
-    gameOver,
-    victory
+enum class Direction {
+  UP,
+  DOWN,
+  LEFT,
+  RIGHT,
+  STAY,
+  HORIZONTAL, // For spring orientation (not movement direction)
+  VERTICAL    // For spring orientation (not movement direction)
 };
 
-//////////////////////////////////////////          DIRECTIONS         //////////////////////////////////////////
+//////////////////////////////////////////        PLAYER ACTIONS
+/////////////////////////////////////////////
 
-enum class Direction
-{
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    STAY,
-    HORIZONTAL,  // For spring orientation (not movement direction)
-    VERTICAL     // For spring orientation (not movement direction)
+enum class Action {
+  MOVE_UP,
+  MOVE_DOWN,
+  MOVE_LEFT,
+  MOVE_RIGHT,
+  STAY,
+  DROP_ITEM,
+  ESC
 };
 
-//////////////////////////////////////////        PLAYER ACTIONS       //////////////////////////////////////////
+//////////////////////////////////////////        RIDDLE RESULTS
+/////////////////////////////////////////////
 
-enum class Action
-{
-    MOVE_UP,
-    MOVE_DOWN,
-    MOVE_LEFT,
-    MOVE_RIGHT,
-    STAY,
-    DROP_ITEM,
-    ESC
+enum class RiddleResult {
+  SOLVED, // Correct answer - remove riddle
+  FAILED, // Wrong answer - keep riddle
+  ESCAPED // ESC pressed - pause game
 };
 
-//////////////////////////////////////////        RIDDLE RESULTS        //////////////////////////////////////////
-
-enum class RiddleResult
-{
-    SOLVED,   // Correct answer - remove riddle
-    FAILED,   // Wrong answer - keep riddle
-    ESCAPED   // ESC pressed - pause game
-};
-
-//////////////////////////////////////////        OBJECT TYPES         //////////////////////////////////////////
+//////////////////////////////////////////        OBJECT TYPES
+/////////////////////////////////////////////
 
 // Char values match sprites for easy mapping
-enum class ObjectType
-{
-    AIR = ' ',
-    WALL = 'W',
-    BREAKABLE_WALL = 'w',
-    SPRING = '#',
-    SPRING_LINK = '#',  // Individual spring link (same sprite as SPRING)
-    OBSTACLE_BLOCK = '*',
-    TORCH = '!',
-    BOMB = '@',
-    KEY = 'K',
-    SWITCH_OFF = '\\',
-    SWITCH_ON = '/',
-    RIDDLE = '?',
-    DOOR = 'D',
-    SWITCH_WALL = 'Z'
+enum class ObjectType {
+  AIR = ' ',
+  WALL = 'W',
+  BREAKABLE_WALL = 'w',
+  SPRING = '#',
+  SPRING_LINK = '#', // Individual spring link (same sprite as SPRING)
+  OBSTACLE_BLOCK = '*',
+  TORCH = '!',
+  BOMB = '@',
+  KEY = 'K',
+  SWITCH_OFF = '\\',
+  SWITCH_ON = '/',
+  RIDDLE = '?',
+  DOOR = 'D',
+  SWITCH_WALL = 'Z'
 };
 
 // Bomb constants moved to Bomb class for better encapsulation
 // Torch constants moved to Torch class for better encapsulation
 
-//////////////////////////////////////////        ROOM LIMITS          //////////////////////////////////////////
+//////////////////////////////////////////        ROOM LIMITS
+/////////////////////////////////////////////
 
-namespace RoomLimits
-{
-    constexpr int MAX_OBJECTS = 100;
-    constexpr int MAX_MODS = 100;
-    constexpr int MAX_DARK_ZONES = 10;
-}
+namespace RoomLimits {
+constexpr int MAX_OBJECTS = 100;
+constexpr int MAX_MODS = 100;
+constexpr int MAX_DARK_ZONES = 10;
+} // namespace RoomLimits
 
-//////////////////////////////////////////       DOOR DEFAULTS         //////////////////////////////////////////
+//////////////////////////////////////////       DOOR DEFAULTS
+/////////////////////////////////////////////
 
-namespace DoorConfig
-{
-    constexpr int DEFAULT_REQUIRED_KEYS = 1;
-    constexpr int DEFAULT_REQUIRED_SWITCHES = 0;
-}
+namespace DoorConfig {
+constexpr int DEFAULT_REQUIRED_KEYS = 1;
+constexpr int DEFAULT_REQUIRED_SWITCHES = 0;
+} // namespace DoorConfig
 
-//////////////////////////////////////////      PLAYER SPRITES         //////////////////////////////////////////
+//////////////////////////////////////////      PLAYER SPRITES
+/////////////////////////////////////////////
 
-namespace PlayerSprites
-{
-    constexpr char PLAYER1 = '$';
-    constexpr char PLAYER2 = '&';
-}
+namespace PlayerSprites {
+constexpr char PLAYER1 = '$';
+constexpr char PLAYER2 = '&';
+} // namespace PlayerSprites
 
-//////////////////////////////////////////       INVENTORY UI          //////////////////////////////////////////
+//////////////////////////////////////////       INVENTORY UI
+/////////////////////////////////////////////
 
-namespace InventoryUI
-{
-    constexpr int PLAYER1_X = 18;
-    constexpr int PLAYER2_X = 58;
-    constexpr int Y_POS = 23;
-}
+namespace InventoryUI {
+constexpr int PLAYER1_X = 18;
+constexpr int PLAYER2_X = 58;
+constexpr int Y_POS = 23;
+} // namespace InventoryUI

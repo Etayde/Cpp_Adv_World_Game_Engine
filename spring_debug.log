@@ -1,0 +1,86 @@
+[LOADOBJECTS] Found 2 obstacle cells
+[ROOM_SPRING_SCAN] Found spring group with 2 cells | Orientation: 6 | Anchor at: (32,16) | Projection dir: 0
+[ROOM_SPRING_SCAN] Reversing array (anchor was first)
+[ROOM_SPRING_SCAN] Start cell: (32,17) | End cell: (32,16)
+[SPRINGLINK_CREATE] Link#0 created at (32,17)
+[SPRINGLINK_CREATE] Link#1 created at (32,16)
+[SPRING_INIT] Spring with 2 links | Anchor:(32,16) | ComprDir: 0
+[ROOM_SPRING_SCAN] Spring created successfully with 2 links
+[OBSTACLE_CREATE] Creating obstacle with 2 blocks
+  Block at (32, 20)
+  Block at (32, 21)
+[LOADOBJECTS] Found 11 obstacle cells
+[ROOM_SPRING_SCAN] Found spring group with 4 cells | Orientation: 6 | Anchor at: (51,1) | Projection dir: 0
+[ROOM_SPRING_SCAN] Reversing array (anchor was first)
+[ROOM_SPRING_SCAN] Start cell: (51,4) | End cell: (51,1)
+[SPRINGLINK_CREATE] Link#0 created at (51,4)
+[SPRINGLINK_CREATE] Link#1 created at (51,3)
+[SPRINGLINK_CREATE] Link#2 created at (51,2)
+[SPRINGLINK_CREATE] Link#3 created at (51,1)
+[SPRING_INIT] Spring with 4 links | Anchor:(51,1) | ComprDir: 0
+[ROOM_SPRING_SCAN] Spring created successfully with 4 links
+[ROOM_SPRING_SCAN] Found spring group with 5 cells | Orientation: 5 | Anchor at: (78,9) | Projection dir: 3
+[ROOM_SPRING_SCAN] Start cell: (74,9) | End cell: (78,9)
+[SPRINGLINK_CREATE] Link#0 created at (74,9)
+[SPRINGLINK_CREATE] Link#1 created at (75,9)
+[SPRINGLINK_CREATE] Link#2 created at (76,9)
+[SPRINGLINK_CREATE] Link#3 created at (77,9)
+[SPRINGLINK_CREATE] Link#4 created at (78,9)
+[SPRING_INIT] Spring with 5 links | Anchor:(78,9) | ComprDir: 3
+[ROOM_SPRING_SCAN] Spring created successfully with 5 links
+[ROOM_SPRING_SCAN] Found spring group with 3 cells | Orientation: 5 | Anchor at: (1,10) | Projection dir: 2
+[ROOM_SPRING_SCAN] Reversing array (anchor was first)
+[ROOM_SPRING_SCAN] Start cell: (3,10) | End cell: (1,10)
+[SPRINGLINK_CREATE] Link#0 created at (3,10)
+[SPRINGLINK_CREATE] Link#1 created at (2,10)
+[SPRINGLINK_CREATE] Link#2 created at (1,10)
+[SPRING_INIT] Spring with 3 links | Anchor:(1,10) | ComprDir: 2
+[ROOM_SPRING_SCAN] Spring created successfully with 3 links
+[ROOM_SPRING_SCAN] Found spring group with 2 cells | Orientation: 6 | Anchor at: (62,19) | Projection dir: 1
+[ROOM_SPRING_SCAN] Start cell: (62,18) | End cell: (62,19)
+[SPRINGLINK_CREATE] Link#0 created at (62,18)
+[SPRINGLINK_CREATE] Link#1 created at (62,19)
+[SPRING_INIT] Spring with 2 links | Anchor:(62,19) | ComprDir: 1
+[ROOM_SPRING_SCAN] Spring created successfully with 2 links
+[OBSTACLE_CREATE] Creating obstacle with 2 blocks
+  Block at (12, 3)
+  Block at (13, 3)
+[OBSTACLE_CREATE] Creating obstacle with 6 blocks
+  Block at (41, 5)
+  Block at (41, 6)
+  Block at (42, 6)
+  Block at (43, 6)
+  Block at (44, 6)
+  Block at (45, 6)
+[OBSTACLE_CREATE] Creating obstacle with 3 blocks
+  Block at (14, 9)
+  Block at (14, 10)
+  Block at (13, 10)
+[LOADOBJECTS] Found 9 obstacle cells
+[ROOM_SPRING_SCAN] Found spring group with 3 cells | Orientation: 6 | Anchor at: (9,9) | Projection dir: 1
+[ROOM_SPRING_SCAN] Start cell: (9,7) | End cell: (9,9)
+[SPRINGLINK_CREATE] Link#0 created at (9,7)
+[SPRINGLINK_CREATE] Link#1 created at (9,8)
+[SPRINGLINK_CREATE] Link#2 created at (9,9)
+[SPRING_INIT] Spring with 3 links | Anchor:(9,9) | ComprDir: 1
+[ROOM_SPRING_SCAN] Spring created successfully with 3 links
+[ROOM_SPRING_SCAN] Found spring group with 3 cells | Orientation: 5 | Anchor at: (1,21) | Projection dir: 2
+[ROOM_SPRING_SCAN] Reversing array (anchor was first)
+[ROOM_SPRING_SCAN] Start cell: (3,21) | End cell: (1,21)
+[SPRINGLINK_CREATE] Link#0 created at (3,21)
+[SPRINGLINK_CREATE] Link#1 created at (2,21)
+[SPRINGLINK_CREATE] Link#2 created at (1,21)
+[SPRING_INIT] Spring with 3 links | Anchor:(1,21) | ComprDir: 2
+[ROOM_SPRING_SCAN] Spring created successfully with 3 links
+[OBSTACLE_CREATE] Creating obstacle with 3 blocks
+  Block at (9, 4)
+  Block at (9, 5)
+  Block at (8, 5)
+[OBSTACLE_CREATE] Creating obstacle with 4 blocks
+  Block at (12, 18)
+  Block at (12, 19)
+  Block at (12, 20)
+  Block at (12, 21)
+[OBSTACLE_CREATE] Creating obstacle with 2 blocks
+  Block at (34, 23)
+  Block at (35, 23)
