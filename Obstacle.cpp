@@ -63,8 +63,10 @@ bool Obstacle::move(Direction dir, Room* room, int force)
         Point oldPos = block->getPosition();
         Point newPos(oldPos.x + dx, oldPos.y + dy);
 
-        // Clear old position visually
+        // Clear old position (both buffer and screen)
         room->setCharAt(oldPos.x, oldPos.y, ' ');
+        gotoxy(oldPos.x, oldPos.y);
+        std::cout << ' ';
 
         // Update block's logical position
         block->setPosition(newPos);
@@ -155,4 +157,179 @@ bool Obstacle::tryPush(Direction dir, int force, Room* room, Player* pusher)
     }
 
     return false;  // Either wrong direction or still not enough force
+}
+
+//////////////////////////////////////////  ObstacleBlock::onExplosion  //////////////////////////////////////////
+
+bool ObstacleBlock::onExplosion()
+{
+    if (parentObstacle)
+    {
+        parentObstacle->markForReconstruction();
+    }
+    return true;
+}
+
+//////////////////////////////////////////  Obstacle::reconstruct  //////////////////////////////////////////
+
+void Obstacle::reconstruct(Room* room)
+{
+    // Get remaining active blocks
+    std::vector<ObstacleBlock*> remaining;
+    for (ObstacleBlock* block : blocks)
+    {
+        if (block && block->isActive())
+            remaining.push_back(block);
+    }
+
+    if (remaining.empty())
+    {
+        // Will be cleaned up by Room
+        return;
+    }
+
+    // Check if blocks are still connected
+    std::vector<std::vector<ObstacleBlock*>> components = findConnectedComponents(remaining);
+
+    if (components.size() == 1)
+    {
+        // Still one piece - reinitialize
+        blocks = remaining;
+        weight = static_cast<int>(blocks.size());
+        for (size_t i = 0; i < blocks.size(); i++)
+        {
+            blocks[i]->setBlockIndex(static_cast<int>(i));
+        }
+        std::unordered_map<Point, std::vector<Point>> neighbors = buildNeighborsMap(remaining);
+        initEdges(neighbors);
+        resetPushState();
+    }
+    else
+    {
+        // Split into multiple - create new obstacles
+        // Use first component for this obstacle
+        blocks = components[0];
+        weight = static_cast<int>(blocks.size());
+        for (size_t i = 0; i < blocks.size(); i++)
+        {
+            blocks[i]->setBlockIndex(static_cast<int>(i));
+        }
+        std::unordered_map<Point, std::vector<Point>> neighbors = buildNeighborsMap(components[0]);
+        initEdges(neighbors);
+        resetPushState();
+
+        // Create new obstacles for other components
+        for (size_t j = 1; j < components.size(); j++)
+        {
+            Obstacle* newObs = new Obstacle();
+            newObs->blocks = components[j];
+            newObs->weight = static_cast<int>(components[j].size());
+
+            for (size_t k = 0; k < components[j].size(); k++)
+            {
+                components[j][k]->setBlockIndex(static_cast<int>(k));
+                components[j][k]->setParent(newObs);
+            }
+
+            std::unordered_map<Point, std::vector<Point>> newNeighbors = buildNeighborsMap(components[j]);
+            newObs->initEdges(newNeighbors);
+            newObs->resetPushState();
+
+            room->addObstacle(newObs);
+        }
+    }
+
+    needsReconstructionFlag = false;
+}
+
+//////////////////////////////////////////  findConnectedComponents  //////////////////////////////////////////
+
+std::vector<std::vector<ObstacleBlock*>> Obstacle::findConnectedComponents(
+    const std::vector<ObstacleBlock*>& blocks)
+{
+    std::vector<std::vector<ObstacleBlock*>> components;
+    std::unordered_set<ObstacleBlock*> visited;
+
+    for (ObstacleBlock* start : blocks)
+    {
+        if (!start || visited.count(start))
+            continue;
+
+        // BFS
+        std::vector<ObstacleBlock*> component;
+        std::queue<ObstacleBlock*> queue;
+        queue.push(start);
+        visited.insert(start);
+
+        while (!queue.empty())
+        {
+            ObstacleBlock* curr = queue.front();
+            queue.pop();
+            component.push_back(curr);
+
+            Point pos = curr->getPosition();
+            Point neighbors[4] = {
+                Point(pos.x+1, pos.y), Point(pos.x-1, pos.y),
+                Point(pos.x, pos.y+1), Point(pos.x, pos.y-1)
+            };
+
+            for (const Point& np : neighbors)
+            {
+                for (ObstacleBlock* other : blocks)
+                {
+                    if (other && other->isActive() &&
+                        other->getPosition() == np &&
+                        !visited.count(other))
+                    {
+                        visited.insert(other);
+                        queue.push(other);
+                    }
+                }
+            }
+        }
+
+        components.push_back(component);
+    }
+
+    return components;
+}
+
+//////////////////////////////////////////  buildNeighborsMap  //////////////////////////////////////////
+
+std::unordered_map<Point, std::vector<Point>> Obstacle::buildNeighborsMap(
+    const std::vector<ObstacleBlock*>& blocks)
+{
+    std::unordered_map<Point, std::vector<Point>> neighbors;
+
+    for (ObstacleBlock* block : blocks)
+    {
+        if (!block)
+            continue;
+
+        Point pos = block->getPosition();
+        Point adjacent[4] = {
+            Point(pos.x+1, pos.y), Point(pos.x-1, pos.y),
+            Point(pos.x, pos.y+1), Point(pos.x, pos.y-1)
+        };
+
+        for (const Point& adj : adjacent)
+        {
+            bool isObstacle = false;
+            for (ObstacleBlock* other : blocks)
+            {
+                if (other && other->getPosition() == adj)
+                {
+                    isObstacle = true;
+                    break;
+                }
+            }
+
+            if (!isObstacle)
+            {
+                neighbors[pos].push_back(adj);
+            }
+        }
+    }
+
+    return neighbors;
 }

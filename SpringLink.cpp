@@ -22,6 +22,16 @@ GameObject* SpringLink::clone() const
     return new SpringLink(*this);
 }
 
+// Handle explosion - destroy entire spring
+bool SpringLink::onExplosion()
+{
+    if (parentSpring)
+    {
+        parentSpring->destroyAllLinks();
+    }
+    return true;
+}
+
 // Collapse this link and update visual
 void SpringLink::collapse(Room* room)
 {

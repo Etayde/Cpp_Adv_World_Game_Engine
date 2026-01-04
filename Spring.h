@@ -59,6 +59,10 @@ public:
     Direction getCompressionDir() const { return compressionDir; }
     bool isCompressed() const { return compressedCount > 0; }
 
+    // Destruction
+    void destroyAllLinks();
+    bool allLinksInactive() const;
+
 private:
 
     // Compression validation

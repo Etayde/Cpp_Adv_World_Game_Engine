@@ -296,8 +296,33 @@ bool Spring::playerSTAYcheck(Player& p, SpringLink& link) const{
 SpringLink* Spring::getPrevLink(const SpringLink* current) const{
     if (current == nullptr)
         return nullptr;
-    
+
     int curr = current->getLinkIndex();
     return curr > 0 ? links[curr - 1] : nullptr;
+}
+
+//////////////////////////////////////////    destroyAllLinks       //////////////////////////////////////////
+
+void Spring::destroyAllLinks()
+{
+    for (SpringLink* link : links)
+    {
+        if (link && link->isActive())
+        {
+            link->setActive(false);
+        }
+    }
+}
+
+//////////////////////////////////////////   allLinksInactive       //////////////////////////////////////////
+
+bool Spring::allLinksInactive() const
+{
+    for (SpringLink* link : links)
+    {
+        if (link && link->isActive())
+            return false;
+    }
+    return true;
 }
 

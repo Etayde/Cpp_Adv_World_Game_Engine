@@ -144,6 +144,7 @@ public:
     std::vector<Door*> getDoors();
     std::vector<Switch*> getSwitches();
     ExplosionResult updateAllObjects(Player *p1, Player *p2);
+    void addObstacle(Obstacle* obs);
 
     // Collision & movement
     bool isBlocked(int x, int y);

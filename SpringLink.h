@@ -23,7 +23,7 @@ public:
     GameObject* clone() const override;
     const char* getName() const override { return "SpringLink"; }
     bool isBlocking() const override { return false; }
-    bool onExplosion() override { return true; }
+    bool onExplosion() override;
 
     // SpringLink specific methods
     Spring* getParentSpring() const { return parentSpring; }

@@ -827,8 +827,7 @@ bool Player::moveMultiStep(Room* room, Riddle** activeRiddle, Player** activePla
 
         if (!moveSucceeded)
         {
-            // Movement blocked - abort launch
-            springMomentum.setLaunchFramesRemaining(0);
+            // Movement blocked - stop this frame's movement but keep launch active
             break;
         }
 

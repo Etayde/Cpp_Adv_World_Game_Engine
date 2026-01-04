@@ -417,6 +417,17 @@ void Room::removeObjectAt(int x, int y)
     }
 }
 
+//////////////////////////////////////////        addObstacle          //////////////////////////////////////////
+
+// Add an obstacle to the room (used when obstacles split)
+void Room::addObstacle(Obstacle* obs)
+{
+    if (obs != nullptr)
+    {
+        obstacles.push_back(obs);
+    }
+}
+
 //////////////////////////////////////////          getDoors           //////////////////////////////////////////
 
 // Get all doors in the room
@@ -722,6 +733,46 @@ ExplosionResult Room::updateAllObjects(Player *p1, Player *p2)
             {
                 obj->update(); // Standard update
             }
+        }
+    }
+
+    // Clean up inactive GameObjects (destroyed by explosions)
+    for (int i = static_cast<int>(objects.size()) - 1; i >= 0; i--)
+    {
+        if (objects[i] && !objects[i]->isActive())
+        {
+            delete objects[i];
+            objects.erase(objects.begin() + i);
+        }
+    }
+
+    // Clean up springs with all links destroyed
+    for (int i = static_cast<int>(springs.size()) - 1; i >= 0; i--)
+    {
+        if (springs[i] && springs[i]->allLinksInactive())
+        {
+            delete springs[i];
+            springs.erase(springs.begin() + i);
+        }
+    }
+
+    // Reconstruct damaged obstacles
+    for (Obstacle* obstacle : obstacles)
+    {
+        if (obstacle && obstacle->needsReconstruction())
+        {
+            obstacle->reconstruct(this);
+        }
+    }
+
+    // Remove fully destroyed obstacles
+    for (int i = static_cast<int>(obstacles.size()) - 1; i >= 0; i--)
+    {
+        Obstacle* obs = obstacles[i];
+        if (obs && obs->getBlocks().empty())
+        {
+            delete obs;
+            obstacles.erase(obstacles.begin() + i);
         }
     }
 

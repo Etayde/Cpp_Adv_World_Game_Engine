@@ -5,6 +5,8 @@
 #include "StaticObjects.h"
 #include <vector>
 #include <unordered_map>
+#include <queue>
+#include <unordered_set>
 
 class Room;
 class Player;
@@ -26,10 +28,12 @@ public:
     GameObject* clone() const override { return new ObstacleBlock(*this); }
     const char* getName() const override { return "ObstacleBloack"; }
     bool isBlocking() const override { return true; }
+    bool onExplosion() override;
     Obstacle* getParent() const { return parentObstacle; }
     int getBlockIndex() const { return blockIndex; }
 
     void setBlockIndex(int index) { blockIndex = index; }
+    void setParent(Obstacle* parent) { parentObstacle = parent; }
     bool isEdge() const { return is_edge; }
     std::vector<Direction> neighborsToEdgeDirections(std::unordered_map<Point, std::vector<Point>>& neighbors);
 };
@@ -49,6 +53,15 @@ private:
     Direction pushDirection;        // Direction being pushed this frame
     std::vector<Player*> pushers;   // Players who contributed to the push
     bool movedThisFrame;            // Prevents multiple moves per frame
+
+    // Reconstruction tracking
+    bool needsReconstructionFlag = false;
+
+    // Helper methods for reconstruction
+    static std::vector<std::vector<ObstacleBlock*>> findConnectedComponents(
+        const std::vector<ObstacleBlock*>& blocks);
+    static std::unordered_map<Point, std::vector<Point>> buildNeighborsMap(
+        const std::vector<ObstacleBlock*>& blocks);
 
 public:
     Obstacle(): blocks(), accumulatedForce(0), pushDirection(Direction::STAY), movedThisFrame(false)
@@ -74,4 +87,9 @@ public:
     // Push state management
     void resetPushState();
     bool tryPush(Direction dir, int force, Room* room, Player* pusher);
+
+    // Destruction and reconstruction
+    void markForReconstruction() { needsReconstructionFlag = true; }
+    bool needsReconstruction() const { return needsReconstructionFlag; }
+    void reconstruct(Room* room);
 };
