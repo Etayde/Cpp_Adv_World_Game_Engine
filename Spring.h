@@ -46,6 +46,9 @@ public:
     Spring();
     ~Spring();
 
+    // Deep copy
+    Spring* clone() const;
+
     // Initialization - call from Room during scanning
     void initialize(const std::vector<SpringLink*>& springLinks,
                    const Point& anchor,

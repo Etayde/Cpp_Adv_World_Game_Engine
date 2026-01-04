@@ -27,6 +27,7 @@ public:
 
     // SpringLink specific methods
     Spring* getParentSpring() const { return parentSpring; }
+    void setParentSpring(Spring* parent) { parentSpring = parent; }
     int getLinkIndex() const { return linkIndex; }
     bool isCollapsed() const { return collapsed; }
     void collapse(Room* room);

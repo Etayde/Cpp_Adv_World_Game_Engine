@@ -74,6 +74,12 @@ Room &Room::operator=(const Room &other) {
   if (this != &other) {
     deleteAllObjects();
 
+    // Delete old springs before copying
+    for (Spring *spring : springs) {
+      delete spring;
+    }
+    springs.clear();
+
     roomId = other.roomId;
     active = other.active;
     completed = other.completed;
@@ -111,10 +117,29 @@ void Room::copyObjectsFrom(const Room &other) {
     }
   }
 
-  // Copy springs (note: this is a shallow copy of spring managers)
-  // Spring pointers will reference the original springs
-  // For deep copy, would need Spring::clone() method
-  springs = other.springs;
+  // Deep copy springs
+  springs.clear();
+  std::unordered_map<Spring*, Spring*> springMap;
+
+  for (Spring *oldSpring : other.springs) {
+    if (oldSpring != nullptr) {
+      Spring *newSpring = oldSpring->clone();
+      springs.push_back(newSpring);
+      springMap[oldSpring] = newSpring;
+    }
+  }
+
+  // Update SpringLink parent pointers to reference the new Spring objects
+  for (GameObject *obj : objects) {
+    if (obj != nullptr && obj->getType() == ObjectType::SPRING_LINK) {
+      SpringLink *link = static_cast<SpringLink *>(obj);
+      Spring *oldParent = link->getParentSpring();
+
+      if (oldParent != nullptr && springMap.find(oldParent) != springMap.end()) {
+        link->setParentSpring(springMap[oldParent]);
+      }
+    }
+  }
 }
 
 // Delete all allocated objects

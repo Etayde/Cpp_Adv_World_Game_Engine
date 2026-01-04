@@ -1,0 +1,35 @@
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W  @               W                    W            W                        W
+W      WW WW       W                    ?            W                        W
+W  !   W  WW       WWWWZZZZZWWWWWWWWWWWWW            W     WWWWWW   WWWWW     W
+W        *WW       W           W        W            W     WWWWWW   WWWWW     W
+WWWWWWWW**WW       W     K     W    W   W            W     WWWWWW   WWWWW     W
+W          W       WWWWWWWWWWWWW    W   W            W     WWWWWW   WWWWW     W
+W        # W                        W   W            W     WWWWWW   WWWWW     W
+W        # WWWWWWWWWWWWWWWWWWWWWWWWWW   W            W     WWWWWW   WWWWW     W
+W        # W        w                   W            W  \  WWWWWW   WWWWW     W
+W       WWWW        w                   W            W     WWWWWW   WWWWW     W
+W          W       WWWWWWWWWWWWWWWWWWWWWW            WWWWWWWWWWWWW?WWWWWWWWWWWW
+W          W                                                                  W
+W          WWWWWWWWWWWWWW                                                     W
+W                       W                                                     W
+W                       W                                                     W
+W                       W                                                     W
+WWWWWWWWWWWWW           W                                       WWWWWWWWWWWWWWW
+W           *           W                                       W             3
+2           *           W                                       W    WWWWWWWWWW
+W           *           W                                       W             W
+W###        *           WWW    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W
+WWWWWWWWWWWWWWWWWWWWWWWWW         WWWW       ?                  W             W
+W                       W         **         W                                W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+---METADATA---
+SPAWN 2 20
+SPAWN_PREV 78 18
+NEXT_ROOM -1
+PREV_ROOM 2
+DOOR 3 1 0
+DARK_ZONE 12 1 39 10
+DARK_ZONE 53 1 78 10
+DARK_ZONE 25 22 44 23
+DARK_ZONE 65 18 78 78

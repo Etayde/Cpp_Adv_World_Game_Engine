@@ -19,6 +19,18 @@ Spring::~Spring()
     // Links are owned by Room's objects vector, don't delete them here
 }
 
+//////////////////////////////////////////      Clone               //////////////////////////////////////////
+
+Spring* Spring::clone() const
+{
+    Spring* newSpring = new Spring();
+    newSpring->anchorPosition = this->anchorPosition;
+    newSpring->compressionDir = this->compressionDir;
+    newSpring->compressedCount = this->compressedCount;
+    // Note: links vector will be populated later by Room after cloning SpringLinks
+    return newSpring;
+}
+
 //////////////////////////////////////////      Initialize          //////////////////////////////////////////
 
 void Spring::initialize(const std::vector<SpringLink*>& springLinks,
