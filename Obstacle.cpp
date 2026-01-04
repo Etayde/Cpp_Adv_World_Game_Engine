@@ -123,7 +123,19 @@ bool Obstacle::tryPush(Direction dir, int force, Room* room, Player* pusher)
 
         // Check if this force alone is enough
         if (accumulatedForce >= weight)
-            return move(dir, room, accumulatedForce);
+        {
+            // Save obstacle position before moving
+            Point obstacleOldPos = blocks[0]->getPosition();
+
+            bool moved = move(dir, room, accumulatedForce);
+            if (moved)
+            {
+                // Move pusher to obstacle's old position
+                pusher->pos.x = obstacleOldPos.x;
+                pusher->pos.y = obstacleOldPos.y;
+            }
+            return moved;
+        }
 
         return false;  // Not enough force yet
     }
@@ -137,21 +149,17 @@ bool Obstacle::tryPush(Direction dir, int force, Room* room, Player* pusher)
         // Check if combined force is now enough
         if (accumulatedForce >= weight)
         {
+            // Save obstacle position before moving
+            Point obstacleOldPos = blocks[0]->getPosition();
+
             bool moved = move(dir, room, accumulatedForce);
             if (moved)
             {
-                // Move all contributing players through the obstacle
+                // Move all contributing players to obstacle's old position
                 for (Player* p : pushers)
                 {
-                    // Move player one step in push direction
-                    switch (dir)
-                    {
-                        case Direction::UP:    p->pos.y--; break;
-                        case Direction::DOWN:  p->pos.y++; break;
-                        case Direction::LEFT:  p->pos.x--; break;
-                        case Direction::RIGHT: p->pos.x++; break;
-                        default: break;
-                    }
+                    p->pos.x = obstacleOldPos.x;
+                    p->pos.y = obstacleOldPos.y;
                 }
             }
             return moved;
