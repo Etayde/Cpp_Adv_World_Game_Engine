@@ -244,6 +244,14 @@ void Obstacle::reconstruct(Room* room)
 
 //////////////////////////////////////////  findConnectedComponents  //////////////////////////////////////////
 
+
+// Made with AI - I strated with a simpler obstacle reconstruction
+// method which had bugs and multiple problems with it's logic.
+// I then asked an AI to review my current algorithm and suggest a better solution.
+// The AI then provided this BFS-based connected components approach,
+// which worked great as far as I've tested, and therefore decided to keep altough 
+// we didn't properly get to study and fully understand the BFS algorithm yet.
+ 
 std::vector<std::vector<ObstacleBlock*>> Obstacle::findConnectedComponents(
     const std::vector<ObstacleBlock*>& blocks)
 {
