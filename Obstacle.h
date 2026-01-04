@@ -48,9 +48,10 @@ private:
     int accumulatedForce;           // Total force applied this frame
     Direction pushDirection;        // Direction being pushed this frame
     std::vector<Player*> pushers;   // Players who contributed to the push
+    bool movedThisFrame;            // Prevents multiple moves per frame
 
 public:
-    Obstacle(): blocks(), accumulatedForce(0), pushDirection(Direction::STAY)
+    Obstacle(): blocks(), accumulatedForce(0), pushDirection(Direction::STAY), movedThisFrame(false)
     {
         edges = {
             {Direction::UP, {}},

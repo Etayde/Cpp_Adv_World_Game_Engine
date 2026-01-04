@@ -269,6 +269,33 @@ void Room::drawDarkness()
     std::cout.flush();
 }
 
+void Room::drawVisibleObjects()
+{
+    // Iterate through ALL GameObjects
+    for (GameObject* obj : objects)
+    {
+        if (!obj || !obj->isActive())
+            continue;
+
+        int x = obj->getX();
+        int y = obj->getY();
+
+        // Check visibility: skip if in dark zone and not visible
+        if (isInDarkZone(x, y) && !visibilityMap[y][x])
+        {
+            // Ensure darkness by clearing the position
+            gotoxy(x, y);
+            std::cout << ' ';
+            continue;
+        }
+
+        // Call the object's virtual draw() method
+        obj->draw();
+    }
+
+    std::cout.flush();
+}
+
 //////////////////////////////////////////         getCharAt           //////////////////////////////////////////
 
 // Get character at position (checks mods first, then base)

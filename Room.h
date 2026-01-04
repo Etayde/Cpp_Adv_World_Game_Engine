@@ -128,6 +128,7 @@ public:
     // Drawing
     void draw();
     void drawDarkness();
+    void drawVisibleObjects();
 
     // Character access
     char getCharAt(int x, int y) const;

@@ -282,6 +282,7 @@ void Game::update()
     // Update visibility
     room->updateVisibility(&player1, &player2);
     room->drawDarkness();
+    room->drawVisibleObjects();
     player1.draw(room);
     player2.draw(room);
 

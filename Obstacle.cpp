@@ -19,6 +19,10 @@ void Obstacle::initialize(const std::vector<ObstacleBlock*>& obstacleBlocks,
 
 bool Obstacle::move(Direction dir, Room* room, int force)
 {
+    // Prevent multiple movements per frame
+    if (movedThisFrame)
+        return false;
+
     // Validate force requirement
     if (force < weight)
         return false;  // Insufficient force
@@ -69,22 +73,7 @@ bool Obstacle::move(Direction dir, Room* room, int force)
         room->setCharAt(newPos.x, newPos.y, block->getSprite());
     }
 
-    // Immediate rendering for instant visual feedback
-    for (ObstacleBlock* block : blocks)
-    {
-        Point pos = block->getPosition();
-        gotoxy(pos.x, pos.y);
-        std::cout << block->getSprite();
-    }
-    // Clear old positions
-    for (int i = 0; i < static_cast<int>(blocks.size()); i++)
-    {
-        Point oldPos(blocks[i]->getX() - dx, blocks[i]->getY() - dy);
-        gotoxy(oldPos.x, oldPos.y);
-        std::cout << ' ';
-    }
-    std::cout.flush();
-
+    movedThisFrame = true;
     return true; // Movement successful
 }
 
@@ -135,6 +124,7 @@ void Obstacle::resetPushState()
     accumulatedForce = 0;
     pushDirection = Direction::STAY;
     pushers.clear();
+    movedThisFrame = false;
 }
 
 bool Obstacle::tryPush(Direction dir, int force, Room* room, Player* pusher)
