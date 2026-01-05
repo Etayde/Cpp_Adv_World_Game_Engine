@@ -341,10 +341,10 @@ void Game::update() {
   room->updateVisibility(&player1, &player2);
   room->drawDarkness();
   room->drawVisibleObjects();
+  room->drawLegend(&player1, &player2);
   player1.draw(room);
   player2.draw(room);
-  room->drawLegend(&player1, &player2);
-
+  
 
   // Check room transitions
   checkRoomTransitions();

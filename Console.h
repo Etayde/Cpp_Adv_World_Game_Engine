@@ -111,7 +111,7 @@ inline void showCursor() {
 // Move cursor to position
 inline void gotoxy(int x, int y) {
 #ifdef PLATFORM_WINDOWS
-    std::cout.flush();
+
     HANDLE hConsoleOutput;
     COORD dwCursorPosition;
     dwCursorPosition.X = x;
@@ -119,7 +119,7 @@ inline void gotoxy(int x, int y) {
     hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleCursorPosition(hConsoleOutput, dwCursorPosition);
 #else
-    std::cout.flush();
+
     std::cout << "\033[" << (y + 1) << ";" << (x + 1) << "H";
 #endif
 }
