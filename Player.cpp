@@ -181,6 +181,7 @@ void Player::fallBack(Room *room) {
   int targetX = pos.x;
   int targetY = pos.y;
   Direction dir = getCurrentDirection();
+  if (springMomentum.isActive()) { springMomentum.resetMomentum(); }
 
   switch (dir) {
     case Direction::UP:
@@ -200,9 +201,14 @@ void Player::fallBack(Room *room) {
     case Direction::VERTICAL:
       break;
   }
-
-  setPosition(targetX, targetY);
+  
+  bool spotFilled = room->isObjectAt(targetX, targetY);
+  
+  if (!spotFilled) { setPosition(targetX, targetY); }
+  
   draw(room);
+
+  return;
 }
 
 

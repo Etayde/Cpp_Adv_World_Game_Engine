@@ -1233,3 +1233,12 @@ void Room::DrawLives(Player* p) {
       break;
   }
 }
+
+bool Room::isObjectAt(int x, int y) {
+  for (GameObject *obj : objects) {
+    if (obj->getX() == x && obj->getY() == y) {
+      return true;
+    }
+  }
+  return false;
+}
