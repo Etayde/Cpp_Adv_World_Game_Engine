@@ -1,5 +1,5 @@
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-W                                                                            W
+WL                                                                            W
 W                                                                             W
 W                                                                             W
 W                  WWWWWWWWWWWWWWWWWWWWWWWWWWWWW             WWWWWWWWWWWWWWWWWW
@@ -14,7 +14,7 @@ W                  W                           w                              W
 W                  W                           w                              W
 W                  W\                          w                              W
 W                  WWWWWWWWWWWWWWWWWWWWWWWWWWWWW                              W
-W            L                  #                                    WZZZZZZZZW
+W                               #                                    WZZZZZZZZW
 W                  !            #                                    W        W
 W                                                                    W        1
 W                  @                                                 W        W

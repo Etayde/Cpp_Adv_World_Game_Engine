@@ -88,6 +88,17 @@ enum class ObjectType {
 // Bomb constants moved to Bomb class for better encapsulation
 // Torch constants moved to Torch class for better encapsulation
 
+// Operator overloads for convenient comparison with char
+inline bool operator==(char c, ObjectType t) {
+  return c == static_cast<char>(t);
+}
+
+inline bool operator==(ObjectType t, char c) { return c == t; }
+
+inline bool operator!=(char c, ObjectType t) { return !(c == t); }
+
+inline bool operator!=(ObjectType t, char c) { return !(c == t); }
+
 //////////////////////////////////////////        ROOM LIMITS
 /////////////////////////////////////////////
 

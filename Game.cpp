@@ -161,7 +161,7 @@ int Game::validateLegendPlacement(Room &room) {
   for (int y = topLeftY; y < topLeftY + height; y++) {
     for (int x = topLeftX; x < topLeftX + width; x++) {
       char c = room.baseLayout->getCharAt(x, y);
-      if (c != 'W' && c != ' ' && c != 'L') {
+      if (c != ObjectType::WALL && c != ObjectType::AIR && c != 'L') {
         return 4;
       }
     }
@@ -171,14 +171,14 @@ int Game::validateLegendPlacement(Room &room) {
   // Check primary spawn point
   if (room.spawnPoint.x >= topLeftX && room.spawnPoint.x < topLeftX + width &&
       room.spawnPoint.y >= topLeftY && room.spawnPoint.y < topLeftY + height) {
-    return 4;
+    return 5;
   }
   // Check secondary spawn point (from next room)
   if (room.spawnPointFromNext.x >= topLeftX &&
       room.spawnPointFromNext.x < topLeftX + width &&
       room.spawnPointFromNext.y >= topLeftY &&
       room.spawnPointFromNext.y < topLeftY + height) {
-    return 4;
+    return 5;
   }
 
   room.setLegendPoint(topLeftX, topLeftY);
@@ -541,7 +541,10 @@ void Game::showErrorScreen() {
     cout << "Error: 'L' out of bounds in room " << initErrorRoomId << endl;
     break;
   case 4:
-    cout << "Error: 'L' accessible in room " << initErrorRoomId << endl;
+    cout << "Error: Legend obscured objects in room " << initErrorRoomId << endl;
+    break;
+  case 5:
+    cout << "Error: Legend obscured a player's spawn point in room " << initErrorRoomId << endl;
     break;
   default:
     cout << "Unknown error" << endl;
