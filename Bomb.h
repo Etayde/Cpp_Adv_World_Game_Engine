@@ -64,6 +64,7 @@ public:
 
     // Bomb-specific interface
     void activate(Room *room);                     // Start countdown when dropped
+    using GameObject::update;                      // Bring base class update into scope
     ExplosionResult update(Player *p1, Player *p2); // Overload to accept players and return result
     BombState getState() const { return state; }
 };

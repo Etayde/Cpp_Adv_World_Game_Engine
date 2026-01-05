@@ -21,8 +21,8 @@ private:
     
 
 public:
-    Riddle() : InteractableObject(), riddleId(-1), correctAnswer(-1), firstAttempt(true), 
-                solvingPlayerId(-1), solvingPlayerSprite(' ')
+    Riddle() : InteractableObject(), firstAttempt(true), solvingPlayerSprite(' '),
+                solvingPlayerId(-1), riddleId(-1), correctAnswer(-1)
     {
         sprite = '?';
         type = ObjectType::RIDDLE;
@@ -30,8 +30,8 @@ public:
 
     Riddle(const Point &pos, int ridId = 0, int ansId = 0) :
                 InteractableObject(pos, '?', ObjectType::RIDDLE),
-                riddleId(ridId), correctAnswer(ansId), firstAttempt(true), 
-                solvingPlayerId(-1), solvingPlayerSprite(' ') {}
+                firstAttempt(true), solvingPlayerSprite(' '), solvingPlayerId(-1),
+                riddleId(ridId), correctAnswer(ansId) {}
 
     GameObject *clone() const override { return new Riddle(*this); }
     const char *getName() const override { return "Riddle"; }

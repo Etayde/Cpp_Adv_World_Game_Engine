@@ -126,12 +126,12 @@ void Riddle::displayFeedback(bool correct) const {
 
     if (correct && firstAttempt)
     {
-        gotoxy(33, 13);
+        gotoxy(33, 14);
         cout << "CORRECT!";
-        gotoxy(18, 15);
+        gotoxy(18, 16);
         cout << "P" << solvingPlayerId << "(" << solvingPlayerSprite << ") " " solved the riddle on the first try!";
         
-        gotoxy(31, 17);
+        gotoxy(31, 18);
         cout << "+100 Points!";
 
         gotoxy(27, 19);
@@ -139,10 +139,10 @@ void Riddle::displayFeedback(bool correct) const {
     }
     else if (correct)
     {
-        gotoxy(33, 13);
+        gotoxy(33, 14);
         cout << "CORRECT!";
 
-        gotoxy(18, 15);
+        gotoxy(18, 16);
         cout << "P" << solvingPlayerId << "(" << solvingPlayerSprite << ") " " solved the riddle!";
         
         gotoxy(27, 17);

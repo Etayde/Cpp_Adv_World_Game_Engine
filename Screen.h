@@ -17,23 +17,22 @@ class Screen {
 private:
   const char *screen[MAX_Y];
   std::string ownedData[MAX_Y]; // For file-loaded layouts
-  bool ownsData;                // Flag indicating if we own string data
 
 public:
   // Construct from layout array (static data - does not own)
-  Screen(const char *layout[MAX_Y]) : ownsData(false) {
+  Screen(const char *layout[MAX_Y]) {
     for (int i = 0; i < MAX_Y; i++)
       screen[i] = layout[i];
   }
 
   // Default constructor - empty screen
-  Screen() : ownsData(false) {
+  Screen() {
     for (int i = 0; i < MAX_Y; i++)
       screen[i] = nullptr;
   }
 
   // Construct from string array (file-loaded data - owns the data)
-  Screen(const std::string layout[MAX_Y]) : ownsData(true) {
+  Screen(const std::string layout[MAX_Y]) {
     for (int i = 0; i < MAX_Y; i++) {
       ownedData[i] = layout[i];
       screen[i] = ownedData[i].c_str();

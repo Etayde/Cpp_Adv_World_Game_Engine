@@ -244,6 +244,7 @@ Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink* link, Play
     return {true, true, launch};
 }
 
+//////////////////////////////////////////    Spring State Helpers        /////////////////////////////////////////////
 
 bool Spring::playerSTAYcheck(Player& p, SpringLink& link) const{
 

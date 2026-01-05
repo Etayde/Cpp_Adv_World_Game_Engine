@@ -6,6 +6,7 @@
 #include "Room.h"
 #include "Player.h"
 
+//////////////////////////////////////////        initialize       /////////////////////////////////////////////
 
 void Obstacle::initialize(const std::vector<ObstacleBlock*>& obstacleBlocks, 
                             std::unordered_map<Point, std::vector<Point>>& neighbors)
@@ -18,6 +19,8 @@ void Obstacle::initialize(const std::vector<ObstacleBlock*>& obstacleBlocks,
     }
     initEdges(neighbors);
 }
+
+//////////////////////////////////////////           move           /////////////////////////////////////////////
 
 bool Obstacle::move(Direction dir, Room* room, int force)
 {
@@ -81,6 +84,7 @@ bool Obstacle::move(Direction dir, Room* room, int force)
     return true; // Movement successful
 }
 
+//////////////////////////////////////////  neighborsToEdgeDirections       /////////////////////////////////////////////
 
 std::vector<Direction> ObstacleBlock::neighborsToEdgeDirections(std::unordered_map<Point, std::vector<Point>>& neighbors)
 {
@@ -108,6 +112,8 @@ std::vector<Direction> ObstacleBlock::neighborsToEdgeDirections(std::unordered_m
     return edgeDirections;
 }
 
+//////////////////////////////////////////        initEdges         /////////////////////////////////////////////
+
 void Obstacle::initEdges(std::unordered_map<Point, std::vector<Point>>& neighbors)
 {
     for (auto& block : blocks)
@@ -123,6 +129,8 @@ void Obstacle::initEdges(std::unordered_map<Point, std::vector<Point>>& neighbor
     }
 }
 
+//////////////////////////////////////////      resetPushState       /////////////////////////////////////////////
+
 void Obstacle::resetPushState()
 {
     accumulatedForce = 0;
@@ -130,6 +138,8 @@ void Obstacle::resetPushState()
     pushers.clear();
     movedThisFrame = false;
 }
+
+//////////////////////////////////////////         tryPush          /////////////////////////////////////////////
 
 bool Obstacle::tryPush(Direction dir, int force, Room* room, Player* pusher)
 {

@@ -22,8 +22,6 @@ private:
     Direction compressionDir;
     int compressedCount;
 
-    Player* currCompressor;
-
 public:
     // Launch calculation result
     struct LaunchData {

@@ -287,6 +287,8 @@ void Room::drawDarkness() {
  
 }
 
+//////////////////////////////////////////     drawVisibleObjects       /////////////////////////////////////////////
+
 void Room::drawVisibleObjects() {
   // Iterate through ALL GameObjects
   for (GameObject *obj : objects) {
@@ -757,6 +759,8 @@ ExplosionResult Room::updateAllObjects(Player *p1, Player *p2) {
   return totalResult;
 }
 
+//////////////////////////////////////////   Multi-Cell Object Detection Helpers       /////////////////////////////////////////////
+
 Direction Room::detectOrientation(const std::vector<Point> &positions) {
   if (positions.size() < 2)
     return Direction::STAY;
@@ -884,7 +888,7 @@ void Room::scanAndCreateSprings() {
   }
 
   // Step 2: Group adjacent cells into springs
-  bool processed[MAX_Y_INGAME][MAX_X] = {false};
+  bool processed[MAX_Y_INGAME][MAX_X] = {{false}};
 
   for (const Point &p : allSpringCells) {
     if (processed[p.y][p.x])
@@ -956,7 +960,7 @@ void Room::scanAndCreateSprings() {
                                  wallCheck.projectionDirection);
               springs.push_back(spring);
             } else {
-              // Cleanup on failure
+              // Cleanup if failed
               delete spring;
               // Links already added to objects will be cleaned up by
               // deleteAllObjects()
@@ -980,7 +984,7 @@ void Room::createMultiCellObject(const std::vector<Point> &allObjCells) {
   char ch = baseLayout->getCharAt(allObjCells[0].x, allObjCells[0].y);
 
   // Step 2: Group adjacent cells into springs
-  bool processed[MAX_Y_INGAME][MAX_X] = {false};
+  bool processed[MAX_Y_INGAME][MAX_X] = {{false}};
 
   for (const Point &p : allObjCells) {
     if (processed[p.y][p.x])
@@ -1116,6 +1120,8 @@ void Room::createObstacleFromGroup(
   }
 }
 
+//////////////////////////////////////////     Legend Drawing       /////////////////////////////////////////////
+
 void Room::drawLegend(Player *p1, Player *p2) {
   drawEmptyLegend();
   drawLegendInfo(p1, p2);
@@ -1137,29 +1143,18 @@ void Room::drawLegendInfo(Player *p1, Player *p2) {
 }
 
 void Room::drawPlayerStats(Player* p) {
-  // Layout provides "$:                     "
-  // We need to print score, lives, inv on top of it
-  // Offsets relative to start of line in legendData:
-  // |$:                     |
-  // 0123456789             21
-  // Score starts after ":  " (offset 4)
 
-  int lineY = legendTopLeft.y + p->playerId; // p1 is row 2 (idx 2), p2 is row 3 (idx 3)
+  int lineY = legendTopLeft.y + p->playerId; 
   int startX = legendTopLeft.x;
   
   // Draw Score
   gotoxy(startX + 4, lineY);
   std::cout << p->getScore();
   
-  // Draw Lives (offset depends on score length, but let's fix it for now)
-  // Actually, let's use fixed offsets based on the layout
-  // SCORE  LIVES  INV
-  // 5      12     19
-  
-  DrawLives(p); // Needs update to absolute position
+  DrawLives(p); 
 
   // Draw Inventory
-  gotoxy(startX + 18, lineY);
+  gotoxy(startX + 17, lineY);
   if (p->hasItem()) {
       std::cout << p->inventory->getSprite();
   } else {
@@ -1191,6 +1186,8 @@ void Room::DrawLives(Player* p) {
       break;
   }
 }
+
+//////////////////////////////////////////       isVacantSpot       /////////////////////////////////////////////
 
 bool Room::isVacantSpot(int x, int y) {
   if (x < 0 || x >= MAX_X || y < 0 || y >= MAX_Y_INGAME) {

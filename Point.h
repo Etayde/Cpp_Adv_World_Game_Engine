@@ -23,6 +23,8 @@ public:
     Point(int x1, int y1) : x(x1), y(y1), diff_x(0), diff_y(0), sprite(' ') {}
     Point(int x1, int y1, int diffx, int diffy, char c)
         : x(x1), y(y1), diff_x(diffx), diff_y(diffy), sprite(c) {}
+    Point(const Point &other) 
+        : x(other.x), y(other.y), diff_x(other.diff_x), diff_y(other.diff_y), sprite(other.sprite) {}
 
     // Draw sprite at current position
     void draw() const

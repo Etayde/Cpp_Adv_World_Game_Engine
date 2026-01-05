@@ -21,6 +21,8 @@ Game::Game()
       currentState(GameState::mainMenu), currentRoomId(-1),
       gameInitialized(false) {}
 
+//////////////////////////////////////////      Game Destructor       /////////////////////////////////////////////
+
 Game::~Game() {
   // Clean up loaded screens
   for (Screen *s : loadedScreens) {
@@ -689,7 +691,9 @@ void Game::changeRoom(int newRoomId, bool goingForward) {
 
 }
 
-bool Game::checkGameOver(const ExplosionResult& result) {
+//////////////////////////////////////////       checkGameOver        /////////////////////////////////////////////
+
+bool Game::checkGameOver(const ExplosionResult& /*result*/) {
   if (player1.isDead()) {
     setGameOverMessege(GameOverMessege::PLAYER1_DIED);
     return true;

@@ -21,6 +21,9 @@ public:
     {}
 
     Momentum &operator=(const Momentum &other);
+    Momentum(const Momentum &other)
+        : activeState(other.activeState), dx(other.dx), dy(other.dy),
+          launchFramesRemaining(other.launchFramesRemaining), launchDir(other.launchDir) {}
 
     // Getters
     bool isActive() const { return activeState; } 

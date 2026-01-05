@@ -63,7 +63,7 @@ inline const char *instructionsData[MAX_Y] = {
      "|     SYSTEM: [ESC] - Pause game                                              |", // 18
      "|             [H]   - From Pause menu, return to main menu                    |", // 19
      "|            * Exiting back to main menu clears progress.                     |", // 20
-     "|     INVENTORY : Shown at bottom of screen for each player.                  |", // 21
+     "| LEGEND: Placed somewhere in the screen. contains scores, lives & inventory. |", // 21
      "|=============================================================================|", // 22
      "|                          Press [ESC] to return                              |", // 23
      "==============================================================================="  // 24
@@ -143,7 +143,7 @@ inline const char *gameOverData[MAX_Y] = {
      "|                              *** GAME OVER ***                              |", // 5
      "|                                                                             |", // 6
      "|                                                                             |", // 7
-     "|                      The bomb destroyed something vital!                    |", // 8
+     "|                                                                             |", // 8
      "|                                                                             |", // 9
      "|                                                                             |", // 10
      "|                                                                             |", // 11

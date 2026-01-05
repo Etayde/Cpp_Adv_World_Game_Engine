@@ -1,6 +1,7 @@
 //////////////////////////////////////       INCLUDES & FORWARDS       /////////////////////////////////////////////
 
 #include "RiddleDatabase.h"
+#include <fstream>
 
 //////////////////////////////////////////    Static Initialization       /////////////////////////////////////////////
 
@@ -13,41 +14,44 @@ void RiddleDatabase::initialize() {
   if (isActive)
     return;
 
-  // Hardcoded riddles - easily replaceable with file loading later
-
-  // Riddle 0
-  {
-    std::string opts[] = {"A Piano", "A Map", "A Tree", "A Clock"};
-    riddles.push_back(
-        RiddleData(0, "What has keys but can't open locks?", opts, 0));
+  // Load riddles from file
+  std::ifstream file("riddle.txt");
+  if (!file.is_open()) {
+    isActive = true;
+    return; // No riddles available if file can't be opened
   }
 
-  // Riddle 1
-  {
-    std::string opts[] = {"A River", "A Clock", "A Machine", "A Person"};
-    riddles.push_back(RiddleData(1, "What runs but never walks?", opts, 0));
+  std::string line;
+  int riddleId = 0;
+
+  while (std::getline(file, line)) {
+    // Look for riddle marker
+    if (line.find("---RIDDLE---") != std::string::npos) {
+      // Read question
+      std::string question;
+      if (!std::getline(file, question))
+        break;
+
+      // Read 4 options
+      std::string opts[4];
+      for (int i = 0; i < 4; i++) {
+        if (!std::getline(file, opts[i]))
+          break;
+      }
+
+      // Read correct answer (1-4 in file, convert to 0-3)
+      std::string answerLine;
+      if (!std::getline(file, answerLine))
+        break;
+
+      int correctAnswer = std::stoi(answerLine) - 1; // Convert 1-based to 0-based
+
+      riddles.push_back(RiddleData(riddleId, question, opts, correctAnswer));
+      riddleId++;
+    }
   }
 
-  // Riddle 2
-  {
-    std::string opts[] = {"A Towel", "A Sponge", "A Desert", "A Fire"};
-    riddles.push_back(RiddleData(2, "What gets wetter as it dries?", opts, 0));
-  }
-
-  // Riddle 3
-  {
-    std::string opts[] = {"An Echo", "A Shadow", "A Memory", "A Dream"};
-    riddles.push_back(
-        RiddleData(3, "What can speak without a mouth?", opts, 0));
-  }
-
-  // Riddle 4
-  {
-    std::string opts[] = {"The Future", "Yesterday", "Tomorrow", "A Dream"};
-    riddles.push_back(
-        RiddleData(4, "What is always coming but never arrives?", opts, 2));
-  }
-
+  file.close();
   isActive = true;
 }
 

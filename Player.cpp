@@ -133,6 +133,8 @@ void Player::erase(Room *room) {
   std::cout << restoreChar;
 }
 
+//////////////////////////////////////////  Respawn and Death Helpers       /////////////////////////////////////////////
+
 void Player::startRespawn() {
     respawnTimer = PlayerConstants::RESPAWN_DURATION_FRAMES;
 }
@@ -893,6 +895,8 @@ void Player::stopAtPosition(int x, int y) {
   // Reset launch state
   springMomentum.setLaunchFramesRemaining(0);
 }
+
+//////////////////////////////////////////   transferMomentumTo       /////////////////////////////////////////////
 
 void Player::transferMomentumTo(Player *otherPlayer) {
   if (otherPlayer == nullptr || !otherPlayer->isAlive())
