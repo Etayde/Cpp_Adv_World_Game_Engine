@@ -434,8 +434,9 @@ void Game::checkRoomTransitions() {
           }
 
           // Award points for unlocking the door (first time only)
-          player1.incrementScore(100);
-          player2.incrementScore(100);
+
+          player1.incrementScore(100 * player1.getLives());
+          player2.incrementScore(100 * player2.getLives());
         }
         room->unlockDoor(doorId);
 
