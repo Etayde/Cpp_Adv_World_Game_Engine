@@ -225,13 +225,8 @@ void Player::draw(Room *room) {
     return;
   }
 
-  // Don't draw player if in dark zone without visibility
-  if (room != nullptr && room->isInDarkZone(pos.x, pos.y) &&
-      !room->isVisible(pos.x, pos.y)) {
-    std::cout << ' ' << std::flush;
-  } else {
-    std::cout << sprite << std::flush;
-  }
+  // Always draw player sprite, even in dark zones
+  std::cout << sprite << std::flush;
 }
 
 //////////////////////////////////////////        pickupItem
