@@ -19,6 +19,7 @@ class Riddle;
 class Game {
 private:
   int initErrorMessage;
+  int initErrorRoomId;
 
   struct ActiveRiddle {
     Riddle *riddle;

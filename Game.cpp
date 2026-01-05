@@ -20,7 +20,8 @@ class Constants;
 /////////////////////////////////////////////
 
 Game::Game()
-    : initErrorMessage(0), currentState(GameState::mainMenu), currentRoomId(-1),
+    : initErrorMessage(0), initErrorRoomId(-1),
+      currentState(GameState::mainMenu), currentRoomId(-1),
       gameInitialized(false) {}
 
 Game::~Game() {
@@ -530,16 +531,16 @@ void Game::showErrorScreen() {
   gotoxy(22, 10);
   switch (initErrorMessage) {
   case 1:
-    cout << "Error: No 'L' found in room " << initErrorMessage << endl;
+    cout << "Error: No 'L' found in room " << initErrorRoomId << endl;
     break;
   case 2:
-    cout << "Error: Multiple 'L's found in room " << initErrorMessage << endl;
+    cout << "Error: Multiple 'L's found in room " << initErrorRoomId << endl;
     break;
   case 3:
-    cout << "Error: 'L' out of bounds in room " << initErrorMessage << endl;
+    cout << "Error: 'L' out of bounds in room " << initErrorRoomId << endl;
     break;
   case 4:
-    cout << "Error: 'L' accessible in room " << initErrorMessage << endl;
+    cout << "Error: 'L' accessible in room " << initErrorRoomId << endl;
     break;
   default:
     cout << "Unknown error" << endl;
@@ -622,6 +623,7 @@ void Game::initializeRooms() {
     int validationResult = validateLegendPlacement(room);
     if (validationResult != 0) {
       initErrorMessage = validationResult;
+      initErrorRoomId = i;
       currentState = GameState::error;
       return;
     }
