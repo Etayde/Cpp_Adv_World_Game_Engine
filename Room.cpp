@@ -373,6 +373,16 @@ ObjectType Room::getObjectTypeAt(int x, int y) const {
 
 // Check if there's a wall at the given position
 bool Room::isWallAt(int x, int y) const {
+  // Check collision with Legend
+  if (legendTopLeft.x >= 0 && legendTopLeft.y >= 0) {
+      int legX = legendTopLeft.x - 1;
+      int legY = legendTopLeft.y - 1;
+      // Dimensions of legendData in Layouts.h: 22 wide, 5 high
+      if (x >= legX && x < legX + 22 && y >= legY && y < legY + 5) {
+          return true;
+      }
+  }
+
   char c = getCharAt(x, y);
   gotoxy(5, 20);
   std::cout << "c: " << c << "\nBlocking: " << BlockingChars::isBlockingChar(c);
@@ -1255,7 +1265,7 @@ void Room::drawPlayerStats(Player* p) {
 }
 
 void Room::DrawLives(Player* p) {
-  int lineY = legendTopLeft.y + p->playerId - 1;
+  int lineY = legendTopLeft.y + p->playerId;
   int startX = legendTopLeft.x - 1;
   int offset = startX + 10; // Align under LIVES
   
@@ -1265,15 +1275,15 @@ void Room::DrawLives(Player* p) {
       std::cout << "<3 <3 <3";
       break;
     case 2:
-      gotoxy(offset, lineY);
+      gotoxy(offset+1, lineY);
       std::cout << "<3 <3   ";
       break;
     case 1:
-      gotoxy(offset, lineY);
+      gotoxy(offset+2, lineY);
       std::cout << "<3      ";
       break;
     default:
-      gotoxy(offset, lineY);
+      gotoxy(offset+3, lineY);
       std::cout << "        ";
       break;
   }

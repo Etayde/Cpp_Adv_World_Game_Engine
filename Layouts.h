@@ -9,7 +9,8 @@
 /////////////////////////////////////////////
 
 // Main menu screen data
-static const char *mainMenuData[MAX_Y] = {
+inline const char *mainMenuData[MAX_Y] = {
+
 
     // 0123456789012345678901234567890123456789012345678901234567890123456789012345678
     "=========================================================================="
@@ -66,7 +67,8 @@ static const char *mainMenuData[MAX_Y] = {
 static Screen mainMenuScreen(mainMenuData);
 
 // Instructions screen data
-static const char *instructionsData[MAX_Y] = {
+inline const char *instructionsData[MAX_Y] = {
+
 
     // 0123456789012345678901234567890123456789012345678901234567890123456789012345678
     "=========================================================================="
@@ -123,7 +125,8 @@ static const char *instructionsData[MAX_Y] = {
 static Screen instructionsScreen(instructionsData);
 
 // Pause screen data
-static const char *pauseData[MAX_Y] = {
+inline const char *pauseData[MAX_Y] = {
+
 
     // 0123456789012345678901234567890123456789012345678901234567890123456789012345678
     "=========================================================================="
@@ -180,7 +183,8 @@ static const char *pauseData[MAX_Y] = {
 static Screen pauseScreen(pauseData);
 
 // Victory screen data
-static const char *victoryData[MAX_Y] = {
+inline const char *victoryData[MAX_Y] = {
+
 
     // 0123456789012345678901234567890123456789012345678901234567890123456789012345678
     "=========================================================================="
@@ -237,7 +241,8 @@ static const char *victoryData[MAX_Y] = {
 static Screen victoryScreen(victoryData);
 
 // Game Over screen data
-static const char *gameOverData[MAX_Y] = {
+inline const char *gameOverData[MAX_Y] = {
+
 
     // 0123456789012345678901234567890123456789012345678901234567890123456789012345678
     "=========================================================================="
@@ -294,7 +299,8 @@ static const char *gameOverData[MAX_Y] = {
 static Screen gameOverScreen(gameOverData);
 
 // Game initialization error screen data
-static const char *initErrorData[MAX_Y] = {
+inline const char *initErrorData[MAX_Y] = {
+
 
     // 0123456789012345678901234567890123456789012345678901234567890123456789012345678
     "=========================================================================="
@@ -350,13 +356,14 @@ static const char *initErrorData[MAX_Y] = {
 };
 static Screen initErrorScreen(initErrorData);
 
-static const char *legendData[5] = {
+inline const char *legendData[5] = {
+
 
      // 0123456789012345678901
-    "+-----------------------+", //0
-    "|    SCORE  LIVES  INV  |", //1
-    "|$:                     |", //2
-    "|&:                     |", //3
-    "+-----------------------+"  //4
+       "+--------------------+", //0
+       "|  SCORE  LIVES  INV |", //1
+       "|$:                  |", //2
+       "|&:                  |", //3
+       "+--------------------+"  //4
     
 };
