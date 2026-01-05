@@ -1,10 +1,13 @@
+//////////////////////////////////////       INCLUDES & FORWARDS       /////////////////////////////////////////////
+
 #include "SpringLink.h"
 #include "Spring.h"
 #include "Room.h"
 #include "Console.h"
 #include <iostream>
 
-// Constructor
+//////////////////////////////////////////       Constructor       /////////////////////////////////////////////
+
 SpringLink::SpringLink(const Point& pos, Spring* parent, int index)
     : StaticObject(pos, '#', ObjectType::SPRING_LINK),
       parentSpring(parent),
@@ -13,13 +16,15 @@ SpringLink::SpringLink(const Point& pos, Spring* parent, int index)
 {
 }
 
-// Clone
+//////////////////////////////////////////          clone       /////////////////////////////////////////////
+
 GameObject* SpringLink::clone() const
 {
     return new SpringLink(*this);
 }
 
-// Handle explosion - destroy entire spring
+//////////////////////////////////////////       onExplosion       /////////////////////////////////////////////
+
 bool SpringLink::onExplosion()
 {
     if (parentSpring)
@@ -29,7 +34,8 @@ bool SpringLink::onExplosion()
     return true;
 }
 
-// Collapse this link and update visual
+//////////////////////////////////////////        collapse       /////////////////////////////////////////////
+
 void SpringLink::collapse(Room* room)
 {
     if (collapsed)
@@ -49,7 +55,8 @@ void SpringLink::collapse(Room* room)
     }
 }
 
-// Reset to uncompressed state
+//////////////////////////////////////////          reset       /////////////////////////////////////////////
+
 void SpringLink::reset(Room* room)
 {
     if (!collapsed)

@@ -1,12 +1,15 @@
 #pragma once
 
+//////////////////////////////////////       INCLUDES & FORWARDS       /////////////////////////////////////////////
+
 #include "StaticObjects.h"
 #include "Point.h"
 #include "Constants.h"
 
-// Forward declaration
 class Spring;
 class Room;
+
+//////////////////////////////////////////        SpringLink       /////////////////////////////////////////////
 
 class SpringLink : public StaticObject
 {
