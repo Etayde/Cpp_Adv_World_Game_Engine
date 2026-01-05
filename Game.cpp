@@ -9,8 +9,6 @@
 #include "Riddle.h"
 #include "Spring.h"
 
-#include <queue>
-#include <set>
 
 class Constants;
 

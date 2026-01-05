@@ -6,7 +6,7 @@
 #include "Player.h"
 #include "Room.h"
 #include "Console.h"
-using std::cout, std::endl;
+using std::cout;
 
 //////////////////////////////////////////         enterRiddle         //////////////////////////////////////////
 
@@ -142,7 +142,7 @@ void Riddle::displayFeedback(bool correct) const {
         gotoxy(33, 14);
         cout << "CORRECT!";
 
-        gotoxy(20ß, 16);
+        gotoxy(20, 16);
         cout << "P" << solvingPlayerId << " (" << solvingPlayerSprite << ") " " solved the riddle!";
         
         gotoxy(27, 17);
