@@ -58,7 +58,8 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
     currentRoom->removeObjectAt(centerX, centerY);
     currentRoom->setCharAt(centerX, centerY, ' ');
     gotoxy(centerX, centerY);
-    std::cout << ' ' << std::flush;
+    std::cout << ' ';
+
 
     // Process explosion in radius
     for (int dy = -EXPLOSION_RADIUS; dy <= EXPLOSION_RADIUS; dy++)
@@ -133,8 +134,8 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
         }
     }
 
-    std::cout.flush();
     return result;
+
 }
 
 //////////////////////////////////////////          draw             //////////////////////////////////////////
@@ -165,6 +166,7 @@ void Bomb::draw() const
     }
 
     std::cout.flush();
+
 }
 
 //////////////////////////////////////////       isPickable          //////////////////////////////////////////

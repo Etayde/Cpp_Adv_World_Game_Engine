@@ -348,6 +348,8 @@ void Game::update() {
 
   // Check room transitions
   checkRoomTransitions();
+
+  std::cout << std::flush;
 }
 
 //////////////////////////////////////////       getCurrentRoom
@@ -504,7 +506,7 @@ void Game::showInstructions() { instructionsScreen.draw(); }
 void Game::handleInstructionsInput() {
   if (check_kbhit()) {
     char choice = get_single_char();
-    if (choice == char(Action::ESC))
+    if (choice == static_cast<char>(Action::ESC))
       currentState = GameState::mainMenu;
   }
 }

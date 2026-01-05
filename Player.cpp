@@ -118,7 +118,7 @@ bool Player::canMoveToBoundaryPosition(int x, int y, Room *room) const {
 void Player::erase(Room *room) {
   if (room == nullptr) {
     gotoxy(pos.x, pos.y);
-    std::cout << ' ' << std::flush;
+    std::cout << ' ';
     return;
   }
 
@@ -136,7 +136,7 @@ void Player::erase(Room *room) {
   }
 
   gotoxy(pos.x, pos.y);
-  std::cout << restoreChar << std::flush;
+  std::cout << restoreChar;
 }
 
 // Log debug information during launch
@@ -226,7 +226,7 @@ void Player::draw(Room *room) {
   }
 
   // Always draw player sprite, even in dark zones
-  std::cout << sprite << std::flush;
+  std::cout << sprite;
 }
 
 //////////////////////////////////////////        pickupItem
@@ -310,7 +310,7 @@ Point Player::dropItem(Room *room) {
 
 
     gotoxy(dropX, dropY);
-    std::cout << droppedItem->getSprite() << std::flush;
+    std::cout << droppedItem->getSprite();
   } else {
     delete droppedItem;
   }
@@ -588,7 +588,7 @@ bool Player::handleSwitchInteraction(Switch *sw, Room *room) {
   sw->toggle();
   room->setCharAt(sw->getX(), sw->getY(), sw->getSprite());
   gotoxy(sw->getX(), sw->getY());
-  std::cout << sw->getSprite() << std::flush;
+  std::cout << sw->getSprite();
   room->updatePuzzleState();
   return true; // Blocks movement
 }

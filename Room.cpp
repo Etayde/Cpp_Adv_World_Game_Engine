@@ -272,7 +272,7 @@ void Room::draw() {
   }
 
   drawDarkness();
-  std::cout.flush();
+ 
 }
 
 //////////////////////////////////////////        drawDarkness
@@ -295,7 +295,7 @@ void Room::drawDarkness() {
         std::cout << ' ';
     }
   }
-  std::cout.flush();
+ 
 }
 
 void Room::drawVisibleObjects() {
@@ -319,7 +319,7 @@ void Room::drawVisibleObjects() {
     obj->draw();
   }
 
-  std::cout.flush();
+ 
 }
 
 //////////////////////////////////////////         getCharAt
@@ -565,7 +565,7 @@ void Room::updatePuzzleState() {
         }
       }
     }
-    std::cout.flush();
+   
   }
 }
 

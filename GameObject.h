@@ -69,7 +69,8 @@ public:
   virtual void draw() const {
     if (active && position.x >= 0 && position.y >= 0) {
       gotoxy(position.x, position.y);
-      std::cout << sprite << std::flush;
+      std::cout << sprite;
+
     }
   }
 
