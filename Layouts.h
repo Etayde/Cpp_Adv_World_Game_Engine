@@ -343,3 +343,14 @@ const char *initErrorData[MAX_Y] = {
     "=====" // 24
 };
 static Screen initErrorScreen(initErrorData);
+
+static const char *legendData[5] = {
+
+     // 0123456789012345678901
+    "+-----------------------+", //0
+    "|    SCORE  LIVES  INV  |", //1
+    "|$:                     |", //2
+    "|&:                     |", //3
+    "+-----------------------+"  //4
+    
+};

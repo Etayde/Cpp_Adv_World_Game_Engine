@@ -8,6 +8,8 @@
 #include "Constants.h"
 #include "DebugLog.h"
 #include "Door.h"
+#include "Layouts.h"
+
 #include "Items.h"
 #include "Obstacle.h"
 #include "Player.h"
@@ -372,8 +374,9 @@ ObjectType Room::getObjectTypeAt(int x, int y) const {
 // Check if there's a wall at the given position
 bool Room::isWallAt(int x, int y) const {
   char c = getCharAt(x, y);
-  return (BlockingChars::isBlockingChar(
-      c)); // Both unbreakable walls and legend borders
+  gotoxy(5, 20);
+  std::cout << "c: " << c << "\nBlocking: " << BlockingChars::isBlockingChar(c);
+  return (BlockingChars::isBlockingChar(c)); // Both unbreakable walls and legend borders
 }
 
 //////////////////////////////////////////        getObjectAt
@@ -1206,96 +1209,72 @@ void Room::drawLegend(Player *p1, Player *p2) {
 }
 
 void Room::drawEmptyLegend() {
+  int startX = legendTopLeft.x - 1;
+  int startY = legendTopLeft.y - 1;
 
-  int startX = legendTopLeft.x-1;
-  int startY = legendTopLeft.y-1;
-  
-  bool validTL = true;
-  bool validBR = true;
-
-  if (startX < 0 || startY < 0)                   { validTL = false; }
-  if (startX + InventoryUI::WIDTH + 2 >= MAX_X || 
-      startY + InventoryUI::HEIGHT + 2 >= MAX_Y)  { validBR = false; }
-
-  gotoxy(5, 20);
-  std::cout << "validTL: " << validTL << " validBR: " << validBR << std::endl;
-  std::cout << "startX: " << startX << " startY: " << startY << std::endl;
-  gotoxy(startX, startY);
-  std::cout << "+";
-  for (int i = 0; i < InventoryUI::WIDTH; i++) {
-    std::cout << "-";
-  }
-  std::cout << "+";
-
-  for (int i = 1; i <= InventoryUI::HEIGHT; i++) {
+  for (int i = 0; i < 5; i++) {
     gotoxy(startX, startY + i);
-    std::cout << "|";
-    gotoxy(startX + InventoryUI::WIDTH + 1, startY + i);
-    std::cout << "|";
-  }
-
-  gotoxy(startX, startY + InventoryUI::HEIGHT + 1);
-  std::cout << "+";
-  for (int i = 0; i < InventoryUI::WIDTH; i++) {
-    std::cout << "-";
-  }
-  std::cout << "+";
-
-  gotoxy(legendTopLeft.x, legendTopLeft.y);
-  for (int i = 0; i < InventoryUI::HEIGHT; i++) {
-    for (int j = 0; j < InventoryUI::WIDTH; j++) {
-      gotoxy(legendTopLeft.x + j, legendTopLeft.y + i);
-      std::cout << " ";
-    }
+    std::cout << legendData[i];
   }
 }
 
 void Room::drawLegendInfo(Player *p1, Player *p2) {
-  gotoxy(legendTopLeft.x + 2, legendTopLeft.y);
-  std::cout << "SCORE  LIVES  INV";
-  
   drawPlayerStats(p1);
   drawPlayerStats(p2);
-
-  return;
 }
 
 void Room::drawPlayerStats(Player* p) {
-  gotoxy(legendTopLeft.x, legendTopLeft.y + p->playerId);
-  std::cout << p->sprite << ":  " << p->getScore();
+  // Layout provides "$:                     "
+  // We need to print score, lives, inv on top of it
+  // Offsets relative to start of line in legendData:
+  // |$:                     |
+  // 0123456789             21
+  // Score starts after ":  " (offset 4)
+
+  int lineY = legendTopLeft.y + p->playerId - 1; // p1 is row 2 (idx 2), p2 is row 3 (idx 3)
+  int startX = legendTopLeft.x - 1;
   
-  DrawLives(p);
-  gotoxy(legendTopLeft.x + 17, legendTopLeft.y + p->playerId);
+  // Draw Score
+  gotoxy(startX + 4, lineY);
+  std::cout << p->getScore();
   
+  // Draw Lives (offset depends on score length, but let's fix it for now)
+  // Actually, let's use fixed offsets based on the layout
+  // SCORE  LIVES  INV
+  // 5      12     19
+  
+  DrawLives(p); // Needs update to absolute position
+
+  // Draw Inventory
+  gotoxy(startX + 19, lineY);
   if (p->hasItem()) {
       std::cout << p->inventory->getSprite();
   } else {
       std::cout << " ";
   }
-  return;
 }
 
 void Room::DrawLives(Player* p) {
-  
-  int LegendY = legendTopLeft.y + p->playerId;
-  int offset = legendTopLeft.x + 7;
+  int lineY = legendTopLeft.y + p->playerId - 1;
+  int startX = legendTopLeft.x - 1;
+  int offset = startX + 10; // Align under LIVES
   
   switch(p->lives) {
     case 3:
-      gotoxy(offset, LegendY);
+      gotoxy(offset, lineY);
       std::cout << "<3 <3 <3";
       break;
     case 2:
-      gotoxy(offset + 1, LegendY);
-      std::cout << "<3 <3";
+      gotoxy(offset, lineY);
+      std::cout << "<3 <3   ";
       break;
     case 1:
-      gotoxy(offset + 2, LegendY);
-      std::cout << "&:";
+      gotoxy(offset, lineY);
+      std::cout << "<3      ";
       break;
     default:
+      gotoxy(offset, lineY);
+      std::cout << "        ";
       break;
   }
-
-  return;
 }
