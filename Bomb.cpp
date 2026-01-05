@@ -111,6 +111,7 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
                     result.switchesDestroyed++;
                 if (obj->getType() == ObjectType::SWITCH_ON)
                     result.switchesDestroyed++;
+                cout << result.keyDestroyed << endl;
 
                 if (obj->onExplosion())
                 {
