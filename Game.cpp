@@ -71,8 +71,6 @@ void Game::run() {
         handlePauseInput();
         sleep_ms(50);
       }
-      // Don't redraw - let the calling context handle screen restoration
-      // This allows riddles to persist across pause/resume
       break;
 
     case GameState::victory:
@@ -82,7 +80,7 @@ void Game::run() {
       while (!check_kbhit())
         sleep_ms(50);
       get_single_char();
-      gameInitialized = false; // Reset for next game
+      gameInitialized = false;
       currentState = GameState::mainMenu;
       break;
 
@@ -93,7 +91,7 @@ void Game::run() {
       while (!check_kbhit())
         sleep_ms(50);
       get_single_char();
-      gameInitialized = false; // Reset for next game
+      gameInitialized = false;
       currentState = GameState::mainMenu;
       break;
 
@@ -104,7 +102,7 @@ void Game::run() {
       while (!check_kbhit())
         sleep_ms(50);
       get_single_char();
-      gameInitialized = false; // Reset for next game
+      gameInitialized = false;
       currentState = GameState::mainMenu;
       break;
 
@@ -525,7 +523,13 @@ void Game::handlePauseInput() {
   }
 }
 
-void Game::showVictory() { victoryScreen.draw(); }
+void Game::showVictory() { 
+  victoryScreen.draw();
+  gotoxy(40, 13);
+  cout << "Player 1: " << player1.getScore() << endl;
+  gotoxy(40, 14);
+  cout << "Player 2: " << player2.getScore() << endl;
+}
 
 void Game::showGameOver() { gameOverScreen.draw(); }
 
@@ -552,12 +556,6 @@ void Game::showErrorScreen() {
     cout << "Unknown error" << endl;
     break;
   }
-  while (check_kbhit())
-    get_single_char();
-  while (!check_kbhit())
-    sleep_ms(50);
-  get_single_char();
-  currentState = GameState::mainMenu;
 }
 
 //////////////////////////////////////////      initializeRooms

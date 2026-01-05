@@ -4,8 +4,8 @@
 
 #include "InteractableObject.h"
 #include "Constants.h"
+#include "Player.h"
 
-class Player;  // Forward declaration
 class Room;    // Forward declaration
 
 //////////////////////////////////////////          Riddle            //////////////////////////////////////////
@@ -13,11 +13,16 @@ class Room;    // Forward declaration
 class Riddle : public InteractableObject
 {
 private:
+    bool firstAttempt;
+    char solvingPlayerSprite;
+    int solvingPlayerId;
     int riddleId;
     int correctAnswer;
+    
 
 public:
-    Riddle() : InteractableObject(), riddleId(-1), correctAnswer(-1)
+    Riddle() : InteractableObject(), riddleId(-1), correctAnswer(-1), firstAttempt(true), 
+                solvingPlayerId(-1), solvingPlayerSprite(' ')
     {
         sprite = '?';
         type = ObjectType::RIDDLE;
@@ -25,7 +30,8 @@ public:
 
     Riddle(const Point &pos, int ridId = 0, int ansId = 0) :
                 InteractableObject(pos, '?', ObjectType::RIDDLE),
-                riddleId(ridId), correctAnswer(ansId) {}
+                riddleId(ridId), correctAnswer(ansId), firstAttempt(true), 
+                solvingPlayerId(-1), solvingPlayerSprite(' ') {}
 
     GameObject *clone() const override { return new Riddle(*this); }
     const char *getName() const override { return "Riddle"; }
@@ -42,6 +48,9 @@ public:
     void displayFeedback(bool correct) const;
     void playExitAnimation() const;
     bool checkAnswer(int playerAnswer) const { return playerAnswer == correctAnswer; };
+    void reset() { solvingPlayerId = -1; solvingPlayerSprite = ' '; }
+    void setSolvingPlayer(Player& player) { solvingPlayerId = player.getId(); 
+                                            solvingPlayerSprite = player.getSprite(); }
 
 
 };

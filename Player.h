@@ -124,7 +124,12 @@ public:
     if (lives > 0)
       lives--;
   }
+  void incrementScore(int points) {
+    int newScore = score + points;
+    newScore >= 0 ? score = newScore : score = 0;
+  }
 
+  // Drawing
   void draw(Room *room = nullptr);
   void erase(Room *room);
 

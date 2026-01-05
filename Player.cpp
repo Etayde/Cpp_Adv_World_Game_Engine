@@ -553,6 +553,7 @@ bool Player::handleRiddleInteraction(Riddle *riddle, int nextX, int nextY,
   if (activeRiddle != nullptr && activePlayer != nullptr) {
     *activeRiddle = riddle;
     *activePlayer = this;
+    riddle->setSolvingPlayer(*this);
   }
 
   // Enter riddle (blocks game) - pass 'this' to track triggering player

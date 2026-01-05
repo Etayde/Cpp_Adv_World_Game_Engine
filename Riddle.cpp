@@ -1,6 +1,7 @@
 //////////////////////////////////////       INCLUDES & FORWARDS       //////////////////////////////////////////
 
 #include "Riddle.h"
+#include "Layouts.h"
 #include "RiddleDatabase.h"
 #include "Player.h"
 #include "Room.h"
@@ -27,6 +28,12 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer) {
     // 5. Check answer
     bool correct = checkAnswer(playerAnswer);
 
+    if (correct && firstAttempt && triggeringPlayer != nullptr) {
+        triggeringPlayer->incrementScore(100);
+    }
+
+    firstAttempt = false;
+
     // 6. Apply penalty for wrong answer
     if (!correct && triggeringPlayer != nullptr) {
         triggeringPlayer->loseLife();  // Subtract 1 life
@@ -43,8 +50,7 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer) {
         room->draw();
 
     // 10. Return result
-    if (correct)
-        return RiddleResult::SOLVED;
+    if (correct) return RiddleResult::SOLVED;
 
     return RiddleResult::FAILED;
 }
@@ -60,36 +66,13 @@ void Riddle::displayRiddleQuestion() const {
     }
 
     // Draw top border
-    gotoxy(11, 4);
-    cout << "/";
-    for (int i = 1; i < 56; i++) {
-        gotoxy(11 + i, 4);
-        cout << "-";
+    int startX = 11;
+    int startY = 4;
+    int endY = 16;
+    for (int i = 0; i < endY; i++) {
+        gotoxy(startX, startY + i);
+        cout << riddlePopupScreen[i];
     }
-    gotoxy(67, 4);
-    cout << "\\";
-
-    // Draw sides and clear interior (rows 5-19)
-    for (int row = 5; row < 20; row++) {
-        gotoxy(11, row);
-        cout << "|";
-        // Clear interior with spaces
-        for (int col = 12; col < 67; col++) {
-            cout << " ";
-        }
-        gotoxy(67, row);
-        cout << "|";
-    }
-
-    // Draw bottom border
-    gotoxy(11, 20);
-    cout << "\\";
-    for (int i = 1; i < 56; i++) {
-        gotoxy(11 + i, 20);
-        cout << "-";
-    }
-    gotoxy(67, 20);
-    cout << "/";
 
     // Display question
     gotoxy(13, 6);
@@ -138,11 +121,36 @@ int Riddle::getPlayerAnswer() const {
 //////////////////////////////////////////       displayFeedback        //////////////////////////////////////////
 
 void Riddle::displayFeedback(bool correct) const {
-    gotoxy(13, 15);
-    if (correct)
-        cout << "CORRECT! The riddle disappears...";
-    else
+
+    if (correct && firstAttempt)
+    {
+        gotoxy(33, 13);
+        cout << "CORRECT!";
+        gotoxy(18, 15);
+        cout << "P" << solvingPlayerId << "(" << solvingPlayerSprite << ") " " solved the riddle on the first try!";
+        
+        gotoxy(31, 17);
+        cout << "+100 Points!";
+
+        gotoxy(27, 19);
+        cout << "Riddle disapeared...";
+    }
+    else if (correct)
+    {
+        gotoxy(33, 13);
+        cout << "CORRECT!";
+
+        gotoxy(18, 15);
+        cout << "P" << solvingPlayerId << "(" << solvingPlayerSprite << ") " " solved the riddle!";
+        
+        gotoxy(27, 17);
+        cout << "Riddle disapeared...";
+    }
+    else 
+    {
+        gotoxy(24, 17);
         cout << "INCORRECT! Try again later.";
+    }
     cout.flush();
 
     sleep_ms(2000);  // Wait for player to read
