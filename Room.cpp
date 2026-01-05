@@ -708,6 +708,7 @@ ExplosionResult Room::updateAllObjects(Player *p1, Player *p2) {
 
         // Accumulate bomb explosion results
         totalResult.keyDestroyed |= result.keyDestroyed;
+        cout << totalResult.keyDestroyed << endl;
         totalResult.player1Hit |= result.player1Hit;
         totalResult.player2Hit |= result.player2Hit;
         totalResult.switchesDestroyed += result.switchesDestroyed;

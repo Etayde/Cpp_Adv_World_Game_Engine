@@ -693,7 +693,7 @@ void Game::changeRoom(int newRoomId, bool goingForward) {
 
 //////////////////////////////////////////       checkGameOver        /////////////////////////////////////////////
 
-bool Game::checkGameOver(const ExplosionResult& /*result*/) {
+bool Game::checkGameOver(const ExplosionResult& result) {
   if (player1.isDead()) {
     setGameOverMessege(GameOverMessege::PLAYER1_DIED);
     return true;
@@ -707,7 +707,12 @@ bool Game::checkGameOver(const ExplosionResult& /*result*/) {
   Room* room = getCurrentRoom();
   int neededSwitches = room->getDoorReqSwitches(room->nextRoomId);
   int totalSwitches = room->getTotalSwitches();
-
+  
+  if (result.keyDestroyed) {
+    setGameOverMessege(GameOverMessege::VALUABLE_DESTROYED);
+    return true;
+  }
+  
   if (neededSwitches > 0 && totalSwitches < neededSwitches) {
     setGameOverMessege(GameOverMessege::VALUABLE_DESTROYED);
     return true;
