@@ -47,7 +47,7 @@ public:
     int getPlayerAnswer() const;
     void displayFeedback(bool correct) const;
     void playExitAnimation() const;
-    bool checkAnswer(int playerAnswer) const { return playerAnswer == correctAnswer; };
+    bool checkAnswer(int playerAnswer) const;
     void reset() { solvingPlayerId = -1; solvingPlayerSprite = ' '; }
     void setSolvingPlayer(Player& player) { solvingPlayerId = player.getId(); 
                                             solvingPlayerSprite = player.getSprite(); }

@@ -708,7 +708,6 @@ ExplosionResult Room::updateAllObjects(Player *p1, Player *p2) {
 
         // Accumulate bomb explosion results
         totalResult.keyDestroyed |= result.keyDestroyed;
-        cout << totalResult.keyDestroyed << endl;
         totalResult.player1Hit |= result.player1Hit;
         totalResult.player2Hit |= result.player2Hit;
         totalResult.switchesDestroyed += result.switchesDestroyed;
@@ -1149,7 +1148,7 @@ void Room::drawPlayerStats(Player* p) {
   int startX = legendTopLeft.x;
   
   // Draw Score
-  gotoxy(startX + 4, lineY);
+  gotoxy(startX + 3, lineY);
   std::cout << p->getScore();
   
   DrawLives(p); 
@@ -1166,7 +1165,7 @@ void Room::drawPlayerStats(Player* p) {
 void Room::DrawLives(Player* p) {
   int lineY = legendTopLeft.y + p->playerId;
   int startX = legendTopLeft.x - 1;
-  int offset = startX + 9; // Align under LIVES
+  int offset = startX + 8; // Align under LIVES
   
   switch(p->lives) {
     case 3:

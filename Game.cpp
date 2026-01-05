@@ -542,6 +542,7 @@ void Game::showGameOver() {
   case GameOverMessege::VALUABLE_DESTROYED:
     gotoxy(18,8);
     cout << "An essential object has been destroyed." << endl;
+    gotoxy(18,9);
     cout << " The game cannot continue without it." << endl;
     break;
   default:
@@ -712,7 +713,7 @@ bool Game::checkGameOver(const ExplosionResult& result) {
     setGameOverMessege(GameOverMessege::VALUABLE_DESTROYED);
     return true;
   }
-  
+
   if (neededSwitches > 0 && totalSwitches < neededSwitches) {
     setGameOverMessege(GameOverMessege::VALUABLE_DESTROYED);
     return true;

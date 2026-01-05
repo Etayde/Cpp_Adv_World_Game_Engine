@@ -142,8 +142,8 @@ void Riddle::displayFeedback(bool correct) const {
         gotoxy(33, 14);
         cout << "CORRECT!";
 
-        gotoxy(18, 16);
-        cout << "P" << solvingPlayerId << "(" << solvingPlayerSprite << ") " " solved the riddle!";
+        gotoxy(20ß, 16);
+        cout << "P" << solvingPlayerId << " (" << solvingPlayerSprite << ") " " solved the riddle!";
         
         gotoxy(27, 17);
         cout << "Riddle disapeared...";
@@ -170,4 +170,14 @@ void Riddle::playRiddleAnimation() const {
 
 void Riddle::playExitAnimation() const {
     // No-op for MVP
+}
+
+//////////////////////////////////////////        checkAnswer           //////////////////////////////////////////
+
+bool Riddle::checkAnswer(int playerAnswer) const {
+    const RiddleData* data = RiddleDatabase::getRiddle(riddleId);
+    if (data == nullptr) {
+        return false;  // Can't verify without data
+    }
+    return playerAnswer == data->correctAnswerIndex;
 }
