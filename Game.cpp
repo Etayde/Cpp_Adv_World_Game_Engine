@@ -166,46 +166,18 @@ int Game::validateLegendPlacement(Room &room) {
     }
   }
 
-  // Second, checking reachability (BFS from spawn)
-  bool visited[MAX_Y][MAX_X] = {false};
-  std::queue<Point> q;
-
-  // Start BFS from spawn point
-  Point start = room.spawnPoint;
-  if (start.x >= 0 && start.x < MAX_X && start.y >= 0 && start.y < MAX_Y) {
-    q.push(start);
-    visited[start.y][start.x] = true;
+  // 4b. Check for overlap with Spawn Points (Player locations)
+  // Check primary spawn point
+  if (room.spawnPoint.x >= topLeftX && room.spawnPoint.x < topLeftX + width &&
+      room.spawnPoint.y >= topLeftY && room.spawnPoint.y < topLeftY + height) {
+    return 4;
   }
-
-  while (!q.empty()) {
-    Point curr = q.front();
-    q.pop();
-
-    // Check if current reachable tile is inside Legend Area
-    if (curr.x >= topLeftX && curr.x < topLeftX + width && curr.y >= topLeftY &&
-        curr.y < topLeftY + height) {
-      return 4; // Legend overlaps reachable area
-    }
-
-    // Neighbors
-    int dx[] = {0, 0, 1, -1};
-    int dy[] = {1, -1, 0, 0};
-
-    for (int i = 0; i < 4; i++) {
-      int nx = curr.x + dx[i];
-      int ny = curr.y + dy[i];
-
-      if (nx >= 0 && nx < MAX_X && ny >= 0 && ny < MAX_Y) {
-        if (!visited[ny][nx]) {
-          char c = room.baseLayout->getCharAt(nx, ny);
-          // Walkable if NOT a wall
-          if (c != 'W' && c != 'w') {
-            visited[ny][nx] = true;
-            q.push(Point(nx, ny));
-          }
-        }
-      }
-    }
+  // Check secondary spawn point (from next room)
+  if (room.spawnPointFromNext.x >= topLeftX &&
+      room.spawnPointFromNext.x < topLeftX + width &&
+      room.spawnPointFromNext.y >= topLeftY &&
+      room.spawnPointFromNext.y < topLeftY + height) {
+    return 4;
   }
 
   return 0; // Valid
