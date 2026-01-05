@@ -181,7 +181,7 @@ int Game::validateLegendPlacement(Room &room) {
     return 5;
   }
 
-  room.setLegendPoint(topLeftX, topLeftY);
+  room.setLegendPoint(lPos.x, lPos.y);
 
   return 0; // Valid
 }

@@ -1207,8 +1207,8 @@ void Room::drawLegend(Player *p1, Player *p2) {
 
 void Room::drawEmptyLegend() {
 
-  int startX = legendTopLeft.x - 1;
-  int startY = legendTopLeft.y - 1;
+  int startX = legendTopLeft.x-1;
+  int startY = legendTopLeft.y-1;
   
   bool validTL = true;
   bool validBR = true;
@@ -1222,29 +1222,29 @@ void Room::drawEmptyLegend() {
   std::cout << "startX: " << startX << " startY: " << startY << std::endl;
   gotoxy(startX, startY);
   std::cout << "+";
-  for (int i = 1; i < InventoryUI::WIDTH + 1; i++) {
+  for (int i = 1; i < InventoryUI::WIDTH; i++) {
     std::cout << "-";
   }
   std::cout << "+";
 
-  for (int i = 1; i < InventoryUI::HEIGHT + 1; i++) {
+  for (int i = 1; i <= InventoryUI::HEIGHT; i++) {
     gotoxy(startX, startY + i);
     std::cout << "|";
     gotoxy(startX + InventoryUI::WIDTH + 2, startY + i);
     std::cout << "|";
   }
 
-  gotoxy(startX, startY + InventoryUI::HEIGHT + 2);
+  gotoxy(startX, startY + InventoryUI::HEIGHT + 1);
   std::cout << "+";
-  for (int i = 1; i < InventoryUI::WIDTH + 1; i++) {
+  for (int i = 1; i <= InventoryUI::WIDTH; i++) {
     std::cout << "-";
   }
   std::cout << "+";
 
-  gotoxy(startX, startY);
+  gotoxy(legendTopLeft.x, legendTopLeft.y);
   for (int i = 0; i < InventoryUI::HEIGHT; i++) {
     for (int j = 0; j < InventoryUI::WIDTH; j++) {
-      gotoxy(startX + j, startY + i);
+      gotoxy(legendTopLeft.x + j, legendTopLeft.y + i);
       std::cout << " ";
     }
   }
