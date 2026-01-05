@@ -138,7 +138,6 @@ void Player::erase(Room *room) {
 
   gotoxy(pos.x, pos.y);
   std::cout << restoreChar;
-  std::cout << restoreChar;
 }
 
 void Player::startRespawn() {
@@ -294,6 +293,7 @@ void Player::draw(Room *room) {
       return;
   }
   std::cout << sprite;
+  std::cout.flush();
 }
 
 //////////////////////////////////////////        pickupItem

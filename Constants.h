@@ -149,5 +149,5 @@ inline bool isBlockingChar(char c) {
 } // namespace BlockingChars
 
 namespace PlayerConstants {
-constexpr int RESPAWN_DURATION_FRAMES = 15;
+constexpr int RESPAWN_DURATION_FRAMES = 150;
 } // namespace PlayerConstants

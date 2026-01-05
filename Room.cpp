@@ -380,9 +380,7 @@ bool Room::isWallAt(int x, int y) const {
           return true;
       }
   }
-
   char c = getCharAt(x, y);
-  gotoxy(5, 20);
   return (BlockingChars::isBlockingChar(c)); // Both unbreakable walls and legend borders
 }
 
