@@ -202,9 +202,9 @@ void Player::fallBack(Room *room) {
       break;
   }
   
-  bool spotFilled = room->isObjectAt(targetX, targetY);
+  bool spotVacant = room->isVacantSpot(targetX, targetY);
   
-  if (!spotFilled) { setPosition(targetX, targetY); }
+  if (spotVacant) { setPosition(targetX, targetY); }
   
   draw(room);
 

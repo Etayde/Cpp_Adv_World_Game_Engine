@@ -150,7 +150,7 @@ public:
   bool isWallAt(int x, int y) const;
 
   // Object management
-  bool isObjectAt(int x, int y);
+  bool isVacantSpot(int x, int y);
   GameObject *getObjectAt(int x, int y);
   const GameObject *getObjectAt(int x, int y) const;
   bool addObject(GameObject *obj);

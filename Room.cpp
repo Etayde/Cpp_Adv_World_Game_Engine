@@ -1234,11 +1234,19 @@ void Room::DrawLives(Player* p) {
   }
 }
 
-bool Room::isObjectAt(int x, int y) {
+bool Room::isVacantSpot(int x, int y) {
+  if (x < 0 || x >= MAX_X || y < 0 || y >= MAX_Y_INGAME) {
+    return false;
+  }
+
+  if (isWallAt(x, y)) {
+    return false;
+  }
+  
   for (GameObject *obj : objects) {
     if (obj->getX() == x && obj->getY() == y) {
-      return true;
+      return false;
     }
   }
-  return false;
+  return true;
 }
