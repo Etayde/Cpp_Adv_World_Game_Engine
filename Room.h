@@ -168,7 +168,7 @@ public:
   int countActiveSwitches() const;
   bool canOpenDoor(int doorId, int player1Keys, int player2Keys) const;
   int getDoorIdAt(int x, int y) const;
-  void unlockDoor(int doorId);
+  bool unlockDoor(int doorId);
   bool isDoorUnlocked(int doorId) const;
 
   // Dark zones

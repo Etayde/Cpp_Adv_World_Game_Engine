@@ -630,9 +630,12 @@ int Room::getDoorIdAt(int x, int y) const {
 //////////////////////////////////////////        unlockDoor
 /////////////////////////////////////////////
 
-void Room::unlockDoor(int doorId) {
-  if (doorId >= 0 && doorId < static_cast<int>(doorReqs.size()))
+bool Room::unlockDoor(int doorId) {
+  if (doorId >= 0 && doorId < static_cast<int>(doorReqs.size())){
     doorReqs[doorId].isUnlocked = true;
+    return true;
+  }
+  return false;
 }
 
 //////////////////////////////////////////      isDoorUnlocked
