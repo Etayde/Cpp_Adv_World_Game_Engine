@@ -40,10 +40,16 @@ Screen *LevelLoader::loadScreenFile(int fileNumber, RoomMetadata &metadata) {
     if (key == "SPAWN") {
       int x, y;
       file >> x >> y;
+      if (x < 0 || x >= MAX_X || y < 0 || y >= MAX_Y) {
+        return nullptr;
+      }
       metadata.spawnPoint = Point(x, y);
     } else if (key == "SPAWN_PREV") {
       int x, y;
       file >> x >> y;
+      if (x < 0 || x >= MAX_X || y < 0 || y >= MAX_Y) {
+        return nullptr;
+      }
       metadata.spawnPointFromNext = Point(x, y);
     } else if (key == "NEXT_ROOM") {
       file >> metadata.nextRoomId;
@@ -56,6 +62,9 @@ Screen *LevelLoader::loadScreenFile(int fileNumber, RoomMetadata &metadata) {
     } else if (key == "DARK_ZONE") {
       int x1, y1, x2, y2;
       file >> x1 >> y1 >> x2 >> y2;
+      if (x1 < 0 || x1 >= MAX_X || y1 < 0 || y1 >= MAX_Y || x2 < 0 || x2 >= MAX_X || y2 < 0 || y2 >= MAX_Y) {
+        return nullptr;
+      }
       metadata.darkZones.push_back(DarkZone(x1, y1, x2, y2));
     }
     // Skip unknown keys (including ---METADATA---)
