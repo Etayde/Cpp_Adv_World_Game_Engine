@@ -346,7 +346,7 @@ void Game::update() {
 //////////////////////////////////////////       getCurrentRoom       /////////////////////////////////////////////
 
 Room *Game::getCurrentRoom() {
-  if (currentRoomId >= 0 && currentRoomId < TOTAL_ROOMS)
+  if (currentRoomId >= 0 && currentRoomId < rooms.size())
     return &rooms[currentRoomId];
   return nullptr;
 }
