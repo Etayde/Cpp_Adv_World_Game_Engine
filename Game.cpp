@@ -646,7 +646,7 @@ void Game::initializeRooms() {
     int validationResult = validateLegendPlacement(room);
     if (validationResult != 0) {
       initErrorMessage = validationResult;
-      initErrorRoomId = i;
+      initErrorRoomId = i + 1;
       currentState = GameState::error;
       return;
     }
