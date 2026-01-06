@@ -209,7 +209,7 @@ void Room::loadObjects(int *riddleCounter) {
         if (riddleCounter != nullptr){
           riddleId = (*riddleCounter)++;
         }
-        else createObjectFromChar(' ',x, y);
+        else continue;
       }
 
       GameObject *obj = createObjectFromChar(ch, x, y, riddleId);
