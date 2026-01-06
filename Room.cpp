@@ -204,8 +204,11 @@ void Room::loadObjects(int *riddleCounter) {
 
       // For riddles, use and increment the counter if provided
       int riddleId = -1;
-      if (ch == '?' && riddleCounter != nullptr) {
-        riddleId = (*riddleCounter)++;
+      if (ch == '?'){
+        if (riddleCounter != nullptr){
+          riddleId = (*riddleCounter)++;
+        }
+        else continue;
       }
 
       GameObject *obj = createObjectFromChar(ch, x, y, riddleId);
