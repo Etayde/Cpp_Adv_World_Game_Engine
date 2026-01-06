@@ -56,7 +56,7 @@ inline const char *instructionsData[MAX_Y] = {
      "|     RIGHT         D        L      |   !    Torch      Lights dark rooms     |", // 11
      "|     STAY          S        K      |   @    Bomb       Explodes (danger!)    |", // 12
      "|     DISPOSE       E        O      |   K    Key        Unlocks Doors (0-9)   |", // 13
-     "|                                   |   \\ /  Switch    Toggles obstacles     |", // 14
+     "|                                   |   \\ /  Switch    Toggles obstacles      |", // 14
      "|    * Characters move until STOP   |   ?    Riddle     Must solve to pass    |", // 15
      "|      is pressed or hit a wall.    |   0-9  Doors      Go to next room       |", // 16
      "|  -------------------------------- | --------------------------------------  |", // 17
