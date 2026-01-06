@@ -431,13 +431,10 @@ void Game::checkRoomTransitions() {
         room->unlockDoor(doorId);
 
         // Check if completing this room triggers victory
-        if (currentRoomId == finalRoomId) {
+        if (currentRoomId == -1) {
           currentState = GameState::victory;
           return;
         }
-        cout << "initiating room change" << endl;
-        cout << "current room id: " << currentRoomId << endl;
-        cout << "door id: " << doorId << endl;
         changeRoom(doorId, true);
       }
       // Backward door check
