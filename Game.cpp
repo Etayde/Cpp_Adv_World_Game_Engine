@@ -667,7 +667,7 @@ void Game::changeRoom(int newRoomId, bool goingForward) {
     rooms[currentRoomId].active = false;
   }
 
-  if (newRoomId == rooms.size()) {
+  if (newRoomId == -1 ||newRoomId == rooms.size()) {
     gotoxy(1,1);
     std::cout << "newRoomId: " << newRoomId << std::endl;
     std::cout << "rooms.size(): " << rooms.size() << std::endl;
