@@ -378,10 +378,6 @@ bool Game::canPassThroughDoor(Room *room, int doorId) {
     return false;
 
   if (doorId == room->nextRoomId || doorId == rooms.size()) {
-    gotoxy(1,1);
-    std::cout << "next room" << std::endl;
-    std::cout << "can open?: " << room->canOpenDoor(doorId, player1.getKeyCount(),
-                             player2.getKeyCount()) << std::endl;
     return room->isDoorUnlocked(doorId) ||
            room->canOpenDoor(doorId, player1.getKeyCount(),
                              player2.getKeyCount());
@@ -405,19 +401,14 @@ void Game::checkRoomTransitions() {
   // BOTH players at the same door - trigger transition
   if (player1.isAtDoor() && player2.isAtDoor() &&
       player1.getDoorId() == player2.getDoorId()) {
-    gotoxy(1,1);
-    std::cout << "got to door" << std::endl;
     int doorId = player1.getDoorId();
-    std::cout << "door id: " << doorId << std::endl;
-
     if (canPassThroughDoor(room, doorId)) {
       // Reset waiting state
       player1.waitingAtDoor = false;
       player2.waitingAtDoor = false;
-      std::cout << "can pass through door" << std::endl;
 
       // Forward door check
-      if (doorId == room->nextRoomId) {
+      if (doorId == room->nextRoomId || doorId == rooms.size()) {
         if (!room->isDoorUnlocked(doorId)) {
           int keysNeeded = (doorId >= 0 && doorId < static_cast<int>(room->doorReqs.size())) 
                             ? room->doorReqs[doorId].requiredKeys : 0;
