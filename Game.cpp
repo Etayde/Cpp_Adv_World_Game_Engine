@@ -660,7 +660,7 @@ void Game::changeRoom(int newRoomId, bool goingForward) {
 
   if (newRoomId < -1 || newRoomId > rooms.size()){
     gotoxy(1,1);
-    std::cout << "newRoomId: " << newRoomId << std::endl;
+    std::cout << "failed to change room, newRoomId: " << newRoomId << std::endl;
     std::cout << "rooms.size(): " << rooms.size() << std::endl;
     return;}
   if (currentRoomId >= 0) {
