@@ -298,8 +298,8 @@ void Room::drawVisibleObjects() {
     int x = obj->getX();
     int y = obj->getY();
 
-    // Check visibility: skip if in dark zone and not visible
-    if (isInDarkZone(x, y) && !visibilityMap[y][x]) {
+    // Check visibility: skip if in dark zone and not visible (unless object is always visible)
+    if (isInDarkZone(x, y) && !visibilityMap[y][x] && !obj->isAlwaysVisible()) {
       // Ensure darkness by clearing the position
       gotoxy(x, y);
       std::cout << ' ';

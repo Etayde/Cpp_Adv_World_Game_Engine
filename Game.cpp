@@ -400,12 +400,16 @@ void Game::checkRoomTransitions() {
   // BOTH players at the same door - trigger transition
   if (player1.isAtDoor() && player2.isAtDoor() &&
       player1.getDoorId() == player2.getDoorId()) {
+    gotoxy(1,1);
+    std::cout << "got to door" << std::endl;
     int doorId = player1.getDoorId();
+    std::cout << "door id: " << doorId << std::endl;
 
     if (canPassThroughDoor(room, doorId)) {
       // Reset waiting state
       player1.waitingAtDoor = false;
       player2.waitingAtDoor = false;
+      std::cout << "can pass through door" << std::endl;
 
       // Forward door check
       if (doorId == room->nextRoomId) {

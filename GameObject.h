@@ -63,6 +63,7 @@ public:
     return false;
   }
   virtual bool onExplosion() { return false; }
+  virtual bool isAlwaysVisible() const { return false; }  // Override for objects visible in dark (e.g., ticking bombs)
 
   virtual void draw() const {
     if (active && position.x >= 0 && position.y >= 0) {

@@ -61,6 +61,7 @@ public:
     const char *getName() const override { return "Bomb"; }
     void draw() const override;
     bool isPickable() const override;
+    bool isAlwaysVisible() const override { return state == BombState::TICKING; }
 
     // Bomb-specific interface
     void activate(Room *room);                     // Start countdown when dropped
