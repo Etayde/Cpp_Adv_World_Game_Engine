@@ -59,11 +59,10 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer) {
 
 //////////////////////////////////////////     displayRiddleQuestion    //////////////////////////////////////////
 
-void Riddle::displayRiddleQuestion() const {
+void Riddle::displayRiddleQuestion() {
     const RiddleData* data = RiddleDatabase::getRiddle(riddleId);
     if (data == nullptr) {
-        gotoxy(13, 6);
-        cout << "Error: Riddle not found!";
+        makeAir();
         return;
     }
 

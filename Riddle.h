@@ -43,7 +43,7 @@ public:
 
     RiddleResult enterRiddle(Room *room, Player *triggeringPlayer);
     void playRiddleAnimation() const;
-    void displayRiddleQuestion() const;
+    void displayRiddleQuestion();
     int getPlayerAnswer() const;
     void displayFeedback(bool correct) const;
     void playExitAnimation() const;
@@ -51,6 +51,7 @@ public:
     void reset() { solvingPlayerId = -1; solvingPlayerSprite = ' '; }
     void setSolvingPlayer(Player& player) { solvingPlayerId = player.getId(); 
                                             solvingPlayerSprite = player.getSprite(); }
+    void makeAir() { sprite = ' '; type = ObjectType::AIR; }
 
 
 };
