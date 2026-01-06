@@ -667,11 +667,12 @@ void Game::changeRoom(int newRoomId, bool goingForward) {
     rooms[currentRoomId].active = false;
   }
 
-  if (newRoomId == -1 ||newRoomId == rooms.size()) {
+  if (newRoomId == -1 || newRoomId == rooms.size()) {
     gotoxy(1,1);
     std::cout << "newRoomId: " << newRoomId << std::endl;
     std::cout << "rooms.size(): " << rooms.size() << std::endl;
     currentState = GameState::victory;
+    std::cout << "Victory!" << std::endl;
     return;
   }
 
