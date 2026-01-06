@@ -213,6 +213,19 @@ void Game::gameLoop() {
     while (aRiddle.isActive() && currentState == GameState::inGame) {
       RiddleResult result = aRiddle.riddle->enterRiddle(room, aRiddle.player);
 
+      if (result == RiddleResult::NO_RIDDLE) {
+        room->removeObjectAt(aRiddle.riddle->getX(), aRiddle.riddle->getY());
+        aRiddle.reset(); // Clear active riddle
+        // Riddle finished - redraw screen and fall through to normal game
+        clrscr();
+        if (room) {
+          room->draw();
+        }
+        player1.draw(room);
+        player2.draw(room);
+        if (room) room->drawLegend(&player1, &player2);
+        break; // Exit riddle loop, continue to normal game
+      };
       if (result == RiddleResult::SOLVED) {
         room->removeObjectAt(aRiddle.riddle->getX(), aRiddle.riddle->getY());
         aRiddle.reset(); // Clear active riddle

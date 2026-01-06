@@ -15,7 +15,7 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer) {
     playRiddleAnimation();
 
     // 2. Display UI
-    displayRiddleQuestion();
+    if (!displayRiddleQuestion()) return RiddleResult::NO_RIDDLE;
 
     // 3. Get player input (blocking)
     int playerAnswer = getPlayerAnswer();
@@ -59,11 +59,10 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer) {
 
 //////////////////////////////////////////     displayRiddleQuestion    //////////////////////////////////////////
 
-void Riddle::displayRiddleQuestion() {
+bool Riddle::displayRiddleQuestion() {
     const RiddleData* data = RiddleDatabase::getRiddle(riddleId);
     if (data == nullptr) {
-        makeAir();
-        return;
+        return false;
     }
 
     // Draw top border
@@ -89,6 +88,7 @@ void Riddle::displayRiddleQuestion() {
     gotoxy(13, 13);
     cout << "Choose answer (1-4)";
     cout.flush();
+    return true;
 }
 
 //////////////////////////////////////////       getPlayerAnswer        //////////////////////////////////////////

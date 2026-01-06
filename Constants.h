@@ -51,7 +51,8 @@ enum class Action {
 enum class RiddleResult {
   SOLVED, // Correct answer - remove riddle
   FAILED, // Wrong answer - keep riddle
-  ESCAPED // ESC pressed - pause game
+  ESCAPED, // ESC pressed - pause game
+  NO_RIDDLE // Riddle not found
 };
 
 //////////////////////////////////////////        OBJECT TYPES       /////////////////////////////////////////////

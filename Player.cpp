@@ -595,7 +595,16 @@ bool Player::handleRiddleInteraction(Riddle *riddle, int nextX, int nextY,
   // Enter riddle (blocks game) - pass 'this' to track triggering player
   RiddleResult result = riddle->enterRiddle(room, this);
 
-  if (result == RiddleResult::SOLVED) {
+  if (result == RiddleResult::NO_RIDDLE) {
+    room->removeObjectAt(nextX, nextY);
+    // Clear aRiddle since solved
+    if (activeRiddle != nullptr)
+      *activeRiddle = nullptr;
+    if (activePlayer != nullptr)
+      *activePlayer = nullptr;
+    return false; // Allow movement onto position
+  }
+  else if (result == RiddleResult::SOLVED) {
     // Remove riddle from room entirely
     room->removeObjectAt(nextX, nextY);
     // Clear aRiddle since solved
