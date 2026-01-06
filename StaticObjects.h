@@ -86,3 +86,22 @@ public:
     bool isRemovedBySwitch() const { return removedBySwitch; }
     void setRemovedBySwitch(bool removable) { removedBySwitch = removable; }
 };
+
+
+class Air : public StaticObject
+{
+public:
+    Air() : StaticObject()
+    {
+        sprite = ' ';
+        type = ObjectType::AIR;
+    }
+
+    Air(const Point &pos) : StaticObject(pos, ' ', ObjectType::AIR) {}
+
+    GameObject *clone() const override { return new Air(*this); }
+    const char *getName() const override { return "Air"; }
+
+    bool isBlocking() const override { return false; }
+    bool onExplosion() override { return false; }
+};

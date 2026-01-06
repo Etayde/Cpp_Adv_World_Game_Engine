@@ -7,6 +7,7 @@
 #include "Constants.h"
 
 #include "Door.h"
+#include "GameObject.h"
 #include "Layouts.h"
 
 #include "Items.h"
@@ -208,7 +209,7 @@ void Room::loadObjects(int *riddleCounter) {
         if (riddleCounter != nullptr){
           riddleId = (*riddleCounter)++;
         }
-        else continue;
+        else createObjectFromChar(' ',x, y);
       }
 
       GameObject *obj = createObjectFromChar(ch, x, y, riddleId);

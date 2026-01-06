@@ -72,6 +72,8 @@ GameObject *createObjectFromChar(char ch, int x, int y, int riddleId) {
     int id = (riddleId >= 0) ? riddleId : nextRiddleId++;
     return new Riddle(pos, id);
   }
+  case ' ':
+    return new Air(pos);
   default:
     return nullptr;
   }
