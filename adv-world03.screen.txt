@@ -1,36 +1,37 @@
-WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
-W  @               W                    W            W                        W
-W      WW WW       W                    ?            W                        W
-W  !   W  WW       WWWWZZZZZWWWWWWWWWWWWW            W     WWWWWW   WWWWW     W
-W        *WW       W           W        W            W     WWWWWW   WWWWW     W
-WWWWWWWW**WW       W     K     W    W   W            W     WWWWWW   WWWWW     W
-W          W       WWWWWWWWWWWWW    W   W            W     WWWWWW   WWWWW     W
-W        # W                        W   W            W     WWWWWW   WWWWW     W
-W        # WWWWWWWWWWWWWWWWWWWWWWWWWW   W            W     WWWWWW   WWWWW     W
-W        # W        w                   W            W  \  WWWWWW   WWWWW     W
-W       WWWW        w                   W            W     WWWWWW   WWWWW     W
-W          W       WWWWWWWWWWWWWWWWWWWWWW            WWWWWWWWWWWWW?WWWWWWWWWWWW
-W          W                                                                  W
-W          WWWWWWWWWWWWWW                                                     W
-W                       W         L                                           W
-W                       W                                       WWWWWWWWWWWWWWW
-W                       W                                       W             W
-WWWWWWWWWWWWW           W                                       W             3
-W           *           W                                       W             W
-1           *           W                                       W    WWWWWWWWWW
-W           *           W                                       W             W
-W###        *           WWW    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W
-WWWWWWWWWWWWWWWWWWWWWWWWW         WWWW       ?                  W             W
-W                       W         **         W                                W
-WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W                                                  WWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W                                                  WWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+W       WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW       W                           W
+W                                          W       W                           3
+W          WWWWWWWWWWWWWWWWWWWWWW          W       W                           W
+W          W                  WWW          W       WWWWWWWWWWWWWWWWWW          W
+W          W  !               WWWWWWWW     W       W                           W
+W     K    W                  WWW          W       W                           W
+W          W                  WWW     WWWWWW       W         WWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWW  WWW      WWW          W       W                           W
+W                  **  W      WWWWWWWW     W       W                           W
+W                  *  WW                   W       WWWWWWWWWWWWWWWWWW          W
+W                     WW                   W       W                           W
+W####               WWWWWWWWWWWWWWWWWWWWWWWW       W                           W
+W                            W             W       W                           W
+WWWWWW                       W    \   W  WWW       W         WWWWWWWWWWWWWWWWWWW
+W \  ?                       W        W  WWW       W                           W
+WWWWWW                    ***WWWWWWWWWW**WWWW?WWW?WW                           W
+WWWWWWWWWWWWWWWWWWWWWWWWWW***WW       W  WWW                                   W
+W                             W   K   W  WWW                                   W
+1                         # # W                                                W
+W                         # # W                                                W
+W                         # # W                                                W
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 ---METADATA---
-SPAWN 2 18
-SPAWN_PREV 78 17
+SPAWN 3 22
+SPAWN_PREV 75 4
 NEXT_ROOM -1
 PREV_ROOM 1
-DOOR 3 1 0
+DOOR 3 2 2
 DOOR 1 0 0
-DARK_ZONE 12 1 39 10
-DARK_ZONE 54 1 77 10
-DARK_ZONE 25 22 44 23
-DARK_ZONE 65 18 77 23
+DARK_ZONE 24 7 43 14
+DARK_ZONE 1 7 11 10
+DARK_ZONE 1 1 51 4
+DARK_ZONE 31 20 38 24
+

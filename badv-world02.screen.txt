@@ -3,7 +3,7 @@ WL                                                                            W
 W                                                                             W
 W                                                                             W
 W                  WWWWWWWWWWWWWWWWWWWWWWWWWWWWW             WWWWWWWWWWWWWWWWWW
-W                  W         W                 W             W                W
+0                  W         W                 W             W                W
 W                  W         W   K             W             WW?WWWWWWWWWWW   W
 W                  W         WWWWWWWW          W             W    W   K   W   W
 W                  W                           W             W            W   W
@@ -16,7 +16,7 @@ W                  W\                          w                              W
 W                  WWWWWWWWWWWWWWWWWWWWWWWWWWWWW                              W
 W                               #                                    WZZZZZZZZW
 W                  !            #                                    W        W
-W                                                                    W        1
+W                                                                    W        2
 W                  @                                                 W        W
 WWWWWWWWWWWWWWWWWWWWWW         W*WWW                                 WWWWWWWWWW
 W                    W         W* \W                                          W
@@ -25,8 +25,8 @@ W                    W         W W                                            W
 WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 ---METADATA---
 SPAWN 3 10
-NEXT_ROOM 1
-PREV_ROOM -1
-DOOR 1 2 0
-DARK_ZONE 62 5 77 8
-DARK_ZONE 20 5 46 14
+SPAWN_PREV 75 17
+NEXT_ROOM 2
+PREV_ROOM 0
+DOOR 2 2 0
+DOOR 0 0 0
