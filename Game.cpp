@@ -377,7 +377,7 @@ bool Game::canPassThroughDoor(Room *room, int doorId) {
   if (room == nullptr)
     return false;
 
-  if (doorId == room->nextRoomId) {
+  if (doorId == room->nextRoomId || doorId == rooms.size()) {
     gotoxy(1,1);
     std::cout << "next room" << std::endl;
     std::cout << "can open?: " << room->canOpenDoor(doorId, player1.getKeyCount(),
