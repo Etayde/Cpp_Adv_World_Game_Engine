@@ -67,11 +67,11 @@ public:
   void run();
 
   // Menu handlers
-  void showMainMenu();
+  virtual void showMainMenu();
   void handleMainMenuInput();
-  void showInstructions();
+  virtual void showInstructions();
   void handleInstructionsInput();
-  void showPauseMenu();
+  virtual void showPauseMenu();
   void handlePauseInput();
   void showVictory();
   void showGameOver();
@@ -79,10 +79,10 @@ public:
 
   // Game logic
   void initializeRooms();
-  void startNewGame();
-  void gameLoop();
-  void handleInput();
-  void update();
+  virtual void startNewGame();
+  virtual void gameLoop();
+  virtual void handleInput() = 0;
+  virtual void update();
 
   // Room management
   void changeRoom(int newRoomId, bool goingForward);

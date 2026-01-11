@@ -2,6 +2,7 @@
 
 #include "Console.h"
 #include "Game.h"
+#include "NormalGame.h"
 
 #include <iostream>
 
@@ -12,7 +13,7 @@ int main()
     hideCursor();
     clrscr();
 
-    Game game;
+    NormalGame game;
     game.run();
 
     showCursor();
