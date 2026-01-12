@@ -30,6 +30,17 @@ void NormalGame::handleInput()
       continue;
     }
 
+    // Debugging shortcuts
+    if (pressed == 'v') {
+      currentState = GameState::victory;
+      return;
+    }
+
+    if (pressed == 'g') {
+      currentState = GameState::gameOver;
+      return;
+    }
+
     for (int i = 0; i < NUM_KEY_BINDINGS; i++)
     {
       if (keyBindings[i].key == pressed)

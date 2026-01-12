@@ -40,12 +40,12 @@ PHASE 4: Create LoadedGame Class
     - Constructor: LoadedGame::LoadedGame() : Game() {}
     - handleInput(): Stub implementation (empty for now)
 [✓] Update Makefile to include LoadedGame.cpp and LoadedGame.h
-[ ] Test - should compile with both NormalGame and LoadedGame
+[✓] Test - should compile with both NormalGame and LoadedGame
 
 PHASE 5: Final Testing
 -----------------------
-[ ] Run make clean && make - should compile without warnings
-[ ] Test game functionality with NormalGame:
+[✓] Run make clean && make - should compile without warnings
+[✓] Test game functionality with NormalGame:
     - Main menu works
     - Gameplay works (both players, objects, riddles, etc.)
     - Pause menu works
@@ -147,3 +147,4 @@ PHASE 6.7: Final EX3 Testing
 [ ] Test determinism:
     - Record same playthrough twice
     - Verify both produce identical results
+[ ] Remove debugging shortcuts
