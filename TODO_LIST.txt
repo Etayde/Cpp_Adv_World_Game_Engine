@@ -51,7 +51,7 @@ PHASE 5: Final Testing
     - Pause menu works
     - Victory and game over work
 [✓] Verify Game cannot be instantiated directly (abstract base class)
-[ ] Optional: Fix sign-comparison warnings in Game.cpp (lines 375, 410, 446)
+[✓] Optional: Fix sign-comparison warnings in Game.cpp (lines 375, 410, 446)
 
 ======================================
 EX3 RECORDING/REPLAY SYSTEM

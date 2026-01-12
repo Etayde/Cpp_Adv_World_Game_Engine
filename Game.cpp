@@ -378,7 +378,7 @@ void Game::update()
 
 Room *Game::getCurrentRoom()
 {
-  if (currentRoomId >= 0 && currentRoomId < rooms.size())
+  if (currentRoomId >= 0 && currentRoomId < static_cast<int>(rooms.size()))
     return &rooms[currentRoomId];
   return nullptr;
 }
@@ -413,7 +413,7 @@ bool Game::canPassThroughDoor(Room *room, int doorId)
   if (room == nullptr)
     return false;
 
-  if (doorId == room->nextRoomId || doorId == rooms.size())
+  if (doorId == room->nextRoomId || doorId == static_cast<int>(rooms.size()))
   {
     return room->isDoorUnlocked(doorId) ||
            room->canOpenDoor(doorId, player1.getKeyCount(),
@@ -449,7 +449,7 @@ void Game::checkRoomTransitions()
       player2.waitingAtDoor = false;
 
       // Forward door check
-      if (doorId == room->nextRoomId || doorId == rooms.size())
+      if (doorId == room->nextRoomId || doorId == static_cast<int>(rooms.size()))
       {
         if (!room->isDoorUnlocked(doorId))
         {
