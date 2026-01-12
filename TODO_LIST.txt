@@ -81,34 +81,34 @@ PHASE 6.2: Create ActionRecord Structure
 
 PHASE 6.3: Implement Action Recording in NormalGame (IMMEDIATE FILE WRITING - CRASH-PROOF)
 ------------------------------------------------------------------------------------------
-[ ] Add includes to NormalGame.h:
+[✓] Add includes to NormalGame.h:
     - #include "Recorder.h", <fstream>
-[ ] Add private members to NormalGame.h:
+[✓] Add private members to NormalGame.h:
     - bool isRecording = false;
     - ofstream recordingFile;
-[ ] Add public methods to NormalGame.h:
+[✓] Add public methods to NormalGame.h:
     - void enableRecording(const string& filename);
     - void disableRecording();
-[ ] Add private method to NormalGame.h:
+[✓] Add private method to NormalGame.h:
     - void recordAction(const PlayerKeyBinding& binding);
-[ ] Add destructor to NormalGame.h:
+[✓] Add destructor to NormalGame.h:
     - ~NormalGame();
-[ ] Modify NormalGame::handleInput() to record actions:
+[✓] Modify NormalGame::handleInput() to record actions:
     - Call recordAction(keyBindings[i]) BEFORE performing action
-    - Recording only happens if -save flag was used in main.cpp
-[ ] Implement recordAction() in NormalGame.cpp:
+    - Recording only happens if -save flag was used in main.cpp         ///////////// NOT TAKEN CARE OF YET /////////
+[✓] Implement recordAction() in NormalGame.cpp:
     - Create ActionRecord from binding and cycleCount
     - Write immediately to recordingFile using record.write()
     - Call recordingFile.flush() after write (ensures disk write - crash-proof!)
-[ ] Implement enableRecording() in NormalGame.cpp:
+[✓] Implement enableRecording() in NormalGame.cpp:
     - Open recordingFile with given filename
     - Set isRecording = true if successful
-[ ] Implement disableRecording() in NormalGame.cpp:
+[✓] Implement disableRecording() in NormalGame.cpp:
     - Close recordingFile
     - Set isRecording = false
-[ ] Implement ~NormalGame() destructor in NormalGame.cpp:
+[✓] Implement ~NormalGame() destructor in NormalGame.cpp:
     - Call disableRecording() to ensure file is closed
-[ ] Test compilation
+[✓] Test compilation
 
 IMPORTANT: Immediate file writing strategy
 - Each action writes to file immediately (not buffered in memory)

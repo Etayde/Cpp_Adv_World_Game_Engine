@@ -6,6 +6,13 @@
 
 NormalGame::NormalGame() : Game() {}
 
+//////////////////////////////////////////     NormalGame Destructor     /////////////////////////////////////////////
+
+NormalGame::~NormalGame()
+{
+    disableRecording();
+}
+
 //////////////////////////////////////////        handleInput         /////////////////////////////////////////////
 
 void NormalGame::handleInput()
@@ -50,6 +57,9 @@ void NormalGame::handleInput()
           currentState = GameState::paused;
           return;
         }
+        
+        recordAction(keyBindings[i]);
+
         Player &player = (keyBindings[i].playerID == 1) ? player1 : player2;
 
         player.performAction(keyBindings[i].action, getCurrentRoom());
@@ -57,4 +67,33 @@ void NormalGame::handleInput()
       }
     }
   }
+}
+
+
+
+void NormalGame::recordAction(const PlayerKeyBinding& binding)
+{
+    if (!isRecording || !recordFile.is_open())
+        return;
+
+    ActionRecord record(cycleCount, binding);
+
+    recordFile.write(reinterpret_cast<const char*>(&record), sizeof(ActionRecord));
+    recordFile.flush();
+}
+
+///////////////////////////////////////////    enableRecording    /////////////////////////////////////////////
+
+void NormalGame::enableRecording(const string &filename)
+{
+    recordFile.open(filename);
+    if (recordFile.is_open()) isRecording = true;
+}
+
+///////////////////////////////////////////    disableRecording    /////////////////////////////////////////////
+
+void NormalGame::disableRecording()
+{
+    if (recordFile.is_open()) recordFile.close();
+    isRecording = false;
 }

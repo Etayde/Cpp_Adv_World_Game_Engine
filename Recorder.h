@@ -93,7 +93,7 @@ public:
     const ActionRecord* getCurrentAction() const;
 
     // Move to next action
-    void advanceToNextAction() { if (currActionIndex < actions.size()) { currActionIndex++; } }
+    void advanceToNextAction() { if (currActionIndex < actions.size()) currActionIndex++; }
 
     // Check if there are more actions
     bool hasMoreActions() const { return currActionIndex < actions.size(); }
