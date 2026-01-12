@@ -7,39 +7,39 @@ This creates the foundation for the recording/replay system (EX3).
 
 PHASE 1: Prepare Base Class
 ----------------------------
-[ ] Make Game destructor virtual (~Game() → virtual ~Game())
-[ ] Move Game constructor to protected section
-[ ] Test compilation - should still work identically
+[✓] Make Game destructor virtual (~Game() → virtual ~Game())
+[✓] Move Game constructor to protected section
+[✓] Test compilation - should still work identically
 
 PHASE 2: Create NormalGame Class
 ---------------------------------
-[ ] Create NormalGame.h (class declaration inheriting from Game)
-[ ] Create NormalGame.cpp (implement constructor and handleInput())
+[✓] Create NormalGame.h (class declaration inheriting from Game)
+[✓] Create NormalGame.cpp (implement constructor and handleInput())
     - Extract current Game::handleInput() logic to NormalGame::handleInput()
-[ ] Update main.cpp to use NormalGame instead of Game
-[ ] Update Makefile to include NormalGame.cpp and NormalGame.h
-[ ] Test compilation with NormalGame - game should work identically
+[✓] Update main.cpp to use NormalGame instead of Game
+[✓] Update Makefile to include NormalGame.cpp and NormalGame.h
+[✓] Test compilation with NormalGame - game should work identically
 
 PHASE 3: Make Game Abstract
 ----------------------------
-[ ] Mark handleInput() as pure virtual in Game.h: virtual void handleInput() = 0;
-[ ] Remove Game::handleInput() implementation from Game.cpp
-[ ] Mark these methods as virtual (with default implementation):
+[✓] Mark handleInput() as pure virtual in Game.h: virtual void handleInput() = 0;
+[✓] Remove Game::handleInput() implementation from Game.cpp
+[✓] Mark these methods as virtual (with default implementation):
     - virtual void gameLoop();
     - virtual void startNewGame();
     - virtual void update();
     - virtual void showMainMenu();
     - virtual void showInstructions();
     - virtual void showPauseMenu();
-[ ] Test - should compile with NormalGame, Game cannot be instantiated directly
+[✓] Test - should compile with NormalGame, Game cannot be instantiated directly
 
 PHASE 4: Create LoadedGame Class
 ---------------------------------
-[ ] Create LoadedGame.h (class declaration inheriting from Game)
-[ ] Create LoadedGame.cpp with stub implementations:
+[✓] Create LoadedGame.h (class declaration inheriting from Game)
+[ ] Create LoadedGame.cpp with complete implementation:
     - Constructor: LoadedGame::LoadedGame() : Game() {}
-    - handleInput(): Empty stub (TODO: inject recorded actions)
-[ ] Update Makefile to include LoadedGame.cpp and LoadedGame.h
+    - handleInput(): Stub implementation (empty for now)
+[✓] Update Makefile to include LoadedGame.cpp and LoadedGame.h
 [ ] Test - should compile with both NormalGame and LoadedGame
 
 PHASE 5: Final Testing
@@ -51,11 +51,99 @@ PHASE 5: Final Testing
     - Pause menu works
     - Victory and game over work
 [ ] Verify Game cannot be instantiated directly (abstract base class)
+[ ] Optional: Fix sign-comparison warnings in Game.cpp (lines 375, 410, 446)
 
-FUTURE EX3 EXTENSIONS (Not part of foundation)
------------------------------------------------
-- Add command-line argument parsing in main.cpp (-save, -load, -silent flags)
-- Implement action recording in NormalGame or RecordGameMode subclass
-- Implement action replay in LoadedGame (load from adv-world.steps)
-- Add SilentLoadedGame subclass for fast verification
-- Add cycle tracking to base Game class for deterministic replay
+======================================
+EX3 RECORDING/REPLAY SYSTEM
+======================================
+
+PHASE 6.1: Add Cycle Tracking to Game Class
+--------------------------------------------
+[ ] Add protected member variable to Game.h:
+    - unsigned long cycleCount = 0;
+[ ] Increment cycleCount in Game::update() method
+[ ] Test compilation
+
+PHASE 6.2: Create ActionRecord Structure
+-----------------------------------------
+[ ] Create ActionRecord.h with:
+    - struct ActionRecord { unsigned long cycle; Action action; int playerIndex; }
+    - Serialization methods: write() and read()
+[ ] Create ActionRecord.cpp with serialization implementation
+[ ] Update Makefile to include ActionRecord.cpp and ActionRecord.h
+[ ] Test compilation
+
+PHASE 6.3: Implement Action Recording in NormalGame
+----------------------------------------------------
+[ ] Add includes to NormalGame.h:
+    - #include "ActionRecord.h", <vector>, <string>
+[ ] Add private members to NormalGame.h:
+    - bool isRecording = false;
+    - std::vector<ActionRecord> recordedActions;
+[ ] Add public methods to NormalGame.h:
+    - void enableRecording(bool enable);
+    - void saveRecording(const std::string& filename);
+[ ] Add private method to NormalGame.h:
+    - void recordAction(Action action, int playerIndex);
+[ ] Modify NormalGame::handleInput() to record actions when isRecording is true
+[ ] Implement recordAction() in NormalGame.cpp
+[ ] Implement enableRecording() in NormalGame.cpp
+[ ] Implement saveRecording() in NormalGame.cpp
+[ ] Add #include <fstream> to NormalGame.cpp
+[ ] Test compilation
+
+PHASE 6.4: Implement Action Replay in LoadedGame
+-------------------------------------------------
+[ ] Add includes to LoadedGame.h:
+    - #include "ActionRecord.h", <vector>, <string>, <fstream>
+[ ] Add private members to LoadedGame.h:
+    - std::vector<ActionRecord> recordedActions;
+    - size_t currentActionIndex = 0;
+[ ] Add private method to LoadedGame.h:
+    - bool loadActions(const std::string& filename);
+[ ] Update LoadedGame constructor to accept filename parameter:
+    - LoadedGame(const std::string& filename);
+[ ] Add handleInput() override declaration to LoadedGame.h
+[ ] Implement new constructor in LoadedGame.cpp (loads actions from file)
+[ ] Implement loadActions() in LoadedGame.cpp (reads binary file)
+[ ] Implement handleInput() in LoadedGame.cpp (injects recorded actions at correct cycles)
+[ ] Test compilation
+
+PHASE 6.5: Create SilentLoadedGame Class
+-----------------------------------------
+[ ] Create SilentLoadedGame.h (inherits from LoadedGame)
+[ ] Create SilentLoadedGame.cpp with:
+    - Constructor that accepts filename
+    - Override render() methods to do nothing (no-op)
+    - Override gameLoop() to run at maximum speed (no delays)
+[ ] Update Makefile to include SilentLoadedGame.cpp and SilentLoadedGame.h
+[ ] Test compilation
+
+PHASE 6.6: Command-Line Argument Parsing
+-----------------------------------------
+[ ] Update main.cpp to parse command-line arguments:
+    - Parse -save, -load, -silent flags
+    - Validate flag combinations (-silent only with -load)
+[ ] Update main.cpp to instantiate appropriate Game subclass:
+    - NormalGame for normal play (with optional recording if -save)
+    - LoadedGame for replay (if -load)
+    - SilentLoadedGame for fast replay (if -load -silent)
+[ ] Add necessary includes to main.cpp (LoadedGame.h, SilentLoadedGame.h)
+[ ] Test compilation
+
+PHASE 6.7: Final EX3 Testing
+-----------------------------
+[ ] Test recording: ./game -save
+    - Play through game
+    - Verify adv-world.steps file is created
+[ ] Test replay: ./game -load
+    - Watch recorded game replay
+    - Verify actions match original gameplay
+[ ] Test silent replay: ./game -load -silent
+    - Fast replay without display
+    - Verify game completes successfully
+[ ] Test invalid combinations: ./game -save -silent
+    - Should warn that -silent is ignored
+[ ] Test determinism:
+    - Record same playthrough twice
+    - Verify both produce identical results
