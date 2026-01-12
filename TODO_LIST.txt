@@ -36,7 +36,7 @@ PHASE 3: Make Game Abstract
 PHASE 4: Create LoadedGame Class
 ---------------------------------
 [✓] Create LoadedGame.h (class declaration inheriting from Game)
-[ ] Create LoadedGame.cpp with complete implementation:
+[✓] Create LoadedGame.cpp with complete implementation:
     - Constructor: LoadedGame::LoadedGame() : Game() {}
     - handleInput(): Stub implementation (empty for now)
 [✓] Update Makefile to include LoadedGame.cpp and LoadedGame.h
@@ -50,7 +50,7 @@ PHASE 5: Final Testing
     - Gameplay works (both players, objects, riddles, etc.)
     - Pause menu works
     - Victory and game over work
-[ ] Verify Game cannot be instantiated directly (abstract base class)
+[✓] Verify Game cannot be instantiated directly (abstract base class)
 [ ] Optional: Fix sign-comparison warnings in Game.cpp (lines 375, 410, 446)
 
 ======================================
@@ -59,38 +59,62 @@ EX3 RECORDING/REPLAY SYSTEM
 
 PHASE 6.1: Add Cycle Tracking to Game Class
 --------------------------------------------
-[ ] Add protected member variable to Game.h:
+[✓] Add protected member variable to Game.h:
     - unsigned long cycleCount = 0;
-[ ] Increment cycleCount in Game::update() method
-[ ] Test compilation
+[✓] Increment cycleCount in Game::update() method
+[✓] Test compilation
 
 PHASE 6.2: Create ActionRecord Structure
 -----------------------------------------
-[ ] Create ActionRecord.h with:
+[✓] Create ActionRecord.h with:
     - struct ActionRecord { unsigned long cycle; Action action; int playerIndex; }
     - Serialization methods: write() and read()
-[ ] Create ActionRecord.cpp with serialization implementation
-[ ] Update Makefile to include ActionRecord.cpp and ActionRecord.h
-[ ] Test compilation
+[✓] Create ActionRecord.cpp with serialization implementation
+    - Constructor from PlayerKeyBinding (eliminates redundancy)
+    - write(ostream&) for text format: CYCLE: X | PLAYER: Y | ACTION: Z
+    - read(istream&) with boolean return (no exceptions)
+    - Private helpers: jumpToFieldValue(), extractFieldValue()
+[✓] Create RecordedSteps class for managing action vector with index tracking
+[✓] Create ToAddToReadme.txt with format specification
+[✓] Update Makefile to include ActionRecord.cpp and ActionRecord.h
+[✓] Test compilation
 
-PHASE 6.3: Implement Action Recording in NormalGame
-----------------------------------------------------
+PHASE 6.3: Implement Action Recording in NormalGame (IMMEDIATE FILE WRITING - CRASH-PROOF)
+------------------------------------------------------------------------------------------
 [ ] Add includes to NormalGame.h:
-    - #include "ActionRecord.h", <vector>, <string>
+    - #include "Recorder.h", <fstream>
 [ ] Add private members to NormalGame.h:
     - bool isRecording = false;
-    - std::vector<ActionRecord> recordedActions;
+    - ofstream recordingFile;
 [ ] Add public methods to NormalGame.h:
-    - void enableRecording(bool enable);
-    - void saveRecording(const std::string& filename);
+    - void enableRecording(const string& filename);
+    - void disableRecording();
 [ ] Add private method to NormalGame.h:
-    - void recordAction(Action action, int playerIndex);
-[ ] Modify NormalGame::handleInput() to record actions when isRecording is true
-[ ] Implement recordAction() in NormalGame.cpp
-[ ] Implement enableRecording() in NormalGame.cpp
-[ ] Implement saveRecording() in NormalGame.cpp
-[ ] Add #include <fstream> to NormalGame.cpp
+    - void recordAction(const PlayerKeyBinding& binding);
+[ ] Add destructor to NormalGame.h:
+    - ~NormalGame();
+[ ] Modify NormalGame::handleInput() to record actions:
+    - Call recordAction(keyBindings[i]) BEFORE performing action
+    - Recording only happens if -save flag was used in main.cpp
+[ ] Implement recordAction() in NormalGame.cpp:
+    - Create ActionRecord from binding and cycleCount
+    - Write immediately to recordingFile using record.write()
+    - Call recordingFile.flush() after write (ensures disk write - crash-proof!)
+[ ] Implement enableRecording() in NormalGame.cpp:
+    - Open recordingFile with given filename
+    - Set isRecording = true if successful
+[ ] Implement disableRecording() in NormalGame.cpp:
+    - Close recordingFile
+    - Set isRecording = false
+[ ] Implement ~NormalGame() destructor in NormalGame.cpp:
+    - Call disableRecording() to ensure file is closed
 [ ] Test compilation
+
+IMPORTANT: Immediate file writing strategy
+- Each action writes to file immediately (not buffered in memory)
+- flush() after each write ensures data reaches disk
+- If game crashes, all actions up to crash point are saved
+- No memory buildup for long gameplay sessions
 
 PHASE 6.4: Implement Action Replay in LoadedGame
 -------------------------------------------------
@@ -148,3 +172,4 @@ PHASE 6.7: Final EX3 Testing
     - Record same playthrough twice
     - Verify both produce identical results
 [ ] Remove debugging shortcuts
+[ ] Optional: Fix sign-comparison warnings in Game.cpp (lines 375, 410, 446)

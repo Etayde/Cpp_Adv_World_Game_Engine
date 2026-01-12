@@ -10,7 +10,6 @@
 
 //////////////////////////////////////////           Game       /////////////////////////////////////////////
 
-// Forward declarations
 class Riddle;
 
 enum class GameOverMessege
@@ -21,13 +20,13 @@ enum class GameOverMessege
   VALUABLE_DESTROYED
 };
 
-// Main game controller
 class Game
 {
 protected:
   int initErrorMessage;
   int initErrorRoomId;
   GameOverMessege gameOverMessege;
+  unsigned long cycleCount;
   
   Game();
 
@@ -48,9 +47,11 @@ protected:
   };
 
   ActiveRiddle aRiddle;                // Track currently active riddle
-  std::vector<Screen *> loadedScreens; // Screens loaded from files
+  std::vector<Screen *> loadedScreens; 
 
   void setGameOverMessege(GameOverMessege messege) { gameOverMessege = messege; }
+
+  void updateCycleCount() { cycleCount++; }
 
 public:
   GameState currentState;
@@ -59,11 +60,10 @@ public:
   int finalRoomId;
   Player player1;
   Player player2;
-  bool gameInitialized; // Track if game is already started
+  bool gameInitialized;
 
   virtual ~Game();
 
-  // Main game loop
   void run();
 
   // Menu handlers

@@ -15,7 +15,7 @@ class Constants;
 
 Game::Game()
     : initErrorMessage(0), initErrorRoomId(-1), gameOverMessege(GameOverMessege::NONE),
-      currentState(GameState::mainMenu), currentRoomId(-1),
+      cycleCount(0), currentState(GameState::mainMenu), currentRoomId(-1),
       gameInitialized(false) {}
 
 //////////////////////////////////////////      Game Destructor       /////////////////////////////////////////////
@@ -318,6 +318,8 @@ void Game::gameLoop()
 
 void Game::update()
 {
+  updateCycleCount();
+
   Room *room = getCurrentRoom();
   if (room == nullptr)
     return;
