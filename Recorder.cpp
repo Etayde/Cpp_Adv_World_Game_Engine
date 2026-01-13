@@ -50,6 +50,7 @@ ErrorCode RecordedSteps::loadFromFile(const string& filename)
     currActionIndex = 0;
 
     fstream debug("readDEBUG.txt");
+    debug << "Loading actions from file: " << filename << "\n";
 
     while (file.peek() != EOF) {
         ActionRecord record;
