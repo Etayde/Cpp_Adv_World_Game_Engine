@@ -56,6 +56,7 @@ ErrorCode RecordedSteps::loadFromFile(const string& filename)
         ActionRecord record;
         if (!record.read(file, debug)) {
             debug << "Failed to read action record.\n";
+            debug.close();
             file.close();
             return ErrorCode::READ_ERROR;
         }
