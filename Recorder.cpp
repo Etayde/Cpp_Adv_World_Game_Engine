@@ -52,7 +52,7 @@ ErrorCode RecordedSteps::loadFromFile(const string& filename)
     ofstream debug("readDEBUG.txt");
     debug << "Loading actions from file: " << filename << "\n";
 
-    while (file.peek() != EOF) {
+    while (file >> ws && file.peek() != EOF) {
         ActionRecord record;
         if (!record.read(file, debug)) {
             debug << "Failed to read action record.\n";
