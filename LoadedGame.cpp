@@ -1,5 +1,6 @@
 #include "LoadedGame.h"
 #include "Recorder.h"
+#include "Layouts.h"
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -7,7 +8,7 @@
 using namespace std;
 
 LoadedGame::LoadedGame(const string& filename, bool silent) : Game(), steps(),
-    expectedEventIndex(0), testPassed(true)
+    expectedEventIndex(0), testPassed(true), quitCycle(-1)
 {
     silentMode = silent;  // Set the flag inherited from Game
     Renderer::setSilentMode(silentMode);  // Update renderer mode
@@ -26,7 +27,7 @@ LoadedGame::LoadedGame(const string& filename, bool silent) : Game(), steps(),
 }
 
 LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
-    expectedEventIndex(0), testPassed(true)
+    expectedEventIndex(0), testPassed(true), quitCycle(-1)
 {
     // Parse arguments specific to LoadedGame
     bool silent = false;
@@ -73,6 +74,35 @@ void LoadedGame::handleInput()
 
         steps.advanceToNextAction();
         curr = steps.getCurrentAction();
+    }
+}
+
+void LoadedGame::gameLoop()
+{
+    Room *room = getCurrentRoom();
+
+    // Normal game start - draw room and start game updates
+    if (room)
+    {
+        room->draw();
+    }
+    player1.draw(room);
+    player2.draw(room);
+    if (room)
+        room->drawLegend(&player1, &player2);
+
+    while (currentState == GameState::inGame)
+    {
+        // Check for quit condition
+        if (shouldQuit())
+        {
+            currentState = GameState::quit;
+            return;
+        }
+
+        handleInput();
+        update();
+        Renderer::sleep_ms(100);
     }
 }
 
@@ -139,7 +169,37 @@ void LoadedGame::run()
       currentState = GameState::quit;
       break;
 
+    case GameState::paused:
+
+      break;
     case GameState::quit:
+      if (silentMode)
+      {
+        recordQuit();  // Verify QUIT event against expected
+
+        // Check if all expected events were consumed
+        if (testPassed && expectedEventIndex < expectedEvents.size())
+        {
+          testFailed("Expected more events (got " + std::to_string(expectedEventIndex) +
+                     ", expected " + std::to_string(expectedEvents.size()) + ")");
+        }
+
+        // Output test result
+        if (testPassed)
+        {
+          std::cout << "Test passed" << std::endl;
+        }
+        else
+        {
+          std::cout << "Test not passed" << std::endl;
+          std::cout << testFailureDetails << std::endl;
+        }
+      }
+      else
+      {
+        showQuitScreen();
+        Renderer::sleep_ms(2000);
+      }
       running = false;
       break;
 
@@ -162,6 +222,7 @@ ErrorCode LoadedGame::loadExpectedResults(const string& filename)
 
     expectedEvents.clear();
     expectedEventIndex = 0;
+    quitCycle = -1;  // Reset quit cycle
 
     while (file >> std::ws && file.peek() != EOF)
     {
@@ -171,6 +232,13 @@ ErrorCode LoadedGame::loadExpectedResults(const string& filename)
             file.close();
             return ErrorCode::READ_ERROR;
         }
+
+        // Check for QUIT event and store the quit cycle
+        if (event.type == GameEventType::QUIT)
+        {
+            quitCycle = static_cast<long>(event.cycle);
+        }
+
         expectedEvents.push_back(event);
     }
 
@@ -298,4 +366,23 @@ void LoadedGame::recordRiddleAttempt(const std::string& question, int answer, bo
 
     GameEvent actual(cycleCount, currentRoomId, question, answer, correct);
     verifyEvent(actual);
+}
+
+///////////////////////////////////////////    recordQuit    /////////////////////////////////////////////
+
+void LoadedGame::recordQuit()
+{
+    if (!silentMode)
+        return;
+
+    GameEvent actual(cycleCount, currentRoomId, GameEventType::QUIT);
+    verifyEvent(actual);
+}
+
+///////////////////////////////////////////    showQuitScreen    /////////////////////////////////////////////
+
+void LoadedGame::showQuitScreen()
+{
+    Renderer::clrscr();
+    quitScreen.draw();
 }

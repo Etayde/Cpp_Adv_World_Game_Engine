@@ -87,10 +87,10 @@ void NormalGame::handleInput()
         if (keyBindings[i].action == Action::ESC)
         {
           currentState = GameState::paused;
-          return;
+          return;  // Don't record ESC actions
         }
-        
-        recordAction(keyBindings[i]);
+
+        recordAction(keyBindings[i]);  // Only record non-ESC actions
 
         Player &player = (keyBindings[i].playerID == 1) ? player1 : player2;
 
@@ -178,4 +178,34 @@ void NormalGame::recordScreenTransition(int roomId)
 
     recordFile << "SCREEN: " << cycleCount << " ROOM: " << roomId << "\n";
     recordFile.flush();
+}
+
+//////////////////////////////////////////     handlePauseInput     /////////////////////////////////////////////
+
+void NormalGame::handlePauseInput()
+{
+  if (check_kbhit())
+  {
+    char choice = get_single_char();
+    if (choice == char(Action::ESC))
+      currentState = GameState::inGame;
+    else if (choice == 'h' || choice == 'H')
+    {
+      recordQuit();  // Record quit event to results file
+      gameInitialized = false; // Reset when going to main menu
+      currentState = GameState::mainMenu;
+    }
+  }
+}
+
+///////////////////////////////////////////    recordQuit    /////////////////////////////////////////////
+
+void NormalGame::recordQuit()
+{
+    if (!resultFile.is_open())
+        return;
+
+    GameEvent event(cycleCount, currentRoomId, GameEventType::QUIT);
+    event.write(resultFile);
+    resultFile.flush();
 }

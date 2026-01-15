@@ -13,7 +13,8 @@ using namespace std;
 enum class GameEventType {
     SCREEN_CHANGE,
     LIFE_LOST,
-    RIDDLE_ANSWERED
+    RIDDLE_ANSWERED,
+    QUIT
 };
 
 struct GameEvent {
@@ -48,38 +49,19 @@ struct GameEvent {
         : cycle(c), type(GameEventType::RIDDLE_ANSWERED), roomId(room),
           playerId(0), question(q), answerGiven(answer), wasCorrect(correct) {}
 
+    // Constructor for QUIT
+    GameEvent(unsigned long c, int room, GameEventType quitType)
+        : cycle(c), type(quitType), roomId(room),
+          playerId(0), answerGiven(0), wasCorrect(false) {}
+
     void write(std::ostream& out) const;
     bool read(std::istream& in);
 };
 
 //////////////////////////////////////////     Action Conversion     /////////////////////////////////////////////
 
-// Convert Action enum to string
-inline string actionToString(Action action) {
-    switch (action) {
-        case Action::MOVE_UP:    return "MOVE_UP";
-        case Action::MOVE_DOWN:  return "MOVE_DOWN";
-        case Action::MOVE_LEFT:  return "MOVE_LEFT";
-        case Action::MOVE_RIGHT: return "MOVE_RIGHT";
-        case Action::STAY:       return "STAY";
-        case Action::DROP_ITEM:  return "DROP_ITEM";
-        case Action::ESC:        return "ESC";
-        default:                 return "UNKNOWN";
-    }
-}
-
-// Convert string to Action enum (returns Action::STAY on invalid input)
-inline Action stringToAction(const string& str) {
-    if (str == "MOVE_UP")    return Action::MOVE_UP;
-    if (str == "MOVE_DOWN")  return Action::MOVE_DOWN;
-    if (str == "MOVE_LEFT")  return Action::MOVE_LEFT;
-    if (str == "MOVE_RIGHT") return Action::MOVE_RIGHT;
-    if (str == "STAY")       return Action::STAY;
-    if (str == "DROP_ITEM")  return Action::DROP_ITEM;
-    if (str == "ESC")        return Action::ESC;
-    return Action::STAY;
-}
-
+inline string actionToString(Action action);
+inline Action stringToAction(const string& str);
 struct ActionRecord
 {
     unsigned long cycle;
@@ -130,8 +112,6 @@ public:
 
     // Get all actions for a specific cycle number
     vector<ActionRecord> getActionsForCycle(unsigned long cycle) const;
-
-    bool actionAt(const unsigned long cycle);
 
     ActionRecord getActionAt(size_t index) const { return actions[index]; }
 

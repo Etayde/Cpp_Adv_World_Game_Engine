@@ -78,7 +78,7 @@ public:
   virtual void showInstructions();
   void handleInstructionsInput();
   virtual void showPauseMenu();
-  void handlePauseInput();
+  virtual void handlePauseInput();
   void showVictory();
   void showGameOver();
   void showErrorScreen();
@@ -109,4 +109,5 @@ public:
   virtual void recordRiddleAttempt(const std::string& question, int answer, bool correct) {
     (void)question; (void)answer; (void)correct;
   }
+  virtual void recordQuit() {}
 };

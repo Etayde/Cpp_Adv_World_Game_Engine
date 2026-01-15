@@ -2,6 +2,32 @@
 #include <fstream>
 #include <sstream>
 
+//////////////////////////////////////////    Action Conversion    /////////////////////////////////////////////
+
+inline Action stringToAction(const string& str) {
+    if (str == "MOVE_UP")    return Action::MOVE_UP;
+    if (str == "MOVE_DOWN")  return Action::MOVE_DOWN;
+    if (str == "MOVE_LEFT")  return Action::MOVE_LEFT;
+    if (str == "MOVE_RIGHT") return Action::MOVE_RIGHT;
+    if (str == "STAY")       return Action::STAY;
+    if (str == "DROP_ITEM")  return Action::DROP_ITEM;
+    if (str == "ESC")        return Action::ESC;
+    return Action::STAY;
+}
+
+inline string actionToString(Action action) {
+    switch (action) {
+        case Action::MOVE_UP:    return "MOVE_UP";
+        case Action::MOVE_DOWN:  return "MOVE_DOWN";
+        case Action::MOVE_LEFT:  return "MOVE_LEFT";
+        case Action::MOVE_RIGHT: return "MOVE_RIGHT";
+        case Action::STAY:       return "STAY";
+        case Action::DROP_ITEM:  return "DROP_ITEM";
+        case Action::ESC:        return "ESC";
+        default:                 return "UNKNOWN";
+    }
+}
+
 //////////////////////////////////////////    GameEvent::write    /////////////////////////////////////////////
 
 void GameEvent::write(std::ostream& out) const
@@ -19,6 +45,9 @@ void GameEvent::write(std::ostream& out) const
                 << " QUESTION: \"" << question << "\""
                 << " ANSWER: " << answerGiven
                 << " CORRECT: " << (wasCorrect ? "YES" : "NO") << "\n";
+            break;
+        case GameEventType::QUIT:
+            out << "QUIT CYCLE: " << cycle << " ROOM: " << roomId << "\n";
             break;
     }
 }
@@ -78,6 +107,10 @@ bool GameEvent::read(std::istream& in)
             return false;
         }
         wasCorrect = (correctStr == "YES");
+    }
+    else if (eventType == "QUIT") {
+        type = GameEventType::QUIT;
+        // QUIT only has CYCLE and ROOM which are already parsed
     }
     else {
         return false;  // Unknown event type
@@ -167,14 +200,5 @@ vector<ActionRecord> RecordedSteps::getActionsForCycle(unsigned long curr) const
     return result;
 }
 
-//////////////////////////////////////////    RecordedSteps::actionAt    /////////////////////////////////////////////
 
-bool RecordedSteps::actionAt(const unsigned long cycle)
-{
-    for (const ActionRecord& record : actions) {
-        if (record.cycle == cycle) {
-            return true;
-        }
-    }
-    return false;
-}
+

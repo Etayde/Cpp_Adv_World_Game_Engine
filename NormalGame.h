@@ -17,6 +17,7 @@ public:
     NormalGame(int argc, char* argv[]);  // New: parses args and initializes
     ~NormalGame() override;
     void handleInput() override;
+    void handlePauseInput() override;
     void enableRecording(const string &filename);
     void disableRecording();
 
@@ -25,6 +26,7 @@ protected:
     void recordScreenChange(int roomId) override;
     void recordLifeLost(int playerId) override;
     void recordRiddleAttempt(const std::string& question, int answer, bool correct) override;
+    void recordQuit() override;
 
 private:
     void recordAction(const PlayerKeyBinding& binding);
