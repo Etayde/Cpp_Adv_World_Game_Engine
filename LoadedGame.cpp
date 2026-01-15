@@ -42,6 +42,8 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps()
     
     if (initErrorMessage != ErrorCode::NONE)
         currentState = GameState::error;
+    else
+        currentState = GameState::inGame;
     //     // File doesn't exist or couldn't be loaded
         
     //     // Error message will be displayed by Game::run()
@@ -106,6 +108,7 @@ void LoadedGame::run()
       break;
 
     default:
+      currentState = GameState::quit;
       break;
     }
   }
