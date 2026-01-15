@@ -33,7 +33,7 @@ NormalGame::NormalGame(int argc, char* argv[]) : NormalGame()
     if (saveMode)
     {
         enableRecording("adv-world.steps.txt");
-        resultFile.open("adv-world.result");
+        resultFile.open("adv-world.result.txt");
     }
 }
 
