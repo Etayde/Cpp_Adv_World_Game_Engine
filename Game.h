@@ -69,7 +69,8 @@ public:
 
   static Game* createFromArgs(int argc, char* argv[]);
 
-  virtual void run();
+
+  virtual void run() = 0;
 
   void setCurrentState(GameState newState) { currentState = newState; }
 
@@ -87,12 +88,12 @@ public:
   // Game logic
   void initializeRooms();
   virtual void startNewGame();
-  virtual void gameLoop();
+  virtual void gameLoop() = 0;
   virtual void handleInput() = 0;
   virtual void update();
 
   // Room management
-  void changeRoom(int newRoomId, bool goingForward);
+  virtual void changeRoom(int newRoomId, bool goingForward);
   Room *getCurrentRoom();
   void checkRoomTransitions();
   void redrawCurrentRoom();
@@ -104,15 +105,13 @@ public:
   unsigned long getCycleCount() const { return cycleCount; }
   int getCurrentRoomId() const { return currentRoomId; }
 
-  // Event recording hooks - overridden by NormalGame (save) and LoadedGame (verify)
-  virtual void recordScreenChange(int roomId) { (void)roomId; }
-  virtual void recordLifeLost(int playerId) { (void)playerId; }
-  virtual void recordRiddleAttempt(const std::string& question, int answer, bool correct) {
-    (void)question; (void)answer; (void)correct;
-  }
-  virtual void recordQuit() {}
+  // Event reporting hooks (pure virtual)
+  virtual void reportScreenChange(int roomId) = 0;
+  virtual void reportLifeLost(int playerId) = 0;
+  virtual void onRiddleAttempt(const std::string& question, int answer, bool correct) = 0;
+  virtual void reportQuit() = 0;
 
-  // New virtual methods for recording/playback of riddle answers
-  virtual int getRecordedRiddleAnswer(unsigned long cycle) { (void)cycle; return -1; }
-  virtual void recordRiddleAnswer(int answer) { (void)answer; }
+  // Riddle interaction hooks
+  virtual int getRiddleInput(unsigned long cycle) = 0;
+  virtual void reportRiddleAnswer(int answer) = 0;
 };

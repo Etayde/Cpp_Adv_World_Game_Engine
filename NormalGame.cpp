@@ -1,5 +1,9 @@
+#include "Game.h"
 #include "NormalGame.h"
 #include "Console.h"
+#include "Riddle.h"
+#include "Room.h"
+#include "Player.h"
 #include "Constants.h"
 #include <string>
 
@@ -46,6 +50,214 @@ NormalGame::~NormalGame()
 
 //////////////////////////////////////////        handleInput         /////////////////////////////////////////////
 
+//////////////////////////////////////////           run               /////////////////////////////////////////////
+
+void NormalGame::run()
+{
+  bool running = true;
+
+  while (running)
+  {
+    switch (currentState)
+    {
+    case GameState::mainMenu:
+      showMainMenu();
+      while (currentState == GameState::mainMenu)
+      {
+        handleMainMenuInput();
+        Renderer::sleep_ms(50);
+      }
+      break;
+
+    case GameState::instructions:
+      showInstructions();
+      while (currentState == GameState::instructions)
+      {
+        handleInstructionsInput();
+        Renderer::sleep_ms(50);
+      }
+      break;
+
+    case GameState::inGame:
+      if (!gameInitialized)
+      {
+        startNewGame(); // Base implements this, but we can override if needed
+      }
+      gameLoop();
+      break;
+
+    case GameState::paused:
+      showPauseMenu();
+      while (currentState == GameState::paused)
+      {
+        handlePauseInput();
+        Renderer::sleep_ms(50);
+      }
+      break;
+
+    case GameState::victory:
+      showVictory();
+      Renderer::gotoxy(20, 18);
+      Renderer::print("Press any key to return to main menu");
+      while (check_kbhit())
+        get_single_char();
+      while (!check_kbhit())
+        Renderer::sleep_ms(50);
+      get_single_char();
+      gameInitialized = false;
+      currentState = GameState::mainMenu;
+      break;
+
+    case GameState::gameOver:
+      showGameOver();
+      Renderer::gotoxy(20, 12);
+      Renderer::print("Press any key to return to main menu");
+      while (check_kbhit())
+        get_single_char();
+      while (!check_kbhit())
+        Renderer::sleep_ms(50);
+      get_single_char();
+      gameInitialized = false;
+      currentState = GameState::mainMenu;
+      break;
+
+    case GameState::error:
+      showErrorScreen();
+      Renderer::gotoxy(20, 12);
+      Renderer::print("Press any key to return to main menu");
+      while (check_kbhit())
+        get_single_char();
+      while (!check_kbhit())
+        Renderer::sleep_ms(50);
+      get_single_char();
+      gameInitialized = false;
+      currentState = GameState::mainMenu;
+      break;
+
+    case GameState::quit:
+      running = false;
+      break;
+    }
+  }
+}
+
+//////////////////////////////////////////         gameLoop           /////////////////////////////////////////////
+
+void NormalGame::gameLoop()
+{
+  // Initial draw - ensure we are setup
+  if (getCurrentRoomId() == 0 && cycleCount == 0) // New game check roughly
+  {
+      // Force a screen change report on start if needed, or rely on startNewGame calls
+      reportScreenChange(0);
+  }
+    
+  Room *room = getCurrentRoom();
+
+  if (aRiddle.isActive())
+  {
+    Renderer::clrscr();
+    if (room)
+    {
+      room->draw();
+    }
+    player1.draw(room);
+    player2.draw(room);
+    if (room)
+      room->drawLegend(&player1, &player2);
+
+    while (aRiddle.isActive() && currentState == GameState::inGame)
+    {
+      // Note: enterRiddle now calls reportRiddleAttempt and reportRiddleAnswer internally via Game interface
+      RiddleResult result = aRiddle.riddle->enterRiddle(room, aRiddle.player, this);
+
+      if (result == RiddleResult::NO_RIDDLE)
+      {
+        room->removeObjectAt(aRiddle.riddle->getX(), aRiddle.riddle->getY());
+        aRiddle.reset();
+        Renderer::clrscr();
+        if (room)
+        {
+          room->draw();
+        }
+        player1.draw(room);
+        player2.draw(room);
+        if (room)
+          room->drawLegend(&player1, &player2);
+        break;
+      };
+      if (result == RiddleResult::SOLVED)
+      {
+        room->removeObjectAt(aRiddle.riddle->getX(), aRiddle.riddle->getY());
+        aRiddle.reset();
+        Renderer::clrscr();
+        if (room)
+        {
+          room->draw();
+        }
+        player1.draw(room);
+        player2.draw(room);
+        if (room)
+          room->drawLegend(&player1, &player2);
+        break;
+      }
+      else if (result == RiddleResult::ESCAPED)
+      {
+        currentState = GameState::paused;
+        return; // Exit game loop to handle pause
+      }
+      else
+      {
+        // FAILED
+        aRiddle.reset();
+        Renderer::clrscr();
+        if (room)
+        {
+          room->draw();
+        }
+        player1.draw(room);
+        player2.draw(room);
+        if (room)
+          room->drawLegend(&player1, &player2);
+        break;
+      }
+    }
+  }
+  else
+  {
+    // Normal update loop
+    if (room)
+    {
+      room->draw();
+    }
+    player1.draw(room);
+    player2.draw(room);
+    if (room)
+      room->drawLegend(&player1, &player2);
+  }
+
+  while (currentState == GameState::inGame)
+  {
+    handleInput();
+    update(); // Base Game::update() logic
+    Renderer::sleep_ms(100);
+  }
+}
+
+//////////////////////////////////////////        changeRoom          /////////////////////////////////////////////
+
+void NormalGame::changeRoom(int newRoomId, bool goingForward)
+{
+    Game::changeRoom(newRoomId, goingForward);
+    
+    // After logic, report the change
+    if (newRoomId >= 0 && newRoomId < static_cast<int>(rooms.size())) {
+        reportScreenChange(newRoomId);
+    }
+}
+
+//////////////////////////////////////////        handleInput         /////////////////////////////////////////////
+
 void NormalGame::handleInput()
 {
 
@@ -56,9 +268,6 @@ void NormalGame::handleInput()
     if (pressed == -1)
       break;
 
-    // Detect and ignore special key sequences (arrow keys, function keys, etc.)
-    // On Windows, special keys send 0 or 224 followed by a key code (apperently
-    // :) )
     if (pressed == 0 || pressed == 224)
     {
       if (check_kbhit())
@@ -118,9 +327,9 @@ void NormalGame::disableRecording()
     isRecording = false;
 }
 
-///////////////////////////////////////////    recordScreenChange    /////////////////////////////////////////////
+///////////////////////////////////////////    reportScreenChange    /////////////////////////////////////////////
 
-void NormalGame::recordScreenChange(int roomId)
+void NormalGame::reportScreenChange(int roomId)
 {
     if (resultFile.is_open())
     {
@@ -130,9 +339,9 @@ void NormalGame::recordScreenChange(int roomId)
     }
 }
 
-///////////////////////////////////////////    recordLifeLost    /////////////////////////////////////////////
+///////////////////////////////////////////    reportLifeLost    /////////////////////////////////////////////
 
-void NormalGame::recordLifeLost(int playerId)
+void NormalGame::reportLifeLost(int playerId)
 {
     if (!resultFile.is_open())
         return;
@@ -142,9 +351,9 @@ void NormalGame::recordLifeLost(int playerId)
     resultFile.flush();
 }
 
-///////////////////////////////////////////    recordRiddleAttempt    /////////////////////////////////////////////
+///////////////////////////////////////////    onRiddleAttempt    /////////////////////////////////////////////
 
-void NormalGame::recordRiddleAttempt(const std::string& question, int answer, bool correct)
+void NormalGame::onRiddleAttempt(const std::string& question, int answer, bool correct)
 {
     if (!resultFile.is_open())
         return;
@@ -165,16 +374,16 @@ void NormalGame::handlePauseInput()
       currentState = GameState::inGame;
     else if (choice == 'h' || choice == 'H')
     {
-      recordQuit();
+      reportQuit();
       gameInitialized = false;
       currentState = GameState::mainMenu;
     }
   }
 }
 
-///////////////////////////////////////////    recordQuit    /////////////////////////////////////////////
+///////////////////////////////////////////    reportQuit    /////////////////////////////////////////////
 
-void NormalGame::recordQuit()
+void NormalGame::reportQuit()
 {
     if (!resultFile.is_open())
         return;
@@ -184,9 +393,9 @@ void NormalGame::recordQuit()
     resultFile.flush();
 }
 
-///////////////////////////////////////////    recordRiddleAnswer    /////////////////////////////////////////////
+///////////////////////////////////////////    reportRiddleAnswer    /////////////////////////////////////////////
 
-void NormalGame::recordRiddleAnswer(int answer)
+void NormalGame::reportRiddleAnswer(int answer)
 {
     if (!isRecording || !recordFile.is_open())
         return;
@@ -199,4 +408,12 @@ void NormalGame::recordRiddleAnswer(int answer)
     ActionRecord ar(cycleCount, playerId, answer);
     ar.write(recordFile);
     recordFile.flush();
+}
+
+///////////////////////////////////////////    getRiddleInput    /////////////////////////////////////////////
+
+int NormalGame::getRiddleInput(unsigned long cycle)
+{
+    (void)cycle;
+    return -1; // Normal game reads from keyboard inside Riddle::getPlayerAnswer if this returns -1
 }

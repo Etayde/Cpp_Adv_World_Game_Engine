@@ -67,95 +67,7 @@ Game* Game::createFromArgs(int argc, char* argv[])
 }
 
 //////////////////////////////////////////           run               /////////////////////////////////////////////
-void Game::run()
-{
-  bool running = true;
 
-  while (running)
-  {
-    switch (currentState)
-    {
-    case GameState::mainMenu:
-      showMainMenu();
-      while (currentState == GameState::mainMenu)
-      {
-        handleMainMenuInput();
-        Renderer::sleep_ms(50);
-      }
-      break;
-
-    case GameState::instructions:
-      showInstructions();
-      while (currentState == GameState::instructions)
-      {
-        handleInstructionsInput();
-        Renderer::sleep_ms(50);
-      }
-      break;
-
-    case GameState::inGame:
-      if (!gameInitialized)
-      {
-        startNewGame();
-        gameInitialized = true;
-      }
-      gameLoop();
-      break;
-
-    case GameState::paused:
-      showPauseMenu();
-      while (currentState == GameState::paused)
-      {
-        handlePauseInput();
-        Renderer::sleep_ms(50);
-      }
-      break;
-
-    case GameState::victory:
-      showVictory();
-      Renderer::gotoxy(20,18);
-      Renderer::print("Press any key to return to main menu");
-      while (check_kbhit())
-        get_single_char();
-      while (!check_kbhit())
-        Renderer::sleep_ms(50);
-      get_single_char();
-      gameInitialized = false;
-      currentState = GameState::mainMenu;
-      break;
-
-    case GameState::gameOver:
-      showGameOver();
-      Renderer::gotoxy(20,12);
-      Renderer::print("Press any key to return to main menu");
-      while (check_kbhit())
-        get_single_char();
-      while (!check_kbhit())
-        Renderer::sleep_ms(50);
-      get_single_char();
-      gameInitialized = false;
-      currentState = GameState::mainMenu;
-      break;
-
-    case GameState::error:
-      showErrorScreen();
-      Renderer::gotoxy(20,12);
-      Renderer::print("Press any key to return to main menu");
-      while (check_kbhit())
-        get_single_char();
-      while (!check_kbhit())
-        Renderer::sleep_ms(50);
-      get_single_char();
-      gameInitialized = false;
-      currentState = GameState::mainMenu;
-      break;
-
-    case GameState::quit:
-      running = false;
-      break;
-    }
-  }
-}
 
 //////////////////////////////////////////   validateLegendPlacement  /////////////////////////////////////////////
 
@@ -239,8 +151,6 @@ void Game::startNewGame()
   currentRoomId = 0;
   rooms[0].active = true;
   gameInitialized = true;
-
-  recordScreenChange(0);
 }
 
 //////////////////////////////////////////         gameLoop           /////////////////////////////////////////////
@@ -768,7 +678,7 @@ void Game::changeRoom(int newRoomId, bool goingForward)
   currentRoomId = newRoomId;
   rooms[newRoomId].active = true;
 
-  recordScreenChange(newRoomId);
+  rooms[newRoomId].active = true;
 
   Point spawn = goingForward ? rooms[newRoomId].spawnPoint
                              : rooms[newRoomId].spawnPointFromNext;

@@ -176,7 +176,7 @@ void LoadedGame::run()
     case GameState::quit:
       if (silentMode)
       {
-        recordQuit();  // Verify quit event against expected
+        reportQuit();  // Verify quit event against expected
 
         if (testPassed && expectedEventIndex < expectedEvents.size())
         {
@@ -242,6 +242,18 @@ ErrorCode LoadedGame::loadExpectedResults(const string& filename)
 
     file.close();
     return ErrorCode::NONE;
+}
+
+///////////////////////////////////////////    verifyEvent    /////////////////////////////////////////////
+
+
+void LoadedGame::changeRoom(int newRoomId, bool goingForward)
+{
+    Game::changeRoom(newRoomId, goingForward);
+    
+    if (newRoomId >= 0 && newRoomId < static_cast<int>(rooms.size())) {
+        reportScreenChange(newRoomId);
+    }
 }
 
 ///////////////////////////////////////////    verifyEvent    /////////////////////////////////////////////
@@ -328,9 +340,9 @@ void LoadedGame::checkMissedEvents()
     }
 }
 
-///////////////////////////////////////////    recordScreenChange    /////////////////////////////////////////////
+///////////////////////////////////////////    reportScreenChange    /////////////////////////////////////////////
 
-void LoadedGame::recordScreenChange(int roomId)
+void LoadedGame::reportScreenChange(int roomId)
 {
     if (!silentMode)
         return;
@@ -339,9 +351,9 @@ void LoadedGame::recordScreenChange(int roomId)
     verifyEvent(actual);
 }
 
-///////////////////////////////////////////    recordLifeLost    /////////////////////////////////////////////
+///////////////////////////////////////////    reportLifeLost    /////////////////////////////////////////////
 
-void LoadedGame::recordLifeLost(int playerId)
+void LoadedGame::reportLifeLost(int playerId)
 {
     if (!silentMode)
         return;
@@ -350,9 +362,9 @@ void LoadedGame::recordLifeLost(int playerId)
     verifyEvent(actual);
 }
 
-///////////////////////////////////////////    recordRiddleAttempt    /////////////////////////////////////////////
+///////////////////////////////////////////    onRiddleAttempt    /////////////////////////////////////////////
 
-void LoadedGame::recordRiddleAttempt(const std::string& question, int answer, bool correct)
+void LoadedGame::onRiddleAttempt(const std::string& question, int answer, bool correct)
 {
     if (!silentMode)
         return;
@@ -361,9 +373,9 @@ void LoadedGame::recordRiddleAttempt(const std::string& question, int answer, bo
     verifyEvent(actual);
 }
 
-///////////////////////////////////////////    recordQuit    /////////////////////////////////////////////
+///////////////////////////////////////////    reportQuit    /////////////////////////////////////////////
 
-void LoadedGame::recordQuit()
+void LoadedGame::reportQuit()
 {
     if (!silentMode)
         return;
@@ -380,9 +392,9 @@ void LoadedGame::showQuitScreen()
     quitScreen.draw();
 }
 
-///////////////////////////////////////////    getRecordedRiddleAnswer    /////////////////////////////////////////////
+///////////////////////////////////////////    getRiddleInput    /////////////////////////////////////////////
 
-int LoadedGame::getRecordedRiddleAnswer(unsigned long cycle)
+int LoadedGame::getRiddleInput(unsigned long cycle)
 {
     vector<ActionRecord> actions = steps.getActionsForCycle(cycle);
     for (const auto& action : actions)

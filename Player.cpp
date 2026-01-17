@@ -176,7 +176,7 @@ void Player::loseLife(Room *room, Game *game)
   decreaseLives();
   respawn(room);
   if (game != nullptr) {
-    game->recordLifeLost(playerId);
+    game->reportLifeLost(playerId);
   }
 }
 

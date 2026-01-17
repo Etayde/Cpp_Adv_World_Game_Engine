@@ -34,7 +34,7 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer, Game *gam
     {
         const RiddleData *data = RiddleDatabase::getRiddle(riddleId);
         std::string questionText = data ? data->question : "";
-        game->recordRiddleAttempt(questionText, playerAnswer + 1, correct);
+        game->onRiddleAttempt(questionText, playerAnswer + 1, correct);
     }
 
     if (correct && firstAttempt && triggeringPlayer != nullptr)
@@ -103,7 +103,7 @@ int Riddle::getPlayerAnswer(const Game* gameContext) const
 {
     if (gameContext != nullptr)
     {
-        int recordedAnswer = const_cast<Game*>(gameContext)->getRecordedRiddleAnswer(gameContext->getCycleCount());
+        int recordedAnswer = const_cast<Game*>(gameContext)->getRiddleInput(gameContext->getCycleCount());
         if (recordedAnswer != -1)
         {
             return recordedAnswer;
@@ -132,7 +132,7 @@ int Riddle::getPlayerAnswer(const Game* gameContext) const
             
             if (gameContext != nullptr)
             {
-                 const_cast<Game*>(gameContext)->recordRiddleAnswer(answer);
+                 const_cast<Game*>(gameContext)->reportRiddleAnswer(answer);
             }
             
             return answer;

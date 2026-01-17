@@ -21,16 +21,19 @@ class LoadedGame : public Game {
 public:
     LoadedGame(const string &filename, bool silent = false);
     LoadedGame(int argc, char* argv[]);
+
     void handleInput() override;
     void run() override;
     void gameLoop() override;
+    void changeRoom(int newRoomId, bool goingForward) override;
 
 protected:
-    void recordScreenChange(int roomId) override;
-    void recordLifeLost(int playerId) override;
-    void recordRiddleAttempt(const std::string& question, int answer, bool correct) override;
-    void recordQuit() override;
-    int getRecordedRiddleAnswer(unsigned long cycle) override;
+    void reportScreenChange(int roomId) override;
+    void reportLifeLost(int playerId) override;
+    void onRiddleAttempt(const std::string& question, int answer, bool correct) override;
+    void reportQuit() override;
+    int getRiddleInput(unsigned long cycle) override;
+    void reportRiddleAnswer(int answer) override { (void)answer; } // No-op for load mode recording override
 
 private:
     ErrorCode loadActions(const string& filename) { return steps.loadFromFile(filename); }
