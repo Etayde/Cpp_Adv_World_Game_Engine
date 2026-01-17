@@ -27,13 +27,10 @@ public:
     void disableRecording();
 
 protected:
-    // Event reporting hooks (override from Game)
     void reportScreenChange(int roomId) override;
     void reportLifeLost(int playerId) override;
     void onRiddleAttempt(const std::string& question, int answer, bool correct) override;
     void reportQuit() override;
-
-    // Riddle interaction hooks
     int getRiddleInput(unsigned long cycle) override;
     void reportRiddleAnswer(int answer) override;
 

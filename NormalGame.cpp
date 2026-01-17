@@ -168,7 +168,6 @@ void NormalGame::gameLoop()
 
     while (aRiddle.isActive() && currentState == GameState::inGame)
     {
-      // Note: enterRiddle now calls reportRiddleAttempt and reportRiddleAnswer internally via Game interface
       RiddleResult result = aRiddle.riddle->enterRiddle(room, aRiddle.player, this);
 
       if (result == RiddleResult::NO_RIDDLE)
@@ -208,7 +207,6 @@ void NormalGame::gameLoop()
       }
       else
       {
-        // FAILED
         aRiddle.reset();
         Renderer::clrscr();
         if (room)
@@ -225,7 +223,6 @@ void NormalGame::gameLoop()
   }
   else
   {
-    // Normal update loop
     if (room)
     {
       room->draw();
@@ -239,7 +236,7 @@ void NormalGame::gameLoop()
   while (currentState == GameState::inGame)
   {
     handleInput();
-    update(); // Base Game::update() logic
+    update();
     Renderer::sleep_ms(100);
   }
 }
@@ -250,7 +247,6 @@ void NormalGame::changeRoom(int newRoomId, bool goingForward)
 {
     Game::changeRoom(newRoomId, goingForward);
     
-    // After logic, report the change
     if (newRoomId >= 0 && newRoomId < static_cast<int>(rooms.size())) {
         reportScreenChange(newRoomId);
     }
@@ -281,13 +277,13 @@ void NormalGame::handleInput()
     {
       if (keyBindings[i].key == pressed)
       {
-        if (keyBindings[i].action == Action::ESC)
+        if (keyBindings[i].action == Action::ESC) // Not recording ESC
         {
           currentState = GameState::paused;
           return;
         }
 
-        recordAction(keyBindings[i]);  // Only record non-ESC actions
+        recordAction(keyBindings[i]);
 
         Player &player = (keyBindings[i].playerID == 1) ? player1 : player2;
 

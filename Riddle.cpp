@@ -18,15 +18,11 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer, Game *gam
 {
     playRiddleAnimation();
 
-    if (!displayRiddleQuestion())
-        return RiddleResult::NO_RIDDLE;
+    if (!displayRiddleQuestion()) return RiddleResult::NO_RIDDLE;
 
     int playerAnswer = getPlayerAnswer(game);
 
-    if (playerAnswer == -1)
-    {
-        return RiddleResult::ESCAPED;
-    }
+    if (playerAnswer == -1) return RiddleResult::ESCAPED;
 
     bool correct = checkAnswer(playerAnswer);
 
@@ -37,10 +33,7 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer, Game *gam
         game->onRiddleAttempt(questionText, playerAnswer + 1, correct);
     }
 
-    if (correct && firstAttempt && triggeringPlayer != nullptr)
-    {
-        triggeringPlayer->incrementScore(100);
-    }
+    if (correct && firstAttempt && triggeringPlayer != nullptr) triggeringPlayer->incrementScore(100);
 
     firstAttempt = false;
 
@@ -55,11 +48,9 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer, Game *gam
 
     playExitAnimation();
 
-    if (room != nullptr)
-        room->draw();
+    if (room != nullptr) room->draw();
 
-    if (correct)
-        return RiddleResult::SOLVED;
+    if (correct) return RiddleResult::SOLVED;
 
     return RiddleResult::FAILED;
 }
@@ -69,18 +60,13 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer, Game *gam
 bool Riddle::displayRiddleQuestion()
 {
     const RiddleData *data = RiddleDatabase::getRiddle(riddleId);
-    if (data == nullptr)
-    {
-        return false;
-    }
+    if (data == nullptr) return false;
 
     int startX = 11;
     int startY = 4;
     int endY = 16;
     for (int i = 0; i < endY; i++)
-    {
         Renderer::printAt(startX, startY + i, riddlePopupScreen[i]);
-    }
 
     Renderer::gotoxy(13, 6);
     Renderer::print(data->question);
@@ -104,16 +90,12 @@ int Riddle::getPlayerAnswer(const Game* gameContext) const
     if (gameContext != nullptr)
     {
         int recordedAnswer = const_cast<Game*>(gameContext)->getRiddleInput(gameContext->getCycleCount());
-        if (recordedAnswer != -1)
-        {
-            return recordedAnswer;
-        }
+        if (recordedAnswer != -1) return recordedAnswer;
     }
 
     Renderer::showCursor();
 
-    while (check_kbhit())
-        get_char_nonblocking();
+    while (check_kbhit()) get_char_nonblocking();
 
     while (true)
     {
@@ -131,9 +113,7 @@ int Riddle::getPlayerAnswer(const Game* gameContext) const
             int answer = key - '1';
             
             if (gameContext != nullptr)
-            {
-                 const_cast<Game*>(gameContext)->reportRiddleAnswer(answer);
-            }
+                const_cast<Game*>(gameContext)->reportRiddleAnswer(answer);
             
             return answer;
         }
@@ -191,9 +171,6 @@ void Riddle::playExitAnimation() const
 bool Riddle::checkAnswer(int playerAnswer) const
 {
     const RiddleData *data = RiddleDatabase::getRiddle(riddleId);
-    if (data == nullptr)
-    {
-        return false;
-    }
+    if (data == nullptr) return false;
     return playerAnswer == data->correctAnswerIndex;
 }

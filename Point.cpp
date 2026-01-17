@@ -9,10 +9,8 @@ void Point::move()
     int newX = x + diff_x;
     int newY = y + diff_y;
 
-    if (newX >= 1 && newX < MAX_X - 1)
-        x = newX;
-    if (newY >= 1 && newY < MAX_Y - 1)
-        y = newY;
+    if (newX >= 1 && newX < MAX_X - 1) x = newX;
+    if (newY >= 1 && newY < MAX_Y - 1) y = newY;
 }
 
 //////////////////////////////////////////       setDirection         //////////////////////////////////////////

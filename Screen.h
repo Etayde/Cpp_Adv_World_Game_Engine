@@ -43,9 +43,7 @@ public:
   char getCharAt(int x, int y) const
   {
     if (x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y && screen[y] != nullptr)
-    {
       return screen[y][x];
-    }
     return 'W';
   }
 

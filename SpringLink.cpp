@@ -3,9 +3,7 @@
 #include "SpringLink.h"
 #include "Spring.h"
 #include "Room.h"
-#include "Console.h"
 #include "Renderer.h"
-#include <iostream>
 
 //////////////////////////////////////////       Constructor       /////////////////////////////////////////////
 

@@ -3,7 +3,6 @@
 #include "Utils.h"
 #include "Renderer.h"
 #include <ctime>
-#include <iostream>
 
 //////////////////////////////////////////         drawAt          //////////////////////////////////////////
 

@@ -4,14 +4,11 @@
 #include "SpringLink.h"
 #include "Room.h"
 #include "Player.h"
-///#include <algorithm>
 
 //////////////////////////////////////////      Constructor          //////////////////////////////////////////
 
 Spring::Spring()
-    : links(), anchorPosition(-1, -1), compressionDir(Direction::STAY), compressedCount(0)
-{
-}
+    : links(), anchorPosition(-1, -1), compressionDir(Direction::STAY), compressedCount(0) {}
 
 //////////////////////////////////////////      Destructor          //////////////////////////////////////////
 
@@ -44,33 +41,17 @@ void Spring::initialize(const std::vector<SpringLink *> &springLinks,
 
 bool Spring::canCompressLink(int linkIndex, Direction playerDir) const
 {
-    if (linkIndex < 0 || linkIndex >= static_cast<int>(links.size()))
-    {
-        return false;
-    }
+    if (linkIndex < 0 || linkIndex >= static_cast<int>(links.size())) return false;
+    if (playerDir != compressionDir) return false;
 
-    if (playerDir != compressionDir)
-    {
-        return false;
-    }
-
-    if (linkIndex == 0)
-    {
-        return true;
-    }
+    if (linkIndex == 0) return true;
 
     for (int i = 0; i < linkIndex; i++)
     {
-        if (!links[i]->isCollapsed())
-        {
-            return false;
-        }
+        if (!links[i]->isCollapsed()) return false;
     }
 
-    if (links[linkIndex]->isCollapsed())
-    {
-        return false;
-    }
+    if (links[linkIndex]->isCollapsed()) return false;
 
     return true;
 }
@@ -79,9 +60,7 @@ bool Spring::canCompressLink(int linkIndex, Direction playerDir) const
 
 void Spring::compressLink(int linkIndex, Room *room)
 {
-    if (linkIndex < 0 || linkIndex >= static_cast<int>(links.size()))
-        return;
-
+    if (linkIndex < 0 || linkIndex >= static_cast<int>(links.size())) return;
     links[linkIndex]->collapse(room);
     compressedCount++;
 }
@@ -171,10 +150,7 @@ Momentum Spring::calculateLaunchMomentum() const
 
 void Spring::resetCompression(Room *room)
 {
-    for (SpringLink *link : links)
-    {
-        link->reset(room);
-    }
+    for (SpringLink *link : links) link->reset(room);
     compressedCount = 0;
 }
 
@@ -182,10 +158,7 @@ void Spring::resetCompression(Room *room)
 
 Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink *link, Player *player, Room *room)
 {
-    if (link == nullptr || player == nullptr)
-    {
-        return {false, false, Momentum()};
-    }
+    if (link == nullptr || player == nullptr) return {false, false, Momentum()};
 
     Direction moveDir = player->getCurrentDirection();
 
@@ -197,28 +170,19 @@ Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink *link, Play
             resetCompression(room);
             return {true, true, launch};
         }
-        else
-        {
-            return {false, false, Momentum()};
-        }
+        else return {false, false, Momentum()};
     }
 
     compressLink(link->getLinkIndex(), room);
 
     bool fullyCompressed = isFullyCompressed();
 
-    if (!fullyCompressed && moveDir == compressionDir)
-    {
-        return {true, false, Momentum()};
-    }
+    if (!fullyCompressed && moveDir == compressionDir) return {true, false, Momentum()};
 
     Momentum launch = calculateLaunchMomentum();
     bool shouldLaunch = compressedCount > 0;
 
-    if (!shouldLaunch)
-    {
-        return {true, false, Momentum()};
-    }
+    if (!shouldLaunch) return {true, false, Momentum()};
 
     resetCompression(room);
 
@@ -229,19 +193,15 @@ Spring::InteractionResult Spring::handlePlayerInteraction(SpringLink *link, Play
 
 bool Spring::playerSTAYcheck(Player &p, SpringLink &link) const
 {
-
-    if (p.getX() == link.getX() && p.getY() == link.getY() && (!link.isCollapsed()) && p.getCurrentDirection() == Direction::STAY)
-    {
+    if (p.getX() == link.getX() && p.getY() == link.getY() 
+       && (!link.isCollapsed()) && p.getCurrentDirection() == Direction::STAY)
         return true;
-    }
     return false;
 }
 
 SpringLink *Spring::getPrevLink(const SpringLink *current) const
 {
-    if (current == nullptr)
-        return nullptr;
-
+    if (current == nullptr) return nullptr;
     int curr = current->getLinkIndex();
     return curr > 0 ? links[curr - 1] : nullptr;
 }
@@ -251,12 +211,7 @@ SpringLink *Spring::getPrevLink(const SpringLink *current) const
 void Spring::destroyAllLinks()
 {
     for (SpringLink *link : links)
-    {
-        if (link && link->isActive())
-        {
-            link->setActive(false);
-        }
-    }
+        if (link && link->isActive()) link->setActive(false);
 }
 
 //////////////////////////////////////////   allLinksInactive       //////////////////////////////////////////
@@ -264,9 +219,6 @@ void Spring::destroyAllLinks()
 bool Spring::allLinksInactive() const
 {
     for (SpringLink *link : links)
-    {
-        if (link && link->isActive())
-            return false;
-    }
+        if (link && link->isActive()) return false;
     return true;
 }

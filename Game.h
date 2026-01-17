@@ -9,9 +9,9 @@
 #include "Renderer.h"
 #include <vector>
 
-//////////////////////////////////////////           Game       /////////////////////////////////////////////
-
 class Riddle;
+
+//////////////////////////////////////////           Game       /////////////////////////////////////////////
 
 enum class GameOverMessege
 {
@@ -21,6 +21,7 @@ enum class GameOverMessege
   VALUABLE_DESTROYED
 };
 
+// Base class for all games - abstract
 class Game
 {
 protected:
