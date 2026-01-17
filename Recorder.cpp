@@ -11,6 +11,7 @@ inline Action stringToAction(const string& str) {
     if (str == "STAY")       return Action::STAY;
     if (str == "DROP_ITEM")  return Action::DROP_ITEM;
     if (str == "ESC")        return Action::ESC;
+    if (str == "ANSWER_RIDDLE") return Action::ANSWER_RIDDLE;
     return Action::STAY;
 }
 
@@ -22,6 +23,7 @@ inline string actionToString(Action action) {
         case Action::MOVE_RIGHT: return "MOVE_RIGHT";
         case Action::STAY:       return "STAY";
         case Action::DROP_ITEM:  return "DROP_ITEM";
+        case Action::ANSWER_RIDDLE: return "ANSWER_RIDDLE";
         case Action::ESC:        return "ESC";
         default:                 return "UNKNOWN";
     }
@@ -132,7 +134,13 @@ void ActionRecord::write(ostream &output) const
 {
     output << "CYCLE: " << cycle
            << " PLAYER: " << playerId
-           << " ACTION: " << actionToString(action) << "\n";
+           << " ACTION: " << actionToString(action);
+    
+    if (action == Action::ANSWER_RIDDLE) {
+        output << " ANSWER: " << answer;
+    }
+    
+    output << "\n";
 }
 
 //////////////////////////////////////////    ActionRecord::read    /////////////////////////////////////////////
@@ -155,6 +163,13 @@ bool ActionRecord::read(istream &input)
     }
 
     action = stringToAction(actionStr);
+
+    if (action == Action::ANSWER_RIDDLE) {
+        string answerLabel;
+        if (!(input >> answerLabel >> answer)) { // Expecting "ANSWER: <int>"
+            return false;
+        }
+    }
 
     return true; 
 }

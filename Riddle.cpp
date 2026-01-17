@@ -18,7 +18,7 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer, Game *gam
     if (!displayRiddleQuestion())
         return RiddleResult::NO_RIDDLE;
 
-    int playerAnswer = getPlayerAnswer();
+    int playerAnswer = getPlayerAnswer(game);
 
     if (playerAnswer == -1)
     {
@@ -97,10 +97,20 @@ bool Riddle::displayRiddleQuestion()
     return true;
 }
 
-//////////////////////////////////////////       getPlayerAnswer        //////////////////////////////////////////
-
-int Riddle::getPlayerAnswer() const
+int Riddle::getPlayerAnswer(const Game* gameContext) const
 {
+    // Check for recorded playback answer first
+    if (gameContext != nullptr)
+    {
+        // Cycle count access needs to be available. Game::getCycleCount() is const.
+        int recordedAnswer = const_cast<Game*>(gameContext)->getRecordedRiddleAnswer(gameContext->getCycleCount());
+        if (recordedAnswer != -1)
+        {
+            return recordedAnswer;
+        }
+    }
+
+    // Interactive Mode
     Renderer::showCursor();
 
     while (check_kbhit())
@@ -119,10 +129,19 @@ int Riddle::getPlayerAnswer() const
         if (key >= '1' && key <= '4')
         {
             Renderer::hideCursor();
-            return key - '1';
+            int answer = key - '1';
+            
+            // Record the answer if we have a game context
+            if (gameContext != nullptr)
+            {
+                 const_cast<Game*>(gameContext)->recordRiddleAnswer(answer);
+            }
+            
+            return answer;
         }
     }
 }
+
 
 //////////////////////////////////////////       displayFeedback        //////////////////////////////////////////
 

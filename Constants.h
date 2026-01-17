@@ -47,6 +47,7 @@ enum class Action
   MOVE_RIGHT,
   STAY,
   DROP_ITEM,
+  ANSWER_RIDDLE,
   ESC = 27
 };
 

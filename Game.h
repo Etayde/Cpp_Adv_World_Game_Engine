@@ -112,4 +112,8 @@ public:
     (void)question; (void)answer; (void)correct;
   }
   virtual void recordQuit() {}
+
+  // New virtual methods for recording/playback of riddle answers
+  virtual int getRecordedRiddleAnswer(unsigned long cycle) { (void)cycle; return -1; }
+  virtual void recordRiddleAnswer(int answer) { (void)answer; }
 };

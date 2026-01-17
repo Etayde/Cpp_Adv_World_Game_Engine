@@ -215,3 +215,29 @@ void NormalGame::recordQuit()
     event.write(resultFile);
     resultFile.flush();
 }
+
+///////////////////////////////////////////    recordRiddleAnswer    /////////////////////////////////////////////
+
+void NormalGame::recordRiddleAnswer(int answer)
+{
+    if (!isRecording || !recordFile.is_open())
+        return;
+
+    ActionRecord record(cycleCount, 1, answer); // Player ID 1 assumed for single player interaction or tracking context
+    // Ideally we should know which player answered, but for now we'll rely on the fact that riddles are blocking
+    // Better: Update recordRiddleAnswer to take player ID, but for now steps format just needs answer.
+    // Actually, Recorder.h ActionRecord constructor takes player ID. Let's use 1 as default or find a way to get it.
+    // The ActiveRiddle struct in Game has the player. But here we just need to save the answer.
+    
+    // Correction: We need to pass the correct player ID.
+    // In Game.h, we can access existing player1/player2 or use aRiddle.player->playerId if active.
+    
+    int playerId = 1;
+    if (aRiddle.isActive() && aRiddle.player != nullptr) {
+        playerId = aRiddle.player->playerId;
+    }
+    
+    ActionRecord ar(cycleCount, playerId, answer);
+    ar.write(recordFile);
+    recordFile.flush();
+}

@@ -93,8 +93,10 @@ void LoadedGame::handleInput()
     // Process all actions that match the current cycle
     while (curr != nullptr && curr->cycle == cycleCount)
     {
-        Player& player = (curr->playerId == 1) ? player1 : player2;
-        player.performAction(curr->action, getCurrentRoom());
+        if (curr->action != Action::ANSWER_RIDDLE) {
+            Player& player = (curr->playerId == 1) ? player1 : player2;
+            player.performAction(curr->action, getCurrentRoom());
+        }
 
         steps.advanceToNextAction();
         curr = steps.getCurrentAction();
@@ -414,4 +416,19 @@ void LoadedGame::showQuitScreen()
 {
     Renderer::clrscr();
     quitScreen.draw();
+}
+
+///////////////////////////////////////////    getRecordedRiddleAnswer    /////////////////////////////////////////////
+
+int LoadedGame::getRecordedRiddleAnswer(unsigned long cycle)
+{
+    vector<ActionRecord> actions = steps.getActionsForCycle(cycle);
+    for (const auto& action : actions)
+    {
+        if (action.action == Action::ANSWER_RIDDLE)
+        {
+            return action.answer;
+        }
+    }
+    return -1;
 }

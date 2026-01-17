@@ -34,6 +34,7 @@ protected:
     void recordLifeLost(int playerId) override;
     void recordRiddleAttempt(const std::string& question, int answer, bool correct) override;
     void recordQuit() override;
+    int getRecordedRiddleAnswer(unsigned long cycle) override;
 
 private:
     ErrorCode loadActions(const string& filename) { return steps.loadFromFile(filename); }

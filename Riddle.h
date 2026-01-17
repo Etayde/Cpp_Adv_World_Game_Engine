@@ -43,7 +43,7 @@ public:
     RiddleResult enterRiddle(Room *room, Player *triggeringPlayer, Game *game = nullptr);
     void playRiddleAnimation() const;
     bool displayRiddleQuestion();
-    int getPlayerAnswer() const;
+    int getPlayerAnswer(const Game* gameContext = nullptr) const;
     void displayFeedback(bool correct) const;
     void playExitAnimation() const;
     bool checkAnswer(int playerAnswer) const;

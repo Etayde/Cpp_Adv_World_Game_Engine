@@ -68,13 +68,19 @@ struct ActionRecord
     int playerId;
     Action action;
 
+    int answer; // -1 if not a riddle answer
+
     // Default constructor
-    ActionRecord() : cycle(0), playerId(0), action(Action::STAY) {}
+    ActionRecord() : cycle(0), playerId(0), action(Action::STAY), answer(-1) {}
 
     // Constructor from PlayerKeyBinding
     ActionRecord(unsigned long c, const PlayerKeyBinding &binding)
         : cycle(c), playerId(binding.playerID),
-          action(binding.action) {}
+          action(binding.action), answer(-1) {}
+    
+    // Constructor for riddle answer
+    ActionRecord(unsigned long c, int player, int ans)
+        : cycle(c), playerId(player), action(Action::ANSWER_RIDDLE), answer(ans) {}
 
     // Serialize to output stream
     // Format: CYCLE: <cycle> PLAYER: <player> ACTION: <action>

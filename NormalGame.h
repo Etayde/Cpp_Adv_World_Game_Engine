@@ -31,4 +31,5 @@ protected:
 private:
     void recordAction(const PlayerKeyBinding& binding);
     void recordScreenTransition(int roomId);  // For steps file
+    void recordRiddleAnswer(int answer) override;
 };
