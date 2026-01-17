@@ -46,8 +46,10 @@ Game::~Game()
   if (consoleInitialized)
   {
     showCursor();
-    clrscr();
-    cleanup_console();
+    if (!silentMode){
+      clrscr();
+      cleanup_console();
+    }
     std::cout << "Thanks for playing!" << std::endl;
   }
 }

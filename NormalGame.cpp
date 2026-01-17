@@ -43,6 +43,12 @@ NormalGame::~NormalGame()
 {
     disableRecording();
     if (resultFile.is_open()) resultFile.close();
+    
+    if (consoleInitialized)
+    {
+      clrscr();
+      cleanup_console();
+    }  
 }
 
 //////////////////////////////////////////        handleInput         /////////////////////////////////////////////
