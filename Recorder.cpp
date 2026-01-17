@@ -60,16 +60,19 @@ bool GameEvent::read(std::istream& in)
     std::string dummy;
 
     if (!(in >> eventType)) {
+        cout << "Failed to read event type" << endl;   // DEBUG
         return false;
     }
 
     // Parse CYCLE: <cycle>
     if (!(in >> dummy >> cycle)) {
+        cout << "Failed to read cycle" << endl;   // DEBUG
         return false;
     }
 
     // Parse ROOM: <roomId>
     if (!(in >> dummy >> roomId)) {
+        cout << "Failed to read roomId" << endl;   // DEBUG
         return false;
     }
 
@@ -80,6 +83,7 @@ bool GameEvent::read(std::istream& in)
         type = GameEventType::LIFE_LOST;
         // Parse PLAYER: <playerId>
         if (!(in >> dummy >> playerId)) {
+            cout << "Failed to read playerId" << endl;   // DEBUG
             return false;
         }
     }
@@ -87,6 +91,7 @@ bool GameEvent::read(std::istream& in)
         type = GameEventType::RIDDLE_ANSWERED;
         // Parse QUESTION: "..."
         if (!(in >> dummy)) {  // "QUESTION:"
+            cout << "Failed to read QUESTION label" << endl;   // DEBUG
             return false;
         }
         // Read quoted question - find opening quote
@@ -99,11 +104,13 @@ bool GameEvent::read(std::istream& in)
         }
         // Parse ANSWER: <answerGiven>
         if (!(in >> dummy >> answerGiven)) {
+            cout << "Failed to read answerGiven" << endl;   // DEBUG
             return false;
         }
         // Parse CORRECT: YES/NO
         std::string correctStr;
         if (!(in >> dummy >> correctStr)) {
+            cout << "Failed to read wasCorrect" << endl;   // DEBUG
             return false;
         }
         wasCorrect = (correctStr == "YES");
@@ -113,6 +120,7 @@ bool GameEvent::read(std::istream& in)
         // QUIT only has CYCLE and ROOM which are already parsed
     }
     else {
+        cout << "Unknown event type: " << eventType << endl;   // DEBUG
         return false;  // Unknown event type
     }
 

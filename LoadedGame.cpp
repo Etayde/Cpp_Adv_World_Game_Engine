@@ -61,7 +61,7 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
         currentState = GameState::error;
     else
         currentState = GameState::inGame;
-        cout << "Loaded steps" << endl;
+        cout << "Loaded steps" << endl;             ////////////////////
 
     // Load expected results (needed for quit detection in all modes, verification in silent mode)
     if (currentState == GameState::inGame)
@@ -239,12 +239,14 @@ ErrorCode LoadedGame::loadExpectedResults(const string& filename)
     expectedEvents.clear();
     expectedEventIndex = 0;
     quitCycle = -1;  // Reset quit cycle
+    cout << "Expected events resetted" << endl;             ////////////////////
 
     while (file >> std::ws && file.peek() != EOF)
     {
         GameEvent event;
         if (!event.read(file))
         {
+            cout << "Error reading expected event from file." << endl;
             file.close();
             return ErrorCode::READ_ERROR;
         }
