@@ -1,4 +1,4 @@
-EXCERCISE 2 - README:
+EXCERCISE 3 - README - READJUSTED WITH AI:
 
 ---------------------------------
 Students: ETAY DE BEER 319041612
@@ -24,6 +24,46 @@ The game is played with two players on the same keyboard. Input is case-insensit
 | DISPOSE ITEM    | E        | O        |
 
 * ESC: Pause Game (Press ESC again to resume, or 'H' to exit to Main Menu).
+
+=== Game Modes ===
+The game can be run in different modes using command-line arguments:
+
+1. Normal Mode
+   Command: ./game
+   Description: Standard gameplay. The user plays the game manually using the keyboard.
+
+2. Save Mode
+   Command: ./game -save
+   Description: Identical to Normal Mode, but records all player actions and key game events (like moving, riddle answers, etc.) to files.
+   - Saves actions to: "adv-world.steps.txt"
+   - Saves events to: "adv-world.result.txt"
+
+3. Load Mode
+   Command: ./game <steps script> 
+   (e.g., ./game adv-world.steps.txt)
+   Description: Replays a recorded game session. The game reads actions from the provided steps file instead of the keyboard. This allows you to watch a previously played game automatically.
+
+4. Silent Mode
+   Command: ./game <steps script> -silent
+   (e.g., ./game adv-world.steps.txt -silent)
+   Description: Runs the simulation as fast as possible without rendering any graphics to the console. This is used for automated testing.
+   - It compares the events occurring in the simulation against the expected events in "adv-world.result.txt".
+   - Prints "Test passed" or "Test not passed" based on the comparison.
+
+=== File Formats ===
+The game uses specific text formats for recording and verifying sessions.
+
+1. Steps File (*.steps.txt)
+   Records every action taken by each player at every game cycle. This file is used to replay the game in Load Mode.
+   Format Example:
+   CYCLE: 15 PLAYER: 1 ACTION: MOVE_RIGHT
+   CYCLE: 200 PLAYER: 1 ACTION: ANSWER_RIDDLE ANSWER: 4
+
+2. Results File (*.result.txt)
+   Records significant game milestones such as changing rooms, solving riddles, or losing lives. This file is used in Silent Mode to verify that the replay matches the original session.
+   Format Example:
+   SCREEN_CHANGE CYCLE: 0 ROOM: 0
+   RIDDLE CYCLE: 600 ROOM: 2 QUESTION: "What walks on four legs?" ANSWER: 2 CORRECT: YES
 
 === Map Creation Instructions ===
 To add new levels to the game, create a text file named "adv-worldXX.screen" (where XX is a number, e.g., 01, 02). Files are loaded in lexicographical order.
@@ -82,3 +122,13 @@ DARK_ZONE <tl_x> <tl_y> <br_x> <br_y>
 === Additional Files ===
 * riddles.txt: 
   Must be present in the working directory. Contains the riddles and answers corresponding to '?' characters on the map.
+
+* adv-world.steps.txt (or similar steps file):
+  - Mandatory for Load Mode and Silent Mode: Used to drive the simulation.
+  - Generated in Save Mode: The game creates this file to record actions.
+  - Not needed for Normal Mode.
+
+* adv-world.result.txt (or similar results file):
+  - Mandatory for Silent Mode: Used to verify that the replay matches expected outcomes.
+  - Generated in Save Mode: The game creates this file to record key events.
+  - Not needed for Normal Mode or Load Mode (unless verifying).

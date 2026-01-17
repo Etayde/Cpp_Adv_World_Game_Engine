@@ -1,0 +1,65 @@
+File Format Documentation - MADE WITH AI
+
+This document describes the formats for the "Steps" file (used for recording and replaying user actions) and the "Results" file (used for verifying game events during playback).
+
+================================================================================
+1. Steps File Format (*.steps.txt)
+================================================================================
+The steps file records player inputs and actions. Each line represents a single action taken by a player at a specific game cycle.
+
+General Format:
+CYCLE: <cycle_number> PLAYER: <player_id> ACTION: <action_name> [ANSWER: <value>]
+
+Fields:
+- <cycle_number>: Unsigned integer representing the game loop cycle.
+- <player_id>: Integer (1 or 2) identifying the player.
+- <action_name>: One of the following strings:
+    - MOVE_UP
+    - MOVE_DOWN
+    - MOVE_LEFT
+    - MOVE_RIGHT
+    - STAY
+    - DROP_ITEM
+    - ESC
+    - ANSWER_RIDDLE
+- [ANSWER: <value>]: Optional field, present ONLY when ACTION is ANSWER_RIDDLE. <value> is the integer answer provided.
+
+Examples:
+CYCLE: 15 PLAYER: 1 ACTION: MOVE_RIGHT
+CYCLE: 15 PLAYER: 2 ACTION: MOVE_UP
+CYCLE: 120 PLAYER: 1 ACTION: DROP_ITEM
+CYCLE: 200 PLAYER: 1 ACTION: ANSWER_RIDDLE ANSWER: 4
+
+================================================================================
+2. Results File Format (*.result.txt)
+================================================================================
+The results file records significant game events for verification. Each line starts with the event type followed by event-specific data.
+
+Event Types:
+
+A. SCREEN_CHANGE
+   Records when the game transitions to a new room (or starts).
+   Format:
+   SCREEN_CHANGE CYCLE: <cycle_number> ROOM: <room_id>
+
+B. LIFE_LOST
+   Records when a player loses a life.
+   Format:
+   LIFE_LOST CYCLE: <cycle_number> ROOM: <room_id> PLAYER: <player_id>
+
+C. RIDDLE
+   Records the outcome of a riddle attempt.
+   Format:
+   RIDDLE CYCLE: <cycle_number> ROOM: <room_id> QUESTION: "<question_text>" ANSWER: <answer_given> CORRECT: <YES|NO>
+   Note: The question text is enclosed in double quotes.
+
+D. QUIT
+   Records when the game is exited.
+   Format:
+   QUIT CYCLE: <cycle_number> ROOM: <room_id>
+
+Examples:
+SCREEN_CHANGE CYCLE: 0 ROOM: 0
+LIFE_LOST CYCLE: 450 ROOM: 1 PLAYER: 2
+RIDDLE CYCLE: 600 ROOM: 2 QUESTION: "What walks on four legs?" ANSWER: 2 CORRECT: YES
+QUIT CYCLE: 1050 ROOM: 2
