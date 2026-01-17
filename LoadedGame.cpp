@@ -66,6 +66,7 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
     // Load expected results (needed for quit detection in all modes, verification in silent mode)
     if (currentState == GameState::inGame)
     {
+        cout << "Loading expected results" << endl;             ////////////////////
         ErrorCode resultError = loadExpectedResults("adv-world.result.txt");
         // In silent mode, missing results file is an error
         // In non-silent mode, just continue without quit detection (quitCycle stays -1)
