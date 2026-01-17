@@ -19,8 +19,8 @@ LoadedGame::LoadedGame(const string& filename, bool silent) : Game(), steps(),
     else
         currentState = GameState::inGame;
 
-    // Load expected results in silent mode
-    if (silentMode && currentState == GameState::inGame)
+    // Load expected results (needed for quit detection in all modes, verification in silent mode)
+    if (currentState == GameState::inGame)
     {
         loadExpectedResults("adv-world.result.txt");
     }
@@ -55,8 +55,8 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
     else
         currentState = GameState::inGame;
 
-    // Load expected results in silent mode
-    if (silentMode && currentState == GameState::inGame)
+    // Load expected results (needed for quit detection in all modes, verification in silent mode)
+    if (currentState == GameState::inGame)
     {
         loadExpectedResults("adv-world.result.txt");
     }
