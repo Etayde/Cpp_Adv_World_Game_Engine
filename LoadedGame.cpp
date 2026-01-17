@@ -57,20 +57,13 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
     // Load actions from hardcoded filename: "adv-world.steps.txt"
     initErrorMessage = loadActions("adv-world.steps.txt");
 
-    if (initErrorMessage != ErrorCode::NONE){
-        cout << static_cast<int>(initErrorMessage) << endl;     
-        currentState = GameState::error;        ////////////////////
-    }
-        
+    if (initErrorMessage != ErrorCode::NONE)
+        currentState = GameState::error;
     else
-        {setCurrentState(GameState::inGame);
-        cout << "Loaded steps" << endl;             ////////////////////
-        cout << " currentState = " << static_cast<int>(currentState) << endl; 
-        }            ////////////////////
+        setCurrentState(GameState::inGame);
     // Load expected results (needed for quit detection in all modes, verification in silent mode)
     if (currentState == GameState::inGame)
     {
-        cout << "Loading expected results" << endl;             ////////////////////
         ErrorCode resultError = loadExpectedResults("adv-world.result.txt");
         // In silent mode, missing results file is an error
         // In non-silent mode, just continue without quit detection (quitCycle stays -1)
@@ -79,10 +72,6 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
             initErrorMessage = resultError;
             currentState = GameState::error;
         }
-    }
-    else
-    {
-        cout << "skipping expected results load" << endl;             ////////////////////
     }
 }
 
@@ -250,14 +239,11 @@ ErrorCode LoadedGame::loadExpectedResults(const string& filename)
     expectedEvents.clear();
     expectedEventIndex = 0;
     quitCycle = -1;  // Reset quit cycle
-    cout << "Expected events resetted" << endl;             ////////////////////
-
     while (file >> std::ws && file.peek() != EOF)
     {
         GameEvent event;
         if (!event.read(file))
         {
-            cout << "Error reading expected event from file." << endl;
             file.close();
             return ErrorCode::READ_ERROR;
         }
@@ -269,8 +255,6 @@ ErrorCode LoadedGame::loadExpectedResults(const string& filename)
         }
 
         expectedEvents.push_back(event);
-        cout << "Loaded expected event: cycle " << event.cycle << ", type "
-             << static_cast<int>(event.type) << ", room " << event.roomId << endl;
     }
 
     file.close();

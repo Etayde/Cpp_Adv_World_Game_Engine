@@ -60,41 +60,33 @@ bool GameEvent::read(std::istream& in)
     std::string eventType;
     std::string dummy;
 
-    if (!(in >> eventType)) {
-        cout << "Failed to read event type" << endl;   // DEBUG
+    if (!(in >> eventType)) 
         return false;
-    }
 
     // Parse CYCLE: <cycle>
-    if (!(in >> dummy >> cycle)) {
-        cout << "Failed to read cycle" << endl;   // DEBUG
+    if (!(in >> dummy >> cycle)) 
         return false;
-    }
 
     // Parse ROOM: <roomId>
-    if (!(in >> dummy >> roomId)) {
-        cout << "Failed to read roomId" << endl;   // DEBUG
+    if (!(in >> dummy >> roomId)) 
         return false;
-    }
 
-    if (eventType == "SCREEN_CHANGE") {
+    if (eventType == "SCREEN_CHANGE") 
         type = GameEventType::SCREEN_CHANGE;
-    }
-    else if (eventType == "LIFE_LOST") {
+    
+    else if (eventType == "LIFE_LOST") 
+    {
         type = GameEventType::LIFE_LOST;
         // Parse PLAYER: <playerId>
-        if (!(in >> dummy >> playerId)) {
-            cout << "Failed to read playerId" << endl;   // DEBUG
+        if (!(in >> dummy >> playerId)) 
             return false;
-        }
     }
-    else if (eventType == "RIDDLE") {
+    else if (eventType == "RIDDLE") 
+    {
         type = GameEventType::RIDDLE_ANSWERED;
         // Parse QUESTION: "..."
-        if (!(in >> dummy)) {  // "QUESTION:"
-            cout << "Failed to read QUESTION label" << endl;   // DEBUG
+        if (!(in >> dummy)) 
             return false;
-        }
         // Read quoted question - find opening quote
         char c;
         while (in.get(c) && c != '"') {}
@@ -104,26 +96,21 @@ bool GameEvent::read(std::istream& in)
             question += c;
         }
         // Parse ANSWER: <answerGiven>
-        if (!(in >> dummy >> answerGiven)) {
-            cout << "Failed to read answerGiven" << endl;   // DEBUG
+        if (!(in >> dummy >> answerGiven)) 
             return false;
-        }
+        
         // Parse CORRECT: YES/NO
         std::string correctStr;
-        if (!(in >> dummy >> correctStr)) {
-            cout << "Failed to read wasCorrect" << endl;   // DEBUG
+        if (!(in >> dummy >> correctStr)) 
             return false;
-        }
+        
         wasCorrect = (correctStr == "YES");
     }
-    else if (eventType == "QUIT") {
+    else if (eventType == "QUIT") 
         type = GameEventType::QUIT;
-        // QUIT only has CYCLE and ROOM which are already parsed
-    }
-    else {
-        cout << "Unknown event type: " << eventType << endl;   // DEBUG
+    
+    else 
         return false;  // Unknown event type
-    }
 
     return true;
 }
