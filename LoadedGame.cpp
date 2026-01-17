@@ -76,6 +76,10 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
             currentState = GameState::error;
         }
     }
+    else
+    {
+        cout << "skipping expected results load" << endl;             ////////////////////
+    }
 }
 
 void LoadedGame::handleInput()
