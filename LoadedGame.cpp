@@ -22,7 +22,14 @@ LoadedGame::LoadedGame(const string& filename, bool silent) : Game(), steps(),
     // Load expected results (needed for quit detection in all modes, verification in silent mode)
     if (currentState == GameState::inGame)
     {
-        loadExpectedResults("adv-world.result.txt");
+        ErrorCode resultError = loadExpectedResults("adv-world.result.txt");
+        // In silent mode, missing results file is an error
+        // In non-silent mode, just continue without quit detection (quitCycle stays -1)
+        if (silentMode && resultError != ErrorCode::NONE)
+        {
+            initErrorMessage = resultError;
+            currentState = GameState::error;
+        }
     }
 }
 
@@ -58,7 +65,14 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
     // Load expected results (needed for quit detection in all modes, verification in silent mode)
     if (currentState == GameState::inGame)
     {
-        loadExpectedResults("adv-world.result.txt");
+        ErrorCode resultError = loadExpectedResults("adv-world.result.txt");
+        // In silent mode, missing results file is an error
+        // In non-silent mode, just continue without quit detection (quitCycle stays -1)
+        if (silentMode && resultError != ErrorCode::NONE)
+        {
+            initErrorMessage = resultError;
+            currentState = GameState::error;
+        }
     }
 }
 

@@ -700,6 +700,12 @@ void Game::showErrorScreen()
     Renderer::print(initErrorRoomId);
     Renderer::print("\n");
     break;
+  case ErrorCode::FILE_NOT_FOUND:
+    Renderer::print("Error: Required file not found\n");
+    break;
+  case ErrorCode::READ_ERROR:
+    Renderer::print("Error: Failed to read file\n");
+    break;
   default:
     Renderer::print("Unknown error\n");
     break;
