@@ -182,8 +182,8 @@ void NormalGame::recordScreenTransition(int roomId)
     if (!isRecording || !recordFile.is_open())
         return;
 
-    recordFile << "SCREEN: " << cycleCount << " ROOM: " << roomId << "\n";
-    recordFile.flush();
+    // recordFile << "SCREEN: " << cycleCount << " ROOM: " << roomId << "\n";
+    // recordFile.flush();
 }
 
 //////////////////////////////////////////     handlePauseInput     /////////////////////////////////////////////
