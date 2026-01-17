@@ -22,7 +22,7 @@ LoadedGame::LoadedGame(const string& filename, bool silent) : Game(), steps(),
     // Load expected results in silent mode
     if (silentMode && currentState == GameState::inGame)
     {
-        loadExpectedResults("adv-world.result");
+        loadExpectedResults("adv-world.result.txt");
     }
 }
 
@@ -58,7 +58,7 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
     // Load expected results in silent mode
     if (silentMode && currentState == GameState::inGame)
     {
-        loadExpectedResults("adv-world.result");
+        loadExpectedResults("adv-world.result.txt");
     }
 }
 
