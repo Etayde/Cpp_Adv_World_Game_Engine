@@ -117,7 +117,7 @@ void LoadedGame::gameLoop()
 
         handleInput();
         update();
-        Renderer::sleep_ms(100);
+        Renderer::sleep_ms(50);
     }
 }
 
