@@ -32,7 +32,7 @@ protected:
   GameOverMessege gameOverMessege;
   unsigned long cycleCount;
 
-  // Game state (protected for derived classes)
+
   GameState currentState;
   std::vector<Room> rooms;
   int currentRoomId;
@@ -118,13 +118,13 @@ public:
   unsigned long getCycleCount() const { return cycleCount; }
   int getCurrentRoomId() const { return currentRoomId; }
 
-  // Event reporting hooks (pure virtual)
+  // Event reporting methods (pure virtual)
   virtual void reportScreenChange(int roomId) = 0;
   virtual void reportLifeLost(int playerId) = 0;
   virtual void onRiddleAttempt(const std::string& question, int answer, bool correct) = 0;
   virtual void reportQuit() = 0;
 
-  // Riddle interaction hooks
+  // Riddle interaction methods
   virtual int getRiddleInput(unsigned long cycle) = 0;
   virtual void reportRiddleAnswer(int answer) = 0;
 };

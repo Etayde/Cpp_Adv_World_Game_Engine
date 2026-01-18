@@ -21,9 +21,9 @@ class Constants;
 //////////////////////////////////////////     Game Constructor       /////////////////////////////////////////////
 
 Game::Game()
-    : silentMode(false), consoleInitialized(false), initErrorMessage(ErrorCode::NONE), initErrorRoomId(-1), gameOverMessege(GameOverMessege::NONE),
-      cycleCount(0), currentState(GameState::mainMenu), currentRoomId(-1),
-      gameInitialized(false)
+    : silentMode(false), consoleInitialized(false), initErrorMessage(ErrorCode::NONE), initErrorRoomId(-1), 
+      gameOverMessege(GameOverMessege::NONE), cycleCount(0), currentState(GameState::mainMenu), 
+      currentRoomId(-1), gameInitialized(false)
 {
   init_console();
   hideCursor();
@@ -37,10 +37,7 @@ Game::Game()
 
 Game::~Game()
 {
-  for (Screen *s : loadedScreens)
-  {
-    delete s;
-  }
+  for (Screen *s : loadedScreens) delete s;
   loadedScreens.clear();
 
   if (consoleInitialized)
@@ -61,10 +58,7 @@ Game* Game::createFromArgs(int argc, char* argv[])
   for (int i = 1; i < argc; i++)
   {
     std::string arg(argv[i]);
-    if (arg == "-load")
-    {
-      return new LoadedGame(argc, argv);
-    }
+    if (arg == "-load") return new LoadedGame(argc, argv);
   }
 
   return new NormalGame(argc, argv);
@@ -85,22 +79,13 @@ ErrorCode Game::validateLegendPlacement(Room &room)
   {
     for (int x = 0; x < MAX_X; x++)
     {
-      if (room.getBaseLayout()->getCharAt(x, y) == 'L')
-      {
-        lMarkers.push_back(Point(x, y));
-      }
+      if (room.getBaseLayout()->getCharAt(x, y) == 'L') lMarkers.push_back(Point(x, y));
     }
   }
 
-  if (lMarkers.empty())
-  {
-    return ErrorCode::L_NOT_FOUND;
-  }
+  if (lMarkers.empty()) return ErrorCode::L_NOT_FOUND;
 
-  if (lMarkers.size() > 1)
-  {
-    return ErrorCode::MULTIPLE_L;
-  }
+  if (lMarkers.size() > 1) return ErrorCode::MULTIPLE_L;
 
   Point lPos = lMarkers[0];
   int topLeftX = lPos.getX() - 1;
@@ -108,10 +93,7 @@ ErrorCode Game::validateLegendPlacement(Room &room)
   int width = 22;
   int height = 5;
   if (topLeftX < 0 || topLeftY < 0 || topLeftX + width > MAX_X ||
-      topLeftY + height > MAX_Y)
-  {
-    return ErrorCode::L_OUT_OF_BOUNDS;
-  }
+      topLeftY + height > MAX_Y) return ErrorCode::L_OUT_OF_BOUNDS;
 
   for (int y = topLeftY; y < topLeftY + height; y++)
   {
@@ -119,41 +101,29 @@ ErrorCode Game::validateLegendPlacement(Room &room)
     {
       char c = room.getBaseLayout()->getCharAt(x, y);
       if (c != ObjectType::WALL && c != ObjectType::AIR && c != 'L')
-      {
-        return ErrorCode::LEGEND_OBSCURES_OBJECTS;
-      }
+       return ErrorCode::LEGEND_OBSCURES_OBJECTS;
     }
   }
 
-  // Check P1 spawn (explicit)
   Point p1Spawn = room.getSpawnPoint(1);
   if (p1Spawn.getX() >= topLeftX && p1Spawn.getX() < topLeftX + width &&
       p1Spawn.getY() >= topLeftY && p1Spawn.getY() < topLeftY + height)
-  {
       return ErrorCode::LEGEND_OBSCURES_SPAWN;
-  }
-  // Check P2 spawn (calculated)
+  
   Point p2Spawn = room.getSpawnPoint(2);
   if (p2Spawn.getX() >= topLeftX && p2Spawn.getX() < topLeftX + width &&
       p2Spawn.getY() >= topLeftY && p2Spawn.getY() < topLeftY + height)
-  {
       return ErrorCode::LEGEND_OBSCURES_SPAWN;
-  }
 
-  // Check P1 FromNext (explicit)
   Point p1Next = room.getSpawnPointFromNext(1);
   if (p1Next.getX() >= topLeftX && p1Next.getX() < topLeftX + width &&
       p1Next.getY() >= topLeftY && p1Next.getY() < topLeftY + height)
-  {
       return ErrorCode::LEGEND_OBSCURES_SPAWN;
-  }
-  // Check P2 FromNext (calculated)
+  
   Point p2Next = room.getSpawnPointFromNext(2);
   if (p2Next.getX() >= topLeftX && p2Next.getX() < topLeftX + width &&
       p2Next.getY() >= topLeftY && p2Next.getY() < topLeftY + height)
-  {
       return ErrorCode::LEGEND_OBSCURES_SPAWN;
-  }
 
   room.setLegendPoint(lPos.getX(), lPos.getY());
 
@@ -164,15 +134,9 @@ ErrorCode Game::validateLegendPlacement(Room &room)
 
 void Game::startNewGame()
 {
-  if (rooms.empty())
-  {
-    initializeRooms();
-  }
+  if (rooms.empty()) initializeRooms();
   
-  if (rooms.empty())
-  {
-      return;
-  }
+  if (rooms.empty()) return;
 
   rooms[0].setActive(true);
   Point startPos1 = rooms[0].getSpawnPoint(1);
@@ -195,14 +159,13 @@ void Game::gameLoop()
   if (aRiddle.isActive())
   {
     Renderer::clrscr();
-    if (room)
-    {
-      room->draw();
-    }
+
+    if (room) room->draw();
+
     player1.draw(room);
     player2.draw(room);
-    if (room)
-      room->drawLegend(&player1, &player2);
+
+    if (room) room->drawLegend(&player1, &player2);
 
     while (aRiddle.isActive() && currentState == GameState::inGame)
     {
@@ -213,14 +176,14 @@ void Game::gameLoop()
         room->removeObjectAt(aRiddle.riddle->getX(), aRiddle.riddle->getY());
         aRiddle.reset();
         Renderer::clrscr();
-        if (room)
-        {
-          room->draw();
-        }
+
+        if (room) room->draw();
+
         player1.draw(room);
         player2.draw(room);
-        if (room)
-          room->drawLegend(&player1, &player2);
+
+        if (room) room->drawLegend(&player1, &player2);
+
         break;
       };
       if (result == RiddleResult::SOLVED)
@@ -228,14 +191,14 @@ void Game::gameLoop()
         room->removeObjectAt(aRiddle.riddle->getX(), aRiddle.riddle->getY());
         aRiddle.reset();
         Renderer::clrscr();
-        if (room)
-        {
-          room->draw();
-        }
+
+        if (room) room->draw();
+
         player1.draw(room);
         player2.draw(room);
-        if (room)
-          room->drawLegend(&player1, &player2);
+
+        if (room) room->drawLegend(&player1, &player2);
+
         break;
       }
       else if (result == RiddleResult::ESCAPED)
@@ -247,26 +210,24 @@ void Game::gameLoop()
       {
         aRiddle.reset();
         Renderer::clrscr();
-        if (room)
-        {
-          room->draw();
-        }
+
+        if (room) room->draw();
+
         player1.draw(room);
         player2.draw(room);
-        if (room)
-          room->drawLegend(&player1, &player2);
+
+        if (room) room->drawLegend(&player1, &player2);
         break;
       }
     }
   }
   else
   {
-    if (room)
-    {
-      room->draw();
-    }
+    if (room) room->draw();
+
     player1.draw(room);
     player2.draw(room);
+
     if (room)
       room->drawLegend(&player1, &player2);
   }
@@ -286,8 +247,7 @@ void Game::update()
   updateCycleCount();
 
   Room *room = getCurrentRoom();
-  if (room == nullptr)
-    return;
+  if (room == nullptr) return;
 
   room->resetAllObstaclePushStates();
 
@@ -303,10 +263,8 @@ void Game::update()
   }
 
   ExplosionResult explosionResult = room->updateAllObjects(&player1, &player2);
-  if (explosionResult.player1Hit)
-    player1.loseLife(room, this);
-  if (explosionResult.player2Hit)
-    player2.loseLife(room, this);
+  if (explosionResult.player1Hit) player1.loseLife(room, this);
+  if (explosionResult.player2Hit) player2.loseLife(room, this);
 
   if (checkGameOver(explosionResult))
   {
@@ -341,27 +299,21 @@ void Game::redrawCurrentRoom()
 {
   Renderer::clrscr();
   Room *room = getCurrentRoom();
-  if (room)
-  {
-    room->draw();
-  }
+  if (room) room->draw();
+  
   player1.draw(room);
   player2.draw(room);
-  if (room)
-    room->drawLegend(&player1, &player2);
+  
+  if (room) room->drawLegend(&player1, &player2);
 
-  if (aRiddle.isActive())
-  {
-    aRiddle.riddle->draw();
-  }
+  if (aRiddle.isActive()) aRiddle.riddle->draw();
 }
 
 /////////////////////////////////////////    canPassThroughDoor       /////////////////////////////////////////////
 
 bool Game::canPassThroughDoor(Room *room, int doorId)
 {
-  if (room == nullptr)
-    return false;
+  if (room == nullptr) return false;
 
   int targetRoom = room->getDoorTargetRoomId(doorId);
 
@@ -379,10 +331,8 @@ bool Game::canPassThroughDoor(Room *room, int doorId)
            room->canOpenDoor(doorId, player1.getKeyCount(),
                              player2.getKeyCount());
   }
-  else if (doorId == room->getPrevRoomId())
-  {
-    return true;
-  }
+  else if (doorId == room->getPrevRoomId()) return true;
+  
   return false;
 }
 
@@ -391,12 +341,7 @@ bool Game::canPassThroughDoor(Room *room, int doorId)
 void Game::checkRoomTransitions()
 {
   Room *room = getCurrentRoom();
-  if (room == nullptr)
-    return;
-
-  // 1. Update Wait State (Generic for both Forward and Backward)
-  // If player is at a passable door, set waitingAtDoor = true.
-  // Player::draw() handles visibility (Invisible for Forward, Visible for Backward).
+  if (room == nullptr) return;
   
   auto updateWaitState = [&](Player &p) {
       if (p.isAtDoor())
@@ -406,18 +351,12 @@ void Game::checkRoomTransitions()
                if (!p.isWaitingAtDoor()) p.setWaitingAtDoor(true);
            }
       }
-      else
-      {
-          p.setWaitingAtDoor(false);
-      }
+      else p.setWaitingAtDoor(false);
   };
 
   updateWaitState(player1);
   updateWaitState(player2);
 
-  // 2. Check for Shared Transition
-  // We check if BOTH are at door (physically).
-  // Note: Even if invisible, they are 'atDoor' physically.
   if (player1.isAtDoor() && player2.isAtDoor() &&
       player1.getDoorId() == player2.getDoorId())
   {
@@ -427,7 +366,6 @@ void Game::checkRoomTransitions()
       player1.setWaitingAtDoor(false);
       player2.setWaitingAtDoor(false);
 
-      // Handle Forward Transition
       int targetRoom = room->getDoorTargetRoomId(doorId);
 
       if (targetRoom != -1 || doorId == room->getNextRoomId() || doorId == static_cast<int>(rooms.size()))
@@ -468,11 +406,7 @@ void Game::checkRoomTransitions()
 
         changeRoom(destinationId, true);
       }
-      // Handle Backward Transition
-      else if (doorId == room->getPrevRoomId())
-      {
-        changeRoom(room->getPrevRoomId(), false);
-      }
+      else if (doorId == room->getPrevRoomId()) changeRoom(room->getPrevRoomId(), false);
     }
   }
 }
@@ -520,8 +454,7 @@ void Game::handlePauseInput()
   if (check_kbhit())
   {
     char choice = get_single_char();
-    if (choice == char(Action::ESC))
-      currentState = GameState::inGame;
+    if (choice == char(Action::ESC)) currentState = GameState::inGame;
     else if (choice == 'h' || choice == 'H')
     {
       gameInitialized = false; // Reset game when going to main menu
@@ -620,6 +553,7 @@ void Game::showErrorScreen()
 
 //////////////////////////////////////////      initializeRooms       /////////////////////////////////////////////
 
+// Seed handling implemented with AI
 void Game::initializeRooms(unsigned int seed)
 {
 
@@ -645,10 +579,7 @@ void Game::initializeRooms(unsigned int seed)
     RoomMetadata metadata;
     Screen *screen = LevelLoader::loadScreenFile(filename, metadata);
 
-    if (screen == nullptr)
-    {
-      continue;
-    }
+    if (screen == nullptr) continue;
 
     screens.push_back(screen);
     metadatas.push_back(metadata);
@@ -667,12 +598,15 @@ void Game::initializeRooms(unsigned int seed)
   std::iota(riddleIds.begin(), riddleIds.end(), 0);
   
   std::mt19937 g;
-  if (seed != 0) {
-      g.seed(seed);
-  } else {
-      std::random_device rd;
-      g.seed(rd());
+
+  if (seed != 0) g.seed(seed);
+  
+  else
+  {
+    std::random_device rd;
+    g.seed(rd());
   }
+
   std::shuffle(riddleIds.begin(), riddleIds.end(), g);
 
   int riddleIndex = 0;
@@ -695,9 +629,8 @@ void Game::initializeRooms(unsigned int seed)
     }
 
     for (const auto &dz : metadatas[i].darkZones)
-    {
       room.addDarkZone(dz.x1, dz.y1, dz.x2, dz.y2);
-    }
+    
     ErrorCode validationResult = validateLegendPlacement(room);
     if (validationResult != ErrorCode::NONE)
     {
@@ -718,23 +651,14 @@ void Game::changeRoom(int newRoomId, bool goingForward)
 
   if (newRoomId == -1 || newRoomId == static_cast<int>(rooms.size()))
   {
-    if (currentRoomId >= 0)
-    {
-      rooms[currentRoomId].setActive(false);
-    }
+    if (currentRoomId >= 0) rooms[currentRoomId].setActive(false);
     currentState = GameState::victory;
     return;
   }
 
-  if (newRoomId < 0 || newRoomId >= static_cast<int>(rooms.size()))
-  {
-    return;
-  }
+  if (newRoomId < 0 || newRoomId >= static_cast<int>(rooms.size())) return;
 
-  if (currentRoomId >= 0)
-  {
-    rooms[currentRoomId].setActive(false);
-  }
+  if (currentRoomId >= 0) rooms[currentRoomId].setActive(false);
 
   currentRoomId = newRoomId;
   rooms[newRoomId].setActive(true);

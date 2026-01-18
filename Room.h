@@ -203,8 +203,6 @@ private:
 
 public:
   // Collision & movement
-
-  // Collision & movement
   bool isBlocked(int x, int y);
   bool hasLineOfSight(int x1, int y1, int x2, int y2);
 
