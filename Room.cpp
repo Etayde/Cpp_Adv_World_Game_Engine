@@ -1095,7 +1095,7 @@ void Room::drawLegendInfo(Player *p1, Player *p2)
 void Room::drawPlayerStats(Player *p)
 {
 
-  int lineY = legendTopLeft.y + p->playerId;
+  int lineY = legendTopLeft.y + p->getId();
   int startX = legendTopLeft.x;
 
   Renderer::gotoxy(startX + 3, lineY);
@@ -1104,17 +1104,20 @@ void Room::drawPlayerStats(Player *p)
   DrawLives(p);
 
   Renderer::gotoxy(startX + 17, lineY);
-  if (p->hasItem()) Renderer::print(p->inventory->getSprite());
+  if (p->hasItem()) {
+    const GameObject* inv = p->getInventory();
+    if (inv) Renderer::print(inv->getSprite());
+  }
   else Renderer::print(" ");
 }
 
 void Room::DrawLives(Player *p)
 {
-  int lineY = legendTopLeft.y + p->playerId;
+  int lineY = legendTopLeft.y + p->getId();
   int startX = legendTopLeft.x - 1;
   int offset = startX + 8;
 
-  switch (p->lives)
+  switch (p->getLives())
   {
   case 3:
     Renderer::printAt(offset, lineY, "<3 <3 <3");

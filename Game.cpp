@@ -297,10 +297,10 @@ void Game::update()
   player1.move(room, &aRiddle.riddle, &aRiddle.player, &player2, this);
   player2.move(room, &aRiddle.riddle, &aRiddle.player, &player1, this);
 
-  if (player1.requestPause || player2.requestPause)
+  if (player1.hasRequestedPause() || player2.hasRequestedPause())
   {
-    player1.requestPause = false;
-    player2.requestPause = false;
+    player1.setRequestPause(false);
+    player2.setRequestPause(false);
     currentState = GameState::paused;
     return;
   }
@@ -410,12 +410,12 @@ void Game::checkRoomTransitions()
       {
            if (canPassThroughDoor(room, p.getDoorId()))
            {
-               if (!p.waitingAtDoor) p.waitingAtDoor = true;
+               if (!p.isWaitingAtDoor()) p.setWaitingAtDoor(true);
            }
       }
       else
       {
-          p.waitingAtDoor = false;
+          p.setWaitingAtDoor(false);
       }
   };
 
@@ -431,8 +431,8 @@ void Game::checkRoomTransitions()
     int doorId = player1.getDoorId();
     if (canPassThroughDoor(room, doorId))
     {
-      player1.waitingAtDoor = false;
-      player2.waitingAtDoor = false;
+      player1.setWaitingAtDoor(false);
+      player2.setWaitingAtDoor(false);
 
       // Handle Forward Transition
       int targetRoom = -1;
@@ -769,14 +769,12 @@ void Game::changeRoom(int newRoomId, bool goingForward)
   player1.setPosition(nextPos1.x, nextPos1.y);
   player2.setPosition(nextPos2.x, nextPos2.y);
 
-  player1.pos.diff_x = 0;
-  player1.pos.diff_y = 0;
-  player2.pos.diff_x = 0;
-  player2.pos.diff_y = 0;
-  player1.atDoor = false;
-  player2.atDoor = false;
-  player1.waitingAtDoor = false;
-  player2.waitingAtDoor = false;
+  player1.stopMovement();
+  player2.stopMovement();
+  player1.setAtDoor(false);
+  player2.setAtDoor(false);
+  player1.setWaitingAtDoor(false);
+  player2.setWaitingAtDoor(false);
 
   Renderer::clrscr();
   if (getCurrentRoom())

@@ -409,7 +409,7 @@ void NormalGame::reportRiddleAnswer(int answer)
     
     int playerId = 1;
     if (aRiddle.isActive() && aRiddle.player != nullptr) {
-        playerId = aRiddle.player->playerId;
+        playerId = aRiddle.player->getId();
     }
     
     ActionRecord ar(cycleCount, playerId, answer);

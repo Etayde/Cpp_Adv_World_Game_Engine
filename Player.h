@@ -46,7 +46,7 @@ static const int NUM_KEY_BINDINGS =
 // Represents a player character
 class Player
 {
-public:
+private:
   Point pos;
   GameObject *inventory;
   int playerId;
@@ -92,6 +92,10 @@ public:
   const GameObject *getInventory() const { return inventory; }
   ObjectType getInventoryType() const { return inventory ? inventory->getType() : ObjectType::AIR; }
   bool isLaunched() const { return springMomentum.isActive(); }
+  bool isWaitingAtDoor() const { return waitingAtDoor; }
+  bool hasRequestedPause() const { return requestPause; }
+  const Momentum& getSpringMomentum() const { return springMomentum; }
+  Momentum& getSpringMomentum() { return springMomentum; }
   bool isRespawning() const { return respawnTimer > 0; }
 
   // Setters
@@ -101,6 +105,11 @@ public:
   bool useKey();
   void incrementScore(int points) { int newScore = score + points; 
                                     newScore >= 0 ? score = newScore : score = 0; }
+  void setAtDoor(bool value) { atDoor = value; }
+  void setDoorId(int id) { doorId = id; }
+  void setWaitingAtDoor(bool value) { waitingAtDoor = value; }
+  void setRequestPause(bool value) { requestPause = value; }
+  void stopMovement() { pos.diff_x = 0; pos.diff_y = 0; }
 
   // Drawing
   void draw(Room *room = nullptr);
