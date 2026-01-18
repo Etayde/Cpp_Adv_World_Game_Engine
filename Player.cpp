@@ -18,7 +18,7 @@
 Player::Player()
     : inventory(nullptr), playerId(0), sprite(' '), atDoor(false), doorId(-1),
       alive(true), keyCount(0), lives(3), score(0), waitingAtDoor(false),
-      requestPause(false), springMomentum(Momentum()), respawnTimer(0), isWaitingInNextRoom(false)
+      requestPause(false), springMomentum(Momentum()), respawnTimer(0)
 {
   pos = Point(1, 1, 0, 0, ' ');
 }
@@ -26,7 +26,7 @@ Player::Player()
 Player::Player(int id, int startX, int startY, char playerSprite)
     : inventory(nullptr), playerId(id), sprite(playerSprite), atDoor(false),
       doorId(-1), alive(true), keyCount(0), lives(3), score(0),
-      waitingAtDoor(false), requestPause(false), springMomentum(Momentum()), respawnTimer(0), isWaitingInNextRoom(false)
+      waitingAtDoor(false), requestPause(false), springMomentum(Momentum()), respawnTimer(0)
 {
   pos = Point(startX, startY, 0, 0, playerSprite);
 }
@@ -241,41 +241,6 @@ bool Player::move(Room *room, Riddle **activeRiddle, Player **activePlayer,
     return false;
   }
 
-  if (isWaitingInNextRoom)
-  {
-    int dx = pos.diff_x;
-    int dy = pos.diff_y;
-    
-    // If no movement input, just return
-    if (dx == 0 && dy == 0) return false;
-
-    int nextX = pos.x + dx;
-    int nextY = pos.y + dy;
-
-    // Logic: If player moves "out" of the door (i.e., not staying in place and not hitting wall/door again?)
-    // Actually, any valid move that isn't "stay" is an attempt to move.
-    // If they move into a blocking cell (like the door they are standing on? No, door is usually passable).
-    // Wait, if they are waiting, they are ON the door.
-    // If they move, check if destination is valid.
-    
-    // Check if next position is valid (not wall)
-    if (!room->isWallAt(nextX, nextY) && !isCellBlocking(nextX, nextY, room))
-    {
-         // If they move off the door or into the room, re-enable them.
-         // Note: If they move deeper into door? 
-         // Simplified: Any valid move toggles wait off.
-         isWaitingInNextRoom = false;
-         
-         // Let the move proceed naturally below?
-         // Yes, fall through to normal move logic.
-    }
-    else
-    {
-        // Blocked, remain waiting
-        return false;
-    }
-  }
-
   erase(room);
 
   if (!springMomentum.isActive())
@@ -331,10 +296,15 @@ void Player::draw(Room *room)
 {
   Renderer::gotoxy(pos.x, pos.y);
 
-  if (waitingAtDoor || isWaitingInNextRoom)
+  if (waitingAtDoor)
   {
-    erase(room);
-    return;
+    // If waiting at a "Forward" door (not previous room), disappear (Wait State).
+    // If waiting at "Backward" door (previous room), stay visible (Legacy behavior).
+    if (doorId != room->prevRoomId)
+    {
+      erase(room);
+      return;
+    }
   }
 
   if (isRespawning() && respawnTimer % 2 != 0) return;

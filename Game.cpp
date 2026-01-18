@@ -148,9 +148,17 @@ ErrorCode Game::validateLegendPlacement(Room &room)
 void Game::startNewGame()
 {
   initializeRooms();
+  
+  if (rooms.empty())
+  {
+      return;
+  }
 
-  player1 = Player(1, 5, 7, PlayerSprites::PLAYER1);
-  player2 = Player(2, 5, 9, PlayerSprites::PLAYER2);
+  rooms[0].active = true;
+  Point startPos = rooms[0].spawnPoint;
+  
+  player1 = Player(1, startPos.x, startPos.y, PlayerSprites::PLAYER1);
+  player2 = Player(2, startPos.x, startPos.y, PlayerSprites::PLAYER2);
 
   currentRoomId = 0;
   rooms[0].active = true;
@@ -372,24 +380,30 @@ void Game::checkRoomTransitions()
   if (room == nullptr)
     return;
 
-  // 1. Update Wait State for Forward Doors
-  if (player1.isAtDoor() && canPassThroughDoor(room, player1.getDoorId()))
-  {
-      if (player1.getDoorId() != room->prevRoomId && !player1.isWaitingInNextRoom)
-      {
-           player1.isWaitingInNextRoom = true;
-      }
-  }
+  // 1. Update Wait State (Generic for both Forward and Backward)
+  // If player is at a passable door, set waitingAtDoor = true.
+  // Player::draw() handles visibility (Invisible for Forward, Visible for Backward).
   
-  if (player2.isAtDoor() && canPassThroughDoor(room, player2.getDoorId()))
-  {
-      if (player2.getDoorId() != room->prevRoomId && !player2.isWaitingInNextRoom)
+  auto updateWaitState = [&](Player &p) {
+      if (p.isAtDoor())
       {
-           player2.isWaitingInNextRoom = true;
+           if (canPassThroughDoor(room, p.getDoorId()))
+           {
+               if (!p.waitingAtDoor) p.waitingAtDoor = true;
+           }
       }
-  }
+      else
+      {
+          p.waitingAtDoor = false;
+      }
+  };
+
+  updateWaitState(player1);
+  updateWaitState(player2);
 
   // 2. Check for Shared Transition
+  // We check if BOTH are at door (physically).
+  // Note: Even if invisible, they are 'atDoor' physically.
   if (player1.isAtDoor() && player2.isAtDoor() &&
       player1.getDoorId() == player2.getDoorId())
   {
@@ -431,7 +445,7 @@ void Game::checkRoomTransitions()
         }
         room->unlockDoor(doorId);
 
-        if (currentRoomId == -1) // If somehow invalid?
+        if (currentRoomId == -1) 
         {
           currentState = GameState::victory;
           return;
@@ -452,27 +466,6 @@ void Game::checkRoomTransitions()
         changeRoom(room->prevRoomId, false);
       }
     }
-  }
-  else 
-  {
-     // UI Feedback for waiting (if explicitly waiting at door but not "In Next Room" hidden?)
-     // Actually, if they are waitingAtDoor (visual), we keep it.
-     // But if isWaitingInNextRoom, they are hidden.
-     
-     // Original logic for "waitingAtDoor" visual:
-      if (player1.isAtDoor() && !player1.isWaitingInNextRoom && canPassThroughDoor(room, player1.getDoorId()) && player1.getDoorId() == room->prevRoomId)
-      {
-         player1.waitingAtDoor = true;
-         player1.draw(room);
-      }
-      else if (!player1.isAtDoor()) player1.waitingAtDoor = false;
-      
-      if (player2.isAtDoor() && !player2.isWaitingInNextRoom && canPassThroughDoor(room, player2.getDoorId()) && player2.getDoorId() == room->prevRoomId)
-      {
-         player2.waitingAtDoor = true;
-         player2.draw(room);
-      }
-      else if (!player2.isAtDoor()) player2.waitingAtDoor = false;
   }
 }
 
@@ -746,8 +739,6 @@ void Game::changeRoom(int newRoomId, bool goingForward)
   player2.atDoor = false;
   player1.waitingAtDoor = false;
   player2.waitingAtDoor = false;
-  player1.isWaitingInNextRoom = false;
-  player2.isWaitingInNextRoom = false;
 
   Renderer::clrscr();
   if (getCurrentRoom())
