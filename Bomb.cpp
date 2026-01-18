@@ -50,8 +50,8 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
     if (!currentRoom)
         return result;
 
-    int centerX = position.x;
-    int centerY = position.y;
+    int centerX = getX();
+    int centerY = getY();
 
     currentRoom->setCharAt(centerX, centerY, ' ');
     Renderer::printAt(centerX, centerY, ' ');
@@ -127,10 +127,10 @@ void Bomb::draw() const
     if (!active || state == BombState::IN_INVENTORY)
         return;
 
-    if (state == BombState::PLACED && currentRoom && !currentRoom->isVisible(position.x, position.y))
+    if (state == BombState::PLACED && currentRoom && !currentRoom->isVisible(getX(), getY()))
         return;
 
-    Renderer::gotoxy(position.x, position.y);
+    Renderer::gotoxy(getX(), getY());
 
     if (state == BombState::TICKING)
     {

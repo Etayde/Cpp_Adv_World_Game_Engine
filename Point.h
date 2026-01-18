@@ -12,7 +12,7 @@
 // 2D point
 class Point
 {
-public:
+private:
     int x;
     int y;
     int diff_x;
@@ -46,14 +46,25 @@ public:
     // Getters
     int getX() const { return x; }
     int getY() const { return y; }
+    int getDiffX() const { return diff_x; }
+    int getDiffY() const { return diff_y; }
     char getSprite() const { return sprite; }
 
     // Setters
+    void setX(int val) { x = val; }
+    void setY(int val) { y = val; }
+    void setDiffX(int val) { diff_x = val; }
+    void setDiffY(int val) { diff_y = val; }
     void setSprite(char c) { sprite = c; }
+    void stopMovement() { diff_x = 0; diff_y = 0; }
+
     void operator=(const Point &other)
     {
         x = other.x;
         y = other.y;
+        diff_x = other.diff_x;
+        diff_y = other.diff_y;
+        sprite = other.sprite;
     }
 
     bool operator==(const Point &other) const { return x == other.x && y == other.y; }
@@ -68,7 +79,7 @@ namespace std
     {
         size_t operator()(const Point &p) const
         {
-            return hash<int>()(p.x) ^ (hash<int>()(p.y) << 1);
+            return hash<int>()(p.getX()) ^ (hash<int>()(p.getY()) << 1);
         }
     };
 }

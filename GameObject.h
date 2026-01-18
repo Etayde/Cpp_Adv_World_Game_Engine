@@ -63,9 +63,9 @@ public:
 
   virtual void draw() const
   {
-    if (active && position.x >= 0 && position.y >= 0)
+    if (active && position.getX() >= 0 && position.getY() >= 0)
     {
-      Renderer::printAt(position.x, position.y, sprite);
+      Renderer::printAt(position.getX(), position.getY(), sprite);
     }
   }
 
@@ -74,8 +74,8 @@ public:
   //////////////////////////////////////////         Getters         /////////////////////////////////////////////
 
   Point getPosition() const { return position; }
-  int getX() const { return position.x; }
-  int getY() const { return position.y; }
+  int getX() const { return position.getX(); }
+  int getY() const { return position.getY(); }
   char getSprite() const { return sprite; }
   ObjectType getType() const { return type; }
   bool isActive() const { return active; }
@@ -85,8 +85,8 @@ public:
   void setPosition(const Point &pos) { position = pos; }
   void setPosition(int x, int y)
   {
-    position.x = x;
-    position.y = y;
+    position.setX(x);
+    position.setY(y);
   }
   void setSprite(char spr) { sprite = spr; }
   void setType(ObjectType t) { type = t; }

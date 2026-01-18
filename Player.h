@@ -70,8 +70,8 @@ public:
   Player &operator=(const Player &other);
 
   // Position getters
-  int getX() const { return pos.x; }
-  int getY() const { return pos.y; }
+  int getX() const { return pos.getX(); }
+  int getY() const { return pos.getY(); }
   Point getPosition() const { return pos; }
   char getSprite() const { return sprite; }
 
@@ -99,7 +99,7 @@ public:
   bool isRespawning() const { return respawnTimer > 0; }
 
   // Setters
-  void setPosition(int x, int y) { pos.x = x; pos.y = y; }
+  void setPosition(int x, int y) { pos.setX(x); pos.setY(y); }
   void setDirection(Direction dir, int speed = 1) { pos.setDirection(dir, speed); }
   void addKey() { keyCount++; }
   bool useKey();
@@ -109,7 +109,7 @@ public:
   void setDoorId(int id) { doorId = id; }
   void setWaitingAtDoor(bool value) { waitingAtDoor = value; }
   void setRequestPause(bool value) { requestPause = value; }
-  void stopMovement() { pos.diff_x = 0; pos.diff_y = 0; }
+  void stopMovement() { pos.stopMovement(); }
 
   // Drawing
   void draw(Room *room = nullptr);

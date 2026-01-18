@@ -348,10 +348,10 @@ ObjectType Room::getObjectTypeAt(int x, int y) const { return static_cast<Object
 
 bool Room::isWallAt(int x, int y) const
 {
-  if (legendTopLeft.x >= 0 && legendTopLeft.y >= 0)
+  if (legendTopLeft.getX() >= 0 && legendTopLeft.getY() >= 0)
   {
-    int legX = legendTopLeft.x - 1;
-    int legY = legendTopLeft.y - 1;
+    int legX = legendTopLeft.getX() - 1;
+    int legY = legendTopLeft.getY() - 1;
     if (x >= legX && x < legX + 22 && y >= legY && y < legY + 5) return true;
   }
   char c = getCharAt(x, y);
@@ -748,13 +748,13 @@ Direction Room::detectOrientation(const std::vector<Point> &positions)
   bool allSameX = true;
   bool allSameY = true;
 
-  int firstX = positions[0].x;
-  int firstY = positions[0].y;
+  int firstX = positions[0].getX();
+  int firstY = positions[0].getY();
 
   for (size_t i = 1; i < positions.size(); i++)
   {
-    if (positions[i].x != firstX) allSameX = false;
-    if (positions[i].y != firstY) allSameY = false;
+    if (positions[i].getX() != firstX) allSameX = false;
+    if (positions[i].getY() != firstY) allSameY = false;
   }
 
   if (allSameX) return Direction::VERTICAL;
@@ -771,20 +771,20 @@ std::vector<Point> Room::sortPositions(const std::vector<Point> &positions,
   {
     std::sort(sorted.begin(), sorted.end(),
               [](const Point &a, const Point &b)
-              { return a.x < b.x; });
+              { return a.getX() < b.getX(); });
   }
   else
   {
     std::sort(sorted.begin(), sorted.end(),
               [](const Point &a, const Point &b)
-              { return a.y < b.y; });
+              { return a.getY() < b.getY(); });
   }
 
   for (size_t i = 1; i < sorted.size(); i++)
   {
     if (orientation == Direction::HORIZONTAL)
-      { if (sorted[i].x != sorted[i - 1].x + 1) return {}; }
-    else if (sorted[i].y != sorted[i - 1].y + 1) return {};
+      { if (sorted[i].getX() != sorted[i - 1].getX() + 1) return {}; }
+    else if (sorted[i].getY() != sorted[i - 1].getY() + 1) return {};
   }
 
   return sorted;
@@ -802,7 +802,7 @@ Room::WallCheckResult Room::checkWallAdjacency(const std::vector<Point> &sorted,
 
   if (orientation == Direction::HORIZONTAL)
   {
-    char leftChar = baseLayout->getCharAt(first.x - 1, first.y);
+    char leftChar = baseLayout->getCharAt(first.getX() - 1, first.getY());
     if (leftChar == 'W')
     {
       result.valid = true;
@@ -812,7 +812,7 @@ Room::WallCheckResult Room::checkWallAdjacency(const std::vector<Point> &sorted,
       return result;
     }
 
-    char rightChar = baseLayout->getCharAt(last.x + 1, last.y);
+    char rightChar = baseLayout->getCharAt(last.getX() + 1, last.getY());
     if (rightChar == 'W')
     {
       result.valid = true;
@@ -824,7 +824,7 @@ Room::WallCheckResult Room::checkWallAdjacency(const std::vector<Point> &sorted,
   }
   else
   {
-    char topChar = baseLayout->getCharAt(first.x, first.y - 1);
+    char topChar = baseLayout->getCharAt(first.getX(), first.getY() - 1);
     if (topChar == 'W')
     {
       result.valid = true;
@@ -833,7 +833,7 @@ Room::WallCheckResult Room::checkWallAdjacency(const std::vector<Point> &sorted,
       return result;
     }
 
-    char bottomChar = baseLayout->getCharAt(last.x, last.y + 1);
+    char bottomChar = baseLayout->getCharAt(last.getX(), last.getY() + 1);
     if (bottomChar == 'W')
     {
       result.valid = true;
@@ -863,28 +863,28 @@ void Room::scanAndCreateSprings()
 
   for (const Point &p : allSpringCells)
   {
-    if (processed[p.y][p.x]) continue;
+    if (processed[p.getY()][p.getX()]) continue;
 
     std::vector<Point> group;
     group.push_back(p);
-    processed[p.y][p.x] = true;
+    processed[p.getY()][p.getX()] = true;
 
     for (size_t i = 0; i < group.size(); i++)
     {
-      int x = group[i].x;
-      int y = group[i].y;
+      int x = group[i].getX();
+      int y = group[i].getY();
 
       Point neighbors[] = {Point(x + 1, y), Point(x - 1, y), Point(x, y + 1),
                            Point(x, y - 1)};
 
       for (const Point &neighbor : neighbors)
       {
-        if (neighbor.x >= 0 && neighbor.x < MAX_X && neighbor.y >= 0 &&
-            neighbor.y < MAX_Y && !processed[neighbor.y][neighbor.x] &&
-            baseLayout->getCharAt(neighbor.x, neighbor.y) == '#')
+        if (neighbor.getX() >= 0 && neighbor.getX() < MAX_X && neighbor.getY() >= 0 &&
+            neighbor.getY() < MAX_Y && !processed[neighbor.getY()][neighbor.getX()] &&
+            baseLayout->getCharAt(neighbor.getX(), neighbor.getY()) == '#')
         {
           group.push_back(neighbor);
-          processed[neighbor.y][neighbor.x] = true;
+          processed[neighbor.getY()][neighbor.getX()] = true;
         }
       }
     }
@@ -945,40 +945,40 @@ void Room::createMultiCellObject(const std::vector<Point> &allObjCells)
 
   if (allObjCells.empty()) return;
 
-  char ch = baseLayout->getCharAt(allObjCells[0].x, allObjCells[0].y);
+  char ch = baseLayout->getCharAt(allObjCells[0].getX(), allObjCells[0].getY());
 
   bool processed[MAX_Y][MAX_X] = {{false}};
 
   for (const Point &p : allObjCells)
   {
-    if (processed[p.y][p.x]) continue;
+    if (processed[p.getY()][p.getX()]) continue;
 
     std::vector<Point> group;
     std::unordered_map<Point, std::vector<Point>> edges;
     group.push_back(p);
-    processed[p.y][p.x] = true;
+    processed[p.getY()][p.getX()] = true;
 
     for (size_t i = 0; i < group.size(); i++)
     {
-      int x = group[i].x;
-      int y = group[i].y;
+      int x = group[i].getX();
+      int y = group[i].getY();
 
       Point neighbors[] = {Point(x + 1, y), Point(x - 1, y), Point(x, y + 1),
                            Point(x, y - 1)};
 
       for (const Point &neighbor : neighbors)
       {
-        if (neighbor.x >= 0 && neighbor.x < MAX_X && neighbor.y >= 0 &&
-            neighbor.y < MAX_Y && !processed[neighbor.y][neighbor.x])
+        if (neighbor.getX() >= 0 && neighbor.getX() < MAX_X && neighbor.getY() >= 0 &&
+            neighbor.getY() < MAX_Y && !processed[neighbor.getY()][neighbor.getX()])
         {
-          if (baseLayout->getCharAt(neighbor.x, neighbor.y) != ch)
+          if (baseLayout->getCharAt(neighbor.getX(), neighbor.getY()) != ch)
           {
             if (ch == '*') edges[group[i]].push_back(neighbor);
           }
           else
           {
             group.push_back(neighbor);
-            processed[neighbor.y][neighbor.x] = true;
+            processed[neighbor.getY()][neighbor.getX()] = true;
           }
         }
       }
@@ -1090,8 +1090,8 @@ void Room::drawLegend(Player *p1, Player *p2)
 
 void Room::drawEmptyLegend()
 {
-  int startX = legendTopLeft.x - 1;
-  int startY = legendTopLeft.y - 1;
+  int startX = legendTopLeft.getX() - 1;
+  int startY = legendTopLeft.getY() - 1;
 
   for (int i = 0; i < 5; i++) Renderer::printAt(startX, startY + i, legendData[i]);
 }
@@ -1105,8 +1105,8 @@ void Room::drawLegendInfo(Player *p1, Player *p2)
 void Room::drawPlayerStats(Player *p)
 {
 
-  int lineY = legendTopLeft.y + p->getId();
-  int startX = legendTopLeft.x;
+  int lineY = legendTopLeft.getY() + p->getId();
+  int startX = legendTopLeft.getX();
 
   Renderer::gotoxy(startX + 3, lineY);
   Renderer::print(p->getScore());
@@ -1123,8 +1123,8 @@ void Room::drawPlayerStats(Player *p)
 
 void Room::DrawLives(Player *p)
 {
-  int lineY = legendTopLeft.y + p->getId();
-  int startX = legendTopLeft.x - 1;
+  int lineY = legendTopLeft.getY() + p->getId();
+  int startX = legendTopLeft.getX() - 1;
   int offset = startX + 8;
 
   switch (p->getLives())
@@ -1163,12 +1163,12 @@ Point Room::findSmartSpawn(Point base)
 {
     // 1. Determine Desired Point (Target)
     // "player 2 will spawn in the position 2 points below player 1's position"
-    Point target = {base.x, base.y + 2};
+    Point target(base.getX(), base.getY() + 2);
 
     // Helper lambda to check validity
     auto isValid = [&](Point p) {
-        if (p.x < 0 || p.x >= MAX_X || p.y < 0 || p.y >= MAX_Y) return false;
-        if (isWallAt(p.x, p.y)) return false;
+        if (p.getX() < 0 || p.getX() >= MAX_X || p.getY() < 0 || p.getY() >= MAX_Y) return false;
+        if (isWallAt(p.getX(), p.getY())) return false;
         return true;
     };
 
@@ -1178,14 +1178,14 @@ Point Room::findSmartSpawn(Point base)
     // "check for a legit spawn point 1 point above/under/on the right/on the left of the desired point"
     
     std::vector<Point> offsets = {
-        {0, -1}, {0, 1}, {-1, 0}, {1, 0},   // Radius 1: Up, Down, Left, Right
-        {0, -2}, {0, 2}, {-2, 0}, {2, 0},   // Radius 2
-        {-1, -1}, {-1, 1}, {1, -1}, {1, 1}  // Diagonals
+        Point(0, -1), Point(0, 1), Point(-1, 0), Point(1, 0),   // Radius 1: Up, Down, Left, Right
+        Point(0, -2), Point(0, 2), Point(-2, 0), Point(2, 0),   // Radius 2
+        Point(-1, -1), Point(-1, 1), Point(1, -1), Point(1, 1)  // Diagonals
     };
 
     for (const auto& offset : offsets)
     {
-        Point p = {target.x + offset.x, target.y + offset.y};
+        Point p(target.getX() + offset.getX(), target.getY() + offset.getY());
         if (isValid(p)) return p;
     }
 

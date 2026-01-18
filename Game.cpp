@@ -103,8 +103,8 @@ ErrorCode Game::validateLegendPlacement(Room &room)
   }
 
   Point lPos = lMarkers[0];
-  int topLeftX = lPos.x - 1;
-  int topLeftY = lPos.y - 1;
+  int topLeftX = lPos.getX() - 1;
+  int topLeftY = lPos.getY() - 1;
   int width = 22;
   int height = 5;
   if (topLeftX < 0 || topLeftY < 0 || topLeftX + width > MAX_X ||
@@ -127,35 +127,35 @@ ErrorCode Game::validateLegendPlacement(Room &room)
 
   // Check P1 spawn (explicit)
   Point p1Spawn = room.getSpawnPoint(1);
-  if (p1Spawn.x >= topLeftX && p1Spawn.x < topLeftX + width &&
-      p1Spawn.y >= topLeftY && p1Spawn.y < topLeftY + height)
+  if (p1Spawn.getX() >= topLeftX && p1Spawn.getX() < topLeftX + width &&
+      p1Spawn.getY() >= topLeftY && p1Spawn.getY() < topLeftY + height)
   {
       return ErrorCode::LEGEND_OBSCURES_SPAWN;
   }
   // Check P2 spawn (calculated)
   Point p2Spawn = room.getSpawnPoint(2);
-  if (p2Spawn.x >= topLeftX && p2Spawn.x < topLeftX + width &&
-      p2Spawn.y >= topLeftY && p2Spawn.y < topLeftY + height)
+  if (p2Spawn.getX() >= topLeftX && p2Spawn.getX() < topLeftX + width &&
+      p2Spawn.getY() >= topLeftY && p2Spawn.getY() < topLeftY + height)
   {
       return ErrorCode::LEGEND_OBSCURES_SPAWN;
   }
 
   // Check P1 FromNext (explicit)
   Point p1Next = room.getSpawnPointFromNext(1);
-  if (p1Next.x >= topLeftX && p1Next.x < topLeftX + width &&
-      p1Next.y >= topLeftY && p1Next.y < topLeftY + height)
+  if (p1Next.getX() >= topLeftX && p1Next.getX() < topLeftX + width &&
+      p1Next.getY() >= topLeftY && p1Next.getY() < topLeftY + height)
   {
       return ErrorCode::LEGEND_OBSCURES_SPAWN;
   }
   // Check P2 FromNext (calculated)
   Point p2Next = room.getSpawnPointFromNext(2);
-  if (p2Next.x >= topLeftX && p2Next.x < topLeftX + width &&
-      p2Next.y >= topLeftY && p2Next.y < topLeftY + height)
+  if (p2Next.getX() >= topLeftX && p2Next.getX() < topLeftX + width &&
+      p2Next.getY() >= topLeftY && p2Next.getY() < topLeftY + height)
   {
       return ErrorCode::LEGEND_OBSCURES_SPAWN;
   }
 
-  room.setLegendPoint(lPos.x, lPos.y);
+  room.setLegendPoint(lPos.getX(), lPos.getY());
 
   return ErrorCode::NONE;
 }
@@ -178,8 +178,8 @@ void Game::startNewGame()
   Point startPos1 = rooms[0].getSpawnPoint(1);
   Point startPos2 = rooms[0].getSpawnPoint(2);
   
-  player1 = Player(1, startPos1.x, startPos1.y, PlayerSprites::PLAYER1);
-  player2 = Player(2, startPos2.x, startPos2.y, PlayerSprites::PLAYER2);
+  player1 = Player(1, startPos1.getX(), startPos1.getY(), PlayerSprites::PLAYER1);
+  player2 = Player(2, startPos2.getX(), startPos2.getY(), PlayerSprites::PLAYER2);
 
   currentRoomId = 0;
   rooms[0].setActive(true);
@@ -753,8 +753,8 @@ void Game::changeRoom(int newRoomId, bool goingForward)
       nextPos2 = rooms[newRoomId].getSpawnPointFromNext(2);
   }
 
-  player1.setPosition(nextPos1.x, nextPos1.y);
-  player2.setPosition(nextPos2.x, nextPos2.y);
+  player1.setPosition(nextPos1.getX(), nextPos1.getY());
+  player2.setPosition(nextPos2.getX(), nextPos2.getY());
 
   player1.stopMovement();
   player2.stopMovement();

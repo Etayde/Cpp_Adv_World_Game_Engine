@@ -32,8 +32,8 @@ void SpringLink::collapse(Room *room) {
 
     if (room != nullptr)
     {
-        room->setCharAt(position.x, position.y, sprite);
-        Renderer::printAt(position.x, position.y, sprite);
+        room->setCharAt(getX(), getY(), sprite);
+        Renderer::printAt(getX(), getY(), sprite);
         Renderer::flush();
     }
 }
@@ -49,8 +49,8 @@ void SpringLink::reset(Room *room)
 
     if (room != nullptr)
     {
-        room->setCharAt(position.x, position.y, sprite);
-        Renderer::printAt(position.x, position.y, sprite);
+        room->setCharAt(getX(), getY(), sprite);
+        Renderer::printAt(getX(), getY(), sprite);
         Renderer::flush();
     }
 }

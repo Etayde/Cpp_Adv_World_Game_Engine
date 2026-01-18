@@ -94,7 +94,7 @@ void Player::copyInventoryFrom(const Player &other)
 
 bool Player::isStationary() const
 {
-  return (pos.diff_x == 0 && pos.diff_y == 0);
+  return (pos.getDiffX() == 0 && pos.getDiffY() == 0);
 }
 
 bool Player::isWithinAbsoluteBounds(int x, int y) const
@@ -117,12 +117,12 @@ void Player::erase(Room *room)
 {
   if (room == nullptr)
   {
-    Renderer::printAt(pos.x, pos.y, ' ');
+    Renderer::printAt(pos.getX(), pos.getY(), ' ');
     return;
   }
 
-  ObjectType currentType = room->getObjectTypeAt(pos.x, pos.y);
-  GameObject *obj = room->getObjectAt(pos.x, pos.y);
+  ObjectType currentType = room->getObjectTypeAt(pos.getX(), pos.getY());
+  GameObject *obj = room->getObjectAt(pos.getX(), pos.getY());
 
   char restoreChar;
   if (obj != nullptr && obj->getType() == ObjectType::DOOR)
@@ -136,7 +136,7 @@ void Player::erase(Room *room)
         (currentChar == ' ' || currentChar == sprite) ? ' ' : currentChar;
   }
 
-  Renderer::printAt(pos.x, pos.y, restoreChar);
+  Renderer::printAt(pos.getX(), pos.getY(), restoreChar);
 }
 
 //////////////////////////////////////////  Respawn and Death Helpers       /////////////////////////////////////////////
@@ -151,8 +151,7 @@ void Player::respawn(Room *room)
 
   erase(room);
 
-  pos.diff_x = 0;
-  pos.diff_y = 0;
+  pos.stopMovement();
   springMomentum.resetMomentum();
   if (room)
   {
@@ -162,7 +161,7 @@ void Player::respawn(Room *room)
     }
     Point spawn = room->getSpawnPoint(playerId);
     if (playerId == 2)
-      spawn.y += 1;
+      spawn.setY(spawn.getY() + 1);
     pos = spawn;
   }
 
@@ -193,8 +192,8 @@ void Player::fallBack(Room *room)
 
   erase(room);
 
-  int targetX = pos.x;
-  int targetY = pos.y;
+  int targetX = pos.getX();
+  int targetY = pos.getY();
   Direction dir = getCurrentDirection();
   if (springMomentum.isActive()) springMomentum.resetMomentum();
 
@@ -245,7 +244,7 @@ bool Player::move(Room *room, Riddle **activeRiddle, Player **activePlayer,
 
   if (!springMomentum.isActive())
   {
-    GameObject *currentObj = room->getObjectAt(pos.x, pos.y);
+    GameObject *currentObj = room->getObjectAt(pos.getX(), pos.getY());
     if (currentObj != nullptr &&
         currentObj->getType() == ObjectType::SPRING_LINK)
     {
@@ -277,8 +276,8 @@ bool Player::move(Room *room, Riddle **activeRiddle, Player **activePlayer,
 
   if (!springMomentum.isActive())
   {
-    int nextX = pos.x + pos.diff_x;
-    int nextY = pos.y + pos.diff_y;
+    int nextX = pos.getX() + pos.getDiffX();
+    int nextY = pos.getY() + pos.getDiffY();
 
     success = singleStep(nextX, nextY, room, activeRiddle, activePlayer, otherPlayer, game);
   }
@@ -294,7 +293,7 @@ bool Player::move(Room *room, Riddle **activeRiddle, Player **activePlayer,
 
 void Player::draw(Room *room)
 {
-  Renderer::gotoxy(pos.x, pos.y);
+  Renderer::gotoxy(pos.getX(), pos.getY());
 
   if (waitingAtDoor)
   {
@@ -342,8 +341,8 @@ Point Player::dropItem(Room *room)
 
   for (int i = 0; i < 8 && !found; i++)
   {
-    int testX = pos.x + checkOffsets[i][0];
-    int testY = pos.y + checkOffsets[i][1];
+    int testX = pos.getX() + checkOffsets[i][0];
+    int testY = pos.getY() + checkOffsets[i][1];
 
     if (testX >= 1 && testX < MAX_X - 1 && testY >= 1 &&
         testY < MAX_Y - 1)
@@ -375,8 +374,8 @@ Point Player::dropItem(Room *room)
 
   if (room->addObject(droppedItem))
   {
-    dropPos.x = dropX;
-    dropPos.y = dropY;
+    dropPos.setX(dropX);
+    dropPos.setY(dropY);
 
     if (inventory->getType() == ObjectType::KEY)
       keyCount--;
@@ -451,11 +450,11 @@ Direction Player::getCurrentDirection() const
 {
   if (springMomentum.isActive()) return springMomentum.getLaunchDir();
 
-  if (pos.diff_x == 0 && pos.diff_y == 0) return Direction::STAY;
-  if (pos.diff_y < 0) return Direction::UP;
-  if (pos.diff_y > 0) return Direction::DOWN;
-  if (pos.diff_x < 0) return Direction::LEFT;
-  if (pos.diff_x > 0) return Direction::RIGHT;
+  if (pos.getDiffX() == 0 && pos.getDiffY() == 0) return Direction::STAY;
+  if (pos.getDiffY() < 0) return Direction::UP;
+  if (pos.getDiffY() > 0) return Direction::DOWN;
+  if (pos.getDiffX() < 0) return Direction::LEFT;
+  if (pos.getDiffX() > 0) return Direction::RIGHT;
   return Direction::STAY;
 }
 
@@ -768,8 +767,8 @@ bool Player::moveMultiStep(Room *room, Riddle **activeRiddle,
     return false;
   }
 
-  int targetX = pos.x + dx;
-  int targetY = pos.y + dy;
+  int targetX = pos.getX() + dx;
+  int targetY = pos.getY() + dy;
 
   // Bresenham's Line Algorithm setup
   int absDX = abs(dx);
@@ -778,8 +777,8 @@ bool Player::moveMultiStep(Room *room, Riddle **activeRiddle,
   int sy = (dy > 0) ? 1 : -1;
   int err = absDX - absDY;
 
-  int currentX = pos.x;
-  int currentY = pos.y;
+  int currentX = pos.getX();
+  int currentY = pos.getY();
 
   while (currentX != targetX || currentY != targetY)
   {
@@ -799,8 +798,7 @@ bool Player::moveMultiStep(Room *room, Riddle **activeRiddle,
   if (springMomentum.getLaunchFramesRemaining() == 0)
   {
     springMomentum.resetMomentum();
-    pos.diff_x = 0;
-    pos.diff_y = 0;
+    pos.stopMovement();
   }
 
   else
@@ -826,7 +824,7 @@ bool Player::singleStep(int nextX, int nextY, Room *room, Riddle **activeRiddle,
   if (springMomentum.isActive())
   {
     if (otherPlayer != nullptr && otherPlayer->isAlive() &&
-        otherPlayer->pos.x == nextX && otherPlayer->pos.y == nextY)
+        otherPlayer->getX() == nextX && otherPlayer->getY() == nextY)
     {
       transferMomentumTo(otherPlayer);
       return false;
@@ -835,8 +833,8 @@ bool Player::singleStep(int nextX, int nextY, Room *room, Riddle **activeRiddle,
 
   if (checkObjectInteraction(nextX, nextY, room, activeRiddle, activePlayer, game)) return false;
 
-  pos.x = nextX;
-  pos.y = nextY;
+  pos.setX(nextX);
+  pos.setY(nextY);
   return true;
 }
 
@@ -844,11 +842,10 @@ bool Player::singleStep(int nextX, int nextY, Room *room, Riddle **activeRiddle,
 
 void Player::stopAtPosition(int x, int y)
 {
-  pos.x = x;
-  pos.y = y;
+  pos.setX(x);
+  pos.setY(y);
 
-  pos.diff_x = 0;
-  pos.diff_y = 0;
+  pos.stopMovement();
 
   springMomentum.setLaunchFramesRemaining(0);
 }
@@ -861,8 +858,7 @@ void Player::transferMomentumTo(Player *otherPlayer)
 
   otherPlayer->springMomentum = this->springMomentum;
 
-  otherPlayer->pos.diff_x = pos.diff_x;
-  otherPlayer->pos.diff_y = pos.diff_y;
+  otherPlayer->setDirection(getCurrentDirection());
   springMomentum.setLaunchFramesRemaining(0);
 }
 
@@ -877,8 +873,8 @@ int Player::calculateForce() const
   }
   else
   {
-    dx = abs(pos.diff_x);
-    dy = abs(pos.diff_y);
+    dx = abs(pos.getDiffX());
+    dy = abs(pos.getDiffY());
   }
   return dx > dy ? dx : dy;
 }

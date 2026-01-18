@@ -53,7 +53,7 @@ bool Obstacle::move(Direction dir, Room *room, int force)
     for (ObstacleBlock *block : edges[dir])
     {
         Point pos = block->getPosition();
-        if (room->isBlocked(pos.x + dx, pos.y + dy))
+        if (room->isBlocked(pos.getX() + dx, pos.getY() + dy))
         {
             return false;
         }
@@ -62,14 +62,14 @@ bool Obstacle::move(Direction dir, Room *room, int force)
     for (ObstacleBlock *block : blocks)
     {
         Point oldPos = block->getPosition();
-        Point newPos(oldPos.x + dx, oldPos.y + dy);
+        Point newPos(oldPos.getX() + dx, oldPos.getY() + dy);
 
-        room->setCharAt(oldPos.x, oldPos.y, ' ');
-        Renderer::printAt(oldPos.x, oldPos.y, ' ');
+        room->setCharAt(oldPos.getX(), oldPos.getY(), ' ');
+        Renderer::printAt(oldPos.getX(), oldPos.getY(), ' ');
 
         block->setPosition(newPos);
 
-        room->setCharAt(newPos.x, newPos.y, block->getSprite());
+        room->setCharAt(newPos.getX(), newPos.getY(), block->getSprite());
     }
 
     movedThisFrame = true;
@@ -80,8 +80,8 @@ bool Obstacle::move(Direction dir, Room *room, int force)
 
 std::vector<Direction> ObstacleBlock::neighborsToEdgeDirections(std::unordered_map<Point, std::vector<Point>> &neighbors)
 {
-    int x = position.x;
-    int y = position.y;
+    int x = getX();
+    int y = getY();
 
     std::vector<Direction> edgeDirections;
     std::vector<Point> neighborPositions = neighbors[Point(x, y)];
@@ -91,13 +91,13 @@ std::vector<Direction> ObstacleBlock::neighborsToEdgeDirections(std::unordered_m
 
     for (const Point &np : neighborPositions)
     {
-        if (np.x == x && np.y == y - 1)
+        if (np.getX() == x && np.getY() == y - 1)
             edgeDirections.push_back(Direction::UP);
-        else if (np.x == x && np.y == y + 1)
+        else if (np.getX() == x && np.getY() == y + 1)
             edgeDirections.push_back(Direction::DOWN);
-        else if (np.x == x - 1 && np.y == y)
+        else if (np.getX() == x - 1 && np.getY() == y)
             edgeDirections.push_back(Direction::LEFT);
-        else if (np.x == x + 1 && np.y == y)
+        else if (np.getX() == x + 1 && np.getY() == y)
             edgeDirections.push_back(Direction::RIGHT);
     }
 
@@ -269,8 +269,8 @@ std::vector<std::vector<ObstacleBlock *>> Obstacle::findConnectedComponents(
 
             Point pos = curr->getPosition();
             Point neighbors[4] = {
-                Point(pos.x + 1, pos.y), Point(pos.x - 1, pos.y),
-                Point(pos.x, pos.y + 1), Point(pos.x, pos.y - 1)};
+                Point(pos.getX() + 1, pos.getY()), Point(pos.getX() - 1, pos.getY()),
+                Point(pos.getX(), pos.getY() + 1), Point(pos.getX(), pos.getY() - 1)};
 
             for (const Point &np : neighbors)
             {
@@ -307,8 +307,8 @@ std::unordered_map<Point, std::vector<Point>> Obstacle::buildNeighborsMap(
 
         Point pos = block->getPosition();
         Point adjacent[4] = {
-            Point(pos.x + 1, pos.y), Point(pos.x - 1, pos.y),
-            Point(pos.x, pos.y + 1), Point(pos.x, pos.y - 1)};
+            Point(pos.getX() + 1, pos.getY()), Point(pos.getX() - 1, pos.getY()),
+            Point(pos.getX(), pos.getY() + 1), Point(pos.getX(), pos.getY() - 1)};
 
         for (const Point &adj : adjacent)
         {
