@@ -125,19 +125,34 @@ ErrorCode Game::validateLegendPlacement(Room &room)
     }
   }
 
-  for (const auto& sp : room.spawnPoints) {
-      if (sp.x >= topLeftX && sp.x < topLeftX + width &&
-          sp.y >= topLeftY && sp.y < topLeftY + height)
-      {
-        return ErrorCode::LEGEND_OBSCURES_SPAWN;
-      }
+  // Check P1 spawn (explicit)
+  Point p1Spawn = room.getSpawnPoint(1);
+  if (p1Spawn.x >= topLeftX && p1Spawn.x < topLeftX + width &&
+      p1Spawn.y >= topLeftY && p1Spawn.y < topLeftY + height)
+  {
+      return ErrorCode::LEGEND_OBSCURES_SPAWN;
   }
-  for (const auto& sp : room.spawnPointsFromNext) {
-      if (sp.x >= topLeftX && sp.x < topLeftX + width &&
-          sp.y >= topLeftY && sp.y < topLeftY + height)
-      {
-        return ErrorCode::LEGEND_OBSCURES_SPAWN;
-      }
+  // Check P2 spawn (calculated)
+  Point p2Spawn = room.getSpawnPoint(2);
+  if (p2Spawn.x >= topLeftX && p2Spawn.x < topLeftX + width &&
+      p2Spawn.y >= topLeftY && p2Spawn.y < topLeftY + height)
+  {
+      return ErrorCode::LEGEND_OBSCURES_SPAWN;
+  }
+
+  // Check P1 FromNext (explicit)
+  Point p1Next = room.getSpawnPointFromNext(1);
+  if (p1Next.x >= topLeftX && p1Next.x < topLeftX + width &&
+      p1Next.y >= topLeftY && p1Next.y < topLeftY + height)
+  {
+      return ErrorCode::LEGEND_OBSCURES_SPAWN;
+  }
+  // Check P2 FromNext (calculated)
+  Point p2Next = room.getSpawnPointFromNext(2);
+  if (p2Next.x >= topLeftX && p2Next.x < topLeftX + width &&
+      p2Next.y >= topLeftY && p2Next.y < topLeftY + height)
+  {
+      return ErrorCode::LEGEND_OBSCURES_SPAWN;
   }
 
   room.setLegendPoint(lPos.x, lPos.y);
@@ -675,8 +690,8 @@ void Game::initializeRooms(unsigned int seed)
 
     Room &room = rooms.back();
     room.initFromLayout(screens[i], &riddleIds, &riddleIndex);
-    room.spawnPoints = metadatas[i].spawnPoints;
-    room.spawnPointsFromNext = metadatas[i].spawnPointsFromNext;
+    room.spawnPoint = metadatas[i].spawnPoint;
+    room.spawnPointFromNext = metadatas[i].spawnPointFromNext;
     room.nextRoomId = metadatas[i].nextRoomId;
     room.prevRoomId = metadatas[i].prevRoomId;
 

@@ -101,8 +101,8 @@ public:
 
   int nextRoomId;
   int prevRoomId;
-  std::vector<Point> spawnPoints;
-  std::vector<Point> spawnPointsFromNext;
+  Point spawnPoint;
+  Point spawnPointFromNext;
 
   std::vector<DarkZone> darkZones;
   bool visibilityMap[MAX_Y][MAX_X];

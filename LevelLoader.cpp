@@ -74,7 +74,7 @@ Screen *LevelLoader::loadScreenFile(const std::string& filename, RoomMetadata &m
       {
         return nullptr;
       }
-      metadata.spawnPoints.push_back(Point(x, y));
+      metadata.spawnPoint = Point(x, y);
     }
     else if (key == "SPAWN_PREV")
     {
@@ -84,7 +84,7 @@ Screen *LevelLoader::loadScreenFile(const std::string& filename, RoomMetadata &m
       {
         return nullptr;
       }
-      metadata.spawnPointsFromNext.push_back(Point(x, y));
+      metadata.spawnPointFromNext = Point(x, y);
     }
     else if (key == "NEXT_ROOM")
     {

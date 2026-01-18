@@ -63,11 +63,11 @@ Room::Room(const Room &other)
       keysCollected(other.keysCollected), activeSwitches(other.activeSwitches),
       totalSwitches(other.totalSwitches), doorReqs(other.doorReqs),
       nextRoomId(other.nextRoomId), prevRoomId(other.prevRoomId),
-      spawnPoints(other.spawnPoints),
-      spawnPointsFromNext(other.spawnPointsFromNext), darkZones(other.darkZones)
+      spawnPoint(other.spawnPoint),
+      spawnPointFromNext(other.spawnPointFromNext), darkZones(other.darkZones)
 {
   for (int y = 0; y < MAX_Y; y++)
-    for (int x = 0; x < MAX_Y; x++) // Fixed typo MAX_Y? Logic says MAX_X usually
+    for (int x = 0; x < MAX_X; x++)
       visibilityMap[y][x] = other.visibilityMap[y][x];
 
   copyObjectsFrom(other);
@@ -96,8 +96,8 @@ Room &Room::operator=(const Room &other)
     totalSwitches = other.totalSwitches;
     nextRoomId = other.nextRoomId;
     prevRoomId = other.prevRoomId;
-    spawnPoints = other.spawnPoints;
-    spawnPointsFromNext = other.spawnPointsFromNext;
+    spawnPoint = other.spawnPoint;
+    spawnPointFromNext = other.spawnPointFromNext;
     darkZones = other.darkZones;
     doorReqs = other.doorReqs;
 
@@ -1185,37 +1185,22 @@ Point Room::findSmartSpawn(Point base)
 
 Point Room::getSpawnPoint(int playerId)
 {
-    if (spawnPoints.empty()) return {3, 5};
-    
-    // Player 1 always gets the first point
-    if (playerId == 1) return spawnPoints[0];
+    // Player 1: Always use metadata spawn point
+    if (playerId == 1) return spawnPoint;
 
-    // Player 2
-    if (playerId == 2)
-    {
-        // If explicit point exists, use it
-        if (spawnPoints.size() > 1) return spawnPoints[1];
-        
-        // Otherwise, use smart logic relative to P1's spawn
-        return findSmartSpawn(spawnPoints[0]);
-    }
-
-    return spawnPoints[0];
+    // Player 2: Smart Spawn Logic
+    // 1. Try (x, y+2) from P1's spawn
+    // 2. If blocked, search neighbors of THAT target point
+    return findSmartSpawn(spawnPoint);
 }
 
 //////////////////////////////////////////   getSpawnPointFromNext   /////////////////////////////////////////////
 
 Point Room::getSpawnPointFromNext(int playerId)
 {
-    if (spawnPointsFromNext.empty()) return {75, 17};
-    
-    if (playerId == 1) return spawnPointsFromNext[0];
+    // Player 1: Always use metadata spawn point
+    if (playerId == 1) return spawnPointFromNext;
 
-    if (playerId == 2)
-    {
-        if (spawnPointsFromNext.size() > 1) return spawnPointsFromNext[1];
-        return findSmartSpawn(spawnPointsFromNext[0]);
-    }
-
-    return spawnPointsFromNext[0];
+    // Player 2: Smart Spawn Logic relative to P1's spawn
+    return findSmartSpawn(spawnPointFromNext);
 }

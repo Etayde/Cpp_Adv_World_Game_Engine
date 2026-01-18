@@ -16,19 +16,16 @@
 // Refactored to support better room connections using AI
 struct RoomMetadata
 {
-  std::vector<Point> spawnPoints;
-  std::vector<Point> spawnPointsFromNext;
+  Point spawnPoint;
+  Point spawnPointFromNext;
   int nextRoomId;
   int prevRoomId;
   std::vector<std::tuple<int, int, int, int>> doorConfigs; // doorId, keys, switches, targetRoom
   std::vector<DarkZone> darkZones;
 
   RoomMetadata()
-      : nextRoomId(-1), prevRoomId(-1) 
-      {
-          spawnPoints = {{3, 5}};
-          spawnPointsFromNext = {{75, 17}};
-      }
+      : spawnPoint(3, 5), spawnPointFromNext(75, 17), nextRoomId(-1),
+        prevRoomId(-1) {}
 };
 
 //////////////////////////////////////////        LevelLoader       /////////////////////////////////////////////
