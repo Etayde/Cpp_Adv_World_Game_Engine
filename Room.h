@@ -79,7 +79,7 @@ struct DoorRequirements
 // Represents a single game room
 class Room
 {
-public:
+private:
   int roomId;
   Point legendTopLeft;
   bool active;
@@ -113,6 +113,41 @@ public:
   ~Room();
   Room(const Room &other);
   Room &operator=(const Room &other);
+
+  // Getters
+  int getRoomId() const { return roomId; }
+  bool isActive() const { return active; }
+  bool isCompleted() const { return completed; }
+  const Screen* getBaseLayout() const { return baseLayout; }
+  int getNextRoomId() const { return nextRoomId; }
+  int getPrevRoomId() const { return prevRoomId; }
+  int getTotalKeysInRoom() const { return totalKeysInRoom; }
+  int getKeysCollected() const { return keysCollected; }
+  const Point& getLegendTopLeft() const { return legendTopLeft; }
+
+  // Door requirements access
+  size_t getDoorReqsCount() const { return doorReqs.size(); }
+  int getDoorTargetRoomId(int doorId) const {
+    if (doorId >= 0 && doorId < static_cast<int>(doorReqs.size()))
+      return doorReqs[doorId].targetRoomId;
+    return -1;
+  }
+  int getDoorRequiredKeys(int doorId) const {
+    if (doorId >= 0 && doorId < static_cast<int>(doorReqs.size()))
+      return doorReqs[doorId].requiredKeys;
+    return 0;
+  }
+
+  // Setters
+  void setActive(bool value) { active = value; }
+  void setSpawnPoint(const Point& p) { spawnPoint = p; }
+  void setSpawnPointFromNext(const Point& p) { spawnPointFromNext = p; }
+  void setNextRoomId(int id) { nextRoomId = id; }
+  void setPrevRoomId(int id) { prevRoomId = id; }
+  
+  // Obstacle access (for iteration)
+  const std::vector<Obstacle*>& getObstacles() const { return obstacles; }
+  void resetAllObstaclePushStates();
 
   // Initialization
   void initFromLayout(const Screen *layout, const std::vector<int> *riddleIds = nullptr, int *riddleIndex = nullptr);

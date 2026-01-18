@@ -423,6 +423,16 @@ void Room::removeObjectAt(int x, int y)
 
 void Room::addObstacle(Obstacle *obs) { if (obs != nullptr) obstacles.push_back(obs); }
 
+//////////////////////////////////////////   resetAllObstaclePushStates   /////////////////////////////////////////////
+
+void Room::resetAllObstaclePushStates()
+{
+  for (Obstacle *obstacle : obstacles)
+  {
+    obstacle->resetPushState();
+  }
+}
+
 //////////////////////////////////////////          getDoors       /////////////////////////////////////////////
 
 std::vector<Door *> Room::getDoors()

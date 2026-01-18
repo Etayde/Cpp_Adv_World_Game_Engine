@@ -77,7 +77,7 @@ Game* Game::createFromArgs(int argc, char* argv[])
 
 ErrorCode Game::validateLegendPlacement(Room &room)
 {
-  if (room.baseLayout == nullptr)
+  if (room.getBaseLayout() == nullptr)
     return ErrorCode::NONE;
 
   std::vector<Point> lMarkers;
@@ -85,7 +85,7 @@ ErrorCode Game::validateLegendPlacement(Room &room)
   {
     for (int x = 0; x < MAX_X; x++)
     {
-      if (room.baseLayout->getCharAt(x, y) == 'L')
+      if (room.getBaseLayout()->getCharAt(x, y) == 'L')
       {
         lMarkers.push_back(Point(x, y));
       }
@@ -117,7 +117,7 @@ ErrorCode Game::validateLegendPlacement(Room &room)
   {
     for (int x = topLeftX; x < topLeftX + width; x++)
     {
-      char c = room.baseLayout->getCharAt(x, y);
+      char c = room.getBaseLayout()->getCharAt(x, y);
       if (c != ObjectType::WALL && c != ObjectType::AIR && c != 'L')
       {
         return ErrorCode::LEGEND_OBSCURES_OBJECTS;
@@ -174,7 +174,7 @@ void Game::startNewGame()
       return;
   }
 
-  rooms[0].active = true;
+  rooms[0].setActive(true);
   Point startPos1 = rooms[0].getSpawnPoint(1);
   Point startPos2 = rooms[0].getSpawnPoint(2);
   
@@ -182,7 +182,7 @@ void Game::startNewGame()
   player2 = Player(2, startPos2.x, startPos2.y, PlayerSprites::PLAYER2);
 
   currentRoomId = 0;
-  rooms[0].active = true;
+  rooms[0].setActive(true);
   gameInitialized = true;
 }
 
@@ -289,10 +289,7 @@ void Game::update()
   if (room == nullptr)
     return;
 
-  for (Obstacle *obstacle : room->obstacles)
-  {
-    obstacle->resetPushState();
-  }
+  room->resetAllObstaclePushStates();
 
   player1.move(room, &aRiddle.riddle, &aRiddle.player, &player2, this);
   player2.move(room, &aRiddle.riddle, &aRiddle.player, &player1, this);
@@ -366,11 +363,7 @@ bool Game::canPassThroughDoor(Room *room, int doorId)
   if (room == nullptr)
     return false;
 
-  int targetRoom = -1;
-  if (doorId >= 0 && doorId < static_cast<int>(room->doorReqs.size()))
-  {
-      targetRoom = room->doorReqs[doorId].targetRoomId;
-  }
+  int targetRoom = room->getDoorTargetRoomId(doorId);
 
   // If explicit target is set, check requirements
   if (targetRoom != -1)
@@ -380,13 +373,13 @@ bool Game::canPassThroughDoor(Room *room, int doorId)
                                player2.getKeyCount());
   }
 
-  if (doorId == room->nextRoomId || doorId == static_cast<int>(rooms.size()))
+  if (doorId == room->getNextRoomId() || doorId == static_cast<int>(rooms.size()))
   {
     return room->isDoorUnlocked(doorId) ||
            room->canOpenDoor(doorId, player1.getKeyCount(),
                              player2.getKeyCount());
   }
-  else if (doorId == room->prevRoomId)
+  else if (doorId == room->getPrevRoomId())
   {
     return true;
   }
@@ -435,19 +428,13 @@ void Game::checkRoomTransitions()
       player2.setWaitingAtDoor(false);
 
       // Handle Forward Transition
-      int targetRoom = -1;
-      if (doorId >= 0 && doorId < static_cast<int>(room->doorReqs.size()))
-      {
-          targetRoom = room->doorReqs[doorId].targetRoomId;
-      }
+      int targetRoom = room->getDoorTargetRoomId(doorId);
 
-      if (targetRoom != -1 || doorId == room->nextRoomId || doorId == static_cast<int>(rooms.size()))
+      if (targetRoom != -1 || doorId == room->getNextRoomId() || doorId == static_cast<int>(rooms.size()))
       {
         if (!room->isDoorUnlocked(doorId))
         {
-          int keysNeeded = (doorId >= 0 && doorId < static_cast<int>(room->doorReqs.size()))
-                               ? room->doorReqs[doorId].requiredKeys
-                               : 0;
+          int keysNeeded = room->getDoorRequiredKeys(doorId);
 
           int keysConsumed = 0;
           while (keysConsumed < keysNeeded && player1.getKeyCount() > 0)
@@ -472,7 +459,7 @@ void Game::checkRoomTransitions()
           return;
         }
         
-        int destinationId = (targetRoom != -1) ? targetRoom : room->nextRoomId;
+        int destinationId = (targetRoom != -1) ? targetRoom : room->getNextRoomId();
         
         if (destinationId == -1) {
              currentState = GameState::victory;
@@ -482,9 +469,9 @@ void Game::checkRoomTransitions()
         changeRoom(destinationId, true);
       }
       // Handle Backward Transition
-      else if (doorId == room->prevRoomId)
+      else if (doorId == room->getPrevRoomId())
       {
-        changeRoom(room->prevRoomId, false);
+        changeRoom(room->getPrevRoomId(), false);
       }
     }
   }
@@ -696,10 +683,10 @@ void Game::initializeRooms(unsigned int seed)
 
     Room &room = rooms.back();
     room.initFromLayout(screens[i], &riddleIds, &riddleIndex);
-    room.spawnPoint = metadatas[i].spawnPoint;
-    room.spawnPointFromNext = metadatas[i].spawnPointFromNext;
-    room.nextRoomId = metadatas[i].nextRoomId;
-    room.prevRoomId = metadatas[i].prevRoomId;
+    room.setSpawnPoint(metadatas[i].spawnPoint);
+    room.setSpawnPointFromNext(metadatas[i].spawnPointFromNext);
+    room.setNextRoomId(metadatas[i].nextRoomId);
+    room.setPrevRoomId(metadatas[i].prevRoomId);
 
     for (const auto &doorConfig : metadatas[i].doorConfigs)
     {
@@ -733,7 +720,7 @@ void Game::changeRoom(int newRoomId, bool goingForward)
   {
     if (currentRoomId >= 0)
     {
-      rooms[currentRoomId].active = false;
+      rooms[currentRoomId].setActive(false);
     }
     currentState = GameState::victory;
     return;
@@ -746,13 +733,13 @@ void Game::changeRoom(int newRoomId, bool goingForward)
 
   if (currentRoomId >= 0)
   {
-    rooms[currentRoomId].active = false;
+    rooms[currentRoomId].setActive(false);
   }
 
   currentRoomId = newRoomId;
-  rooms[newRoomId].active = true;
+  rooms[newRoomId].setActive(true);
 
-  rooms[newRoomId].active = true;
+  rooms[newRoomId].setActive(true);
 
   Point nextPos1, nextPos2;
   if (goingForward)
@@ -801,7 +788,7 @@ bool Game::checkGameOver(const ExplosionResult &result)
   }
 
   Room *room = getCurrentRoom();
-  int neededSwitches = room->getDoorReqSwitches(room->nextRoomId);
+  int neededSwitches = room->getDoorReqSwitches(room->getNextRoomId());
   int totalSwitches = room->getTotalSwitches();
 
   if (result.keyDestroyed)

@@ -300,7 +300,7 @@ void Player::draw(Room *room)
   {
     // If waiting at a "Forward" door (not previous room), disappear (Wait State).
     // If waiting at "Backward" door (previous room), stay visible (Legacy behavior).
-    if (doorId != room->prevRoomId)
+    if (doorId != room->getPrevRoomId())
     {
       erase(room);
       return;
