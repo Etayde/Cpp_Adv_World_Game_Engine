@@ -22,37 +22,6 @@ ExplosionResult Bomb::update(Player *p1, Player *p2)
 {
     ExplosionResult result;
 
-    // Handle animation state per-tick
-    if (state == BombState::ANIMATING)
-    {
-        animationTimer--;
-
-        // Check player collision during animation each tick
-        for (const Point& cell : explodedCells)
-        {
-            if (p1 && p1->getX() == cell.getX() && p1->getY() == cell.getY())
-                result.player1Hit = true;
-            if (p2 && p2->getX() == cell.getX() && p2->getY() == cell.getY())
-                result.player2Hit = true;
-        }
-
-        // Animation finished
-        if (animationTimer <= 0)
-        {
-            // Clear all cells in room
-            for (const Point& cell : explodedCells)
-            {
-                if (currentRoom)
-                    currentRoom->setCharAt(cell.getX(), cell.getY(), ' ');
-            }
-            explodedCells.clear();
-            state = BombState::EXPLODED;
-            active = false;
-        }
-
-        return result;
-    }
-
     if (state != BombState::TICKING)
         return result;
 
@@ -62,6 +31,8 @@ ExplosionResult Bomb::update(Player *p1, Player *p2)
     if (fuseTimer <= 0)
     {
         result = explode(p1, p2);
+        state = BombState::EXPLODED;
+        active = false;
         return result;
     }
 
@@ -70,14 +41,10 @@ ExplosionResult Bomb::update(Player *p1, Player *p2)
 
 //////////////////////////////////////////         explode           //////////////////////////////////////////
 
-// Most of the bomb's logic methods, including this one,
-// were made with AI assistance in the previous excercise but were in different classes.
-// For better OOP oriented design, I moved the explode logic into the Bomb class itself
-// to support better encapsulation and self containment.
 ExplosionResult Bomb::explode(Player *p1, Player *p2)
 {
     ExplosionResult result;
-    explodedCells.clear();
+    std::vector<Point> explosionCells;
 
     if (!currentRoom)
         return result;
@@ -85,9 +52,10 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
     int centerX = getX();
     int centerY = getY();
 
-    // Add center cell
+    // Clear center cell immediately (original behavior)
     currentRoom->setCharAt(centerX, centerY, ' ');
-    explodedCells.push_back(Point(centerX, centerY));
+    Renderer::printAt(centerX, centerY, ' ');
+    explosionCells.push_back(Point(centerX, centerY));
 
     for (int dy = -EXPLOSION_RADIUS; dy <= EXPLOSION_RADIUS; dy++)
     {
@@ -133,7 +101,8 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
                 if (obj->onExplosion())
                 {
                     currentRoom->setCharAt(x, y, ' ');
-                    explodedCells.push_back(Point(x, y));
+                    Renderer::printAt(x, y, ' ');  // Immediate visual clear
+                    explosionCells.push_back(Point(x, y));
                     obj->setActive(false);
                     result.objectsDestroyed++;
                 }
@@ -141,27 +110,30 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
             else if (type == ObjectType::BREAKABLE_WALL)
             {
                 currentRoom->setCharAt(x, y, ' ');
-                explodedCells.push_back(Point(x, y));
+                Renderer::printAt(x, y, ' ');  // Immediate visual clear
+                explosionCells.push_back(Point(x, y));
                 result.objectsDestroyed++;
             }
             else if (type == ObjectType::AIR)
             {
-                // Add air cells that are within line of sight (not sheltered)
-                explodedCells.push_back(Point(x, y));
+                // Add air cells for animation (not sheltered)
+                explosionCells.push_back(Point(x, y));
             }
             else if (type != ObjectType::WALL)
             {
-                // Other destroyable non-wall cells
                 currentRoom->setCharAt(x, y, ' ');
-                explodedCells.push_back(Point(x, y));
+                Renderer::printAt(x, y, ' ');  // Immediate visual clear
+                explosionCells.push_back(Point(x, y));
                 result.objectsDestroyed++;
             }
         }
     }
 
-    // Start animation
-    state = BombState::ANIMATING;
-    animationTimer = ANIMATION_TICKS;
+    // Add explosion animation to room (visual effect only)
+    if (!explosionCells.empty())
+    {
+        currentRoom->addExplosion(PostExplosion(explosionCells));
+    }
 
     return result;
 }
@@ -175,32 +147,6 @@ void Bomb::draw() const
 
     if (state == BombState::PLACED && currentRoom && !currentRoom->isVisible(getX(), getY()))
         return;
-
-    // Draw explosion animation
-    if (state == BombState::ANIMATING)
-    {
-        // Blink: show '~' for 5 ticks, hide for 5 ticks
-        bool showWave = (animationTimer / 5) % 2 == 0;
-        
-        if (showWave)
-        {
-            set_color(Color::Yellow);
-            for (const Point& cell : explodedCells)
-            {
-                Renderer::printAt(cell.getX(), cell.getY(), '~');
-            }
-            reset_color();
-        }
-        else
-        {
-            for (const Point& cell : explodedCells)
-            {
-                Renderer::printAt(cell.getX(), cell.getY(), ' ');
-            }
-        }
-        Renderer::flush();
-        return;
-    }
 
     Renderer::gotoxy(getX(), getY());
 

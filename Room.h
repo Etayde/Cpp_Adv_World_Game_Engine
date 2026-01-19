@@ -6,6 +6,7 @@
 #include "Constants.h"
 #include "GameObject.h"
 #include "Screen.h"
+#include "Bomb.h"
 #include <unordered_map>
 #include <vector>
 
@@ -109,6 +110,7 @@ class Room
   Point spawnPoint;
   Point spawnPointFromNext;
   std::vector<DarkZone> darkZones;
+  std::vector<PostExplosion> explosions;
   VisibilityState visibilityMap[MAX_Y][MAX_X];
 
   void copyObjectsFrom(const Room &other);
@@ -244,4 +246,7 @@ public:
   void updateVisibility(Player *p1, Player *p2);
   void lightRadius(int centerX, int centerY, int radius);
   bool isVisible(int x, int y) const;
+
+  // Explosion animations
+  void addExplosion(const PostExplosion& explosion);
 };
