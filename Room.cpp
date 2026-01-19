@@ -154,7 +154,36 @@ void Room::initVisibility()
 {
   for (int y = 0; y < MAX_Y; y++)
     for (int x = 0; x < MAX_X; x++)
-      visibilityMap[y][x] = true;
+      visibilityMap[y][x] = VisibilityState::INNER;
+}
+
+void Room::setColorForChar(char c)
+{
+  switch (c)
+  {
+    case 'W': case 'w': case 'Z':
+    case '|': case '-': case '=':
+      set_color(Color::White);
+      break;
+    case '!':
+      set_color(Color::LightYellow);
+      break;
+    case 'K': case '/': case '\\':
+      set_color(Color::LightPurple);
+      break;
+    case '@':
+      set_color(Color::Green);
+      break;
+    case '#': case '*':
+      set_color(Color::Gray);
+      break;
+    case '?':
+      set_color(Color::LightBlue);
+      break;
+    default:
+      if (c >= '0' && c <= '9') set_color(Color::Purple);
+      break;
+  }
 }
 
 //////////////////////////////////////////       initFromLayout       /////////////////////////////////////////////
@@ -250,22 +279,12 @@ void Room::draw()
 
   for (const Modification &mod : mods) 
   {
-      // Skip coloring for empty space (destroyed objects)
       if (mod.newChar == ' ') {
           Renderer::printAt(mod.x, mod.y, mod.newChar);
           continue;
       }
       
-      // Color based on character
-      if (mod.newChar == 'W' || mod.newChar == 'w' || mod.newChar == 'Z') set_color(Color::White);
-      else if (mod.newChar == '!') set_color(Color::LightYellow);
-      else if (mod.newChar == 'K' || mod.newChar == '/' || mod.newChar == '\\') set_color(Color::LightPurple);
-      else if (mod.newChar == '@') set_color(Color::Green);
-      else if (mod.newChar >= '0' && mod.newChar <= '9') set_color(Color::Purple);
-      else if (mod.newChar == '#' || mod.newChar == '*') set_color(Color::Gray);
-      else if (mod.newChar == '?') set_color(Color::LightBlue);
-      // No else - don't color unknown chars
-      
+      setColorForChar(mod.newChar);
       Renderer::printAt(mod.x, mod.y, mod.newChar);
       reset_color();
   }
@@ -290,19 +309,15 @@ void Room::drawDarkness(Player *p1, Player *p2)
 
       Renderer::gotoxy(x, y);
 
-      if (visibilityMap[y][x]) 
+      if (visibilityMap[y][x] != VisibilityState::DARK) 
       {
           char c = getCharAt(x, y);
           
           // Skip coloring for empty space
           if (c != ' ') {
-              if (c == 'W' || c == 'w' || c == 'Z' || c == '|' || c == '-' || c == '=') set_color(Color::White);
-              else if (c == '!') set_color(Color::LightYellow);
-              else if (c == 'K' || c == '/' || c == '\\') set_color(Color::LightPurple);
-              else if (c == '@') set_color(Color::Green);
-              else if (c >= '0' && c <= '9') set_color(Color::Purple);
-              else if (c == '#' || c == '*') set_color(Color::Gray);
-              else if (c == '?') set_color(Color::LightBlue);
+              // Apply torch-based coloring in dark zones
+              if (visibilityMap[y][x] == VisibilityState::EDGE) set_color(Color::LightYellow);
+              else if (visibilityMap[y][x] == VisibilityState::INNER) set_color(Color::Yellow);
           }
           
           Renderer::print(c);
@@ -325,7 +340,7 @@ void Room::drawVisibleObjects()
     int x = obj->getX();
     int y = obj->getY();
 
-    if (isInDarkZone(x, y) && !visibilityMap[y][x] && !obj->isAlwaysVisible())
+    if (isInDarkZone(x, y) && visibilityMap[y][x] == VisibilityState::DARK && !obj->isAlwaysVisible())
     {
       Renderer::printAt(x, y, ' ');
       continue;
@@ -665,7 +680,7 @@ void Room::updateVisibility(Player *p1, Player *p2)
     {
       for (int x = zone.x1; x <= zone.x2; x++)
       {
-        if (x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y) visibilityMap[y][x] = false;
+        if (x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y) visibilityMap[y][x] = VisibilityState::DARK;
       }
     }
   }
@@ -699,14 +714,18 @@ void Room::lightRadius(int centerX, int centerY, int radius)
       double distance = sqrt(dx * dx + dy * dy);
       if (distance > radius) continue;
 
-      visibilityMap[y][x] = true;
+      // EDGE if at the outer boundary, INNER otherwise
+      if (distance > radius - 1)
+        visibilityMap[y][x] = VisibilityState::EDGE;
+      else
+        visibilityMap[y][x] = VisibilityState::INNER;
     }
   }
 }
 
 //////////////////////////////////////////         isVisible       /////////////////////////////////////////////
 
-bool Room::isVisible(int x, int y) const { return x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y && visibilityMap[y][x]; }
+bool Room::isVisible(int x, int y) const { return x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y && visibilityMap[y][x] != VisibilityState::DARK; }
 
 //////////////////////////////////////////     updateAllObjects       /////////////////////////////////////////////
 

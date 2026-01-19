@@ -462,6 +462,8 @@ void NormalGame::handleMainMenuInput()
   }
 }
 
+//////////////////////////////////////////     toggleColorModeBanner     /////////////////////////////////////////////
+
 void NormalGame::toggleColorModeBanner()
 {
   Renderer::gotoxy(47, 10);

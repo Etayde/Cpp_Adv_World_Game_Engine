@@ -109,11 +109,12 @@ class Room
   Point spawnPoint;
   Point spawnPointFromNext;
   std::vector<DarkZone> darkZones;
-  bool visibilityMap[MAX_Y][MAX_X];
+  VisibilityState visibilityMap[MAX_Y][MAX_X];
 
   void copyObjectsFrom(const Room &other);
   void deleteAllObjects();
   void initVisibility();
+  void setColorForChar(char c);
 
   char getCharAt(int x, int y) const;
 

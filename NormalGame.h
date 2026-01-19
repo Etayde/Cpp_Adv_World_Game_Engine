@@ -42,6 +42,5 @@ public:
     void disableRecording();
 
     // Menu overrides
-    void showMainMenu() override;
     void handleMainMenuInput() override;
 };

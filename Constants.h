@@ -23,6 +23,15 @@ enum class GameState
   error
 };
 
+//////////////////////////////////////////      VISIBILITY STATE       /////////////////////////////////////////////
+
+enum class VisibilityState
+{
+  DARK,   // Not visible
+  INNER,  // Inside torch radius (Yellow)
+  EDGE    // At edge of radius (Light Yellow)
+};
+
 //////////////////////////////////////////          DIRECTIONS       /////////////////////////////////////////////
 
 enum class Direction
