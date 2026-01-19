@@ -59,6 +59,15 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
     silentMode = silent;
     Renderer::setSilentMode(silentMode);
 
+    if (!silentMode)
+    {
+       init_console();
+       hideCursor();
+       clrscr();
+       consoleInitialized = true; 
+    }
+    
+
     initErrorMessage = loadActions("adv-world.steps.txt");
     if (initErrorMessage != ErrorCode::NONE) {
         currentState = GameState::error;

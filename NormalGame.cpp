@@ -17,6 +17,11 @@ NormalGame::NormalGame() : Game() {}
 
 NormalGame::NormalGame(int argc, char* argv[]) : NormalGame()
 {
+    init_console();
+    hideCursor();
+    clrscr();
+    consoleInitialized = true;
+
     bool saveMode = false;
 
     for (int i = 1; i < argc; i++)

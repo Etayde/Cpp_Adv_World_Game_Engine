@@ -25,11 +25,6 @@ Game::Game()
       gameOverMessege(GameOverMessege::NONE), cycleCount(0), currentState(GameState::mainMenu), 
       currentRoomId(-1), gameInitialized(false)
 {
-  init_console();
-  hideCursor();
-  clrscr();
-  consoleInitialized = true;
-
   Renderer::setSilentMode(silentMode);
 }
 
