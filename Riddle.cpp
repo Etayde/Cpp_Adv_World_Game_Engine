@@ -163,7 +163,7 @@ void Riddle::playRiddleAnimation(DelayRate delayRate) const
     const int startY = 4;
     const int frameHeight = 16; // Number of riddlePopupScreen rows (in Layouts.h)
     const int frameWidth = 56;  // Length of riddlePopupScreen rows (in Layouts.h)
-    const int waveDelay = 30 / delayRate;
+    const int waveDelay = 30 / static_cast<int>(delayRate);
     
     for (int pulse = 0; pulse < 2; pulse++)
     {
