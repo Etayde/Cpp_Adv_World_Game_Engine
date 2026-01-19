@@ -9,6 +9,7 @@ using namespace std;
 class NormalGame : public Game
 {
     bool isRecording;
+    bool saveMode;
     ofstream recordFile;
     ofstream resultFile;
     unsigned int randomSeed = 0;
@@ -17,6 +18,8 @@ private:
     void recordAction(const PlayerKeyBinding& binding);
     void writeStepsHeader();
     void toggleColorModeBanner();
+    void closeRecordingFiles();
+    void resetRecordingFiles();
 
 protected:
     void reportScreenChange(int roomId) override;
@@ -36,6 +39,7 @@ public:
     void handleInput() override;
     void handlePauseInput() override;
     void changeRoom(int newRoomId, bool goingForward) override;
+    void startNewGame() override;
 
     void enableRecording(const string &filename);
     void disableRecording();

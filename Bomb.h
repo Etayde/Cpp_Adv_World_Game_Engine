@@ -19,7 +19,7 @@ struct PostExplosion
     int timer;
     
     static const int ANIMATION_TICKS = 10;  // Total animation duration
-    static const int BLINK_INTERVAL = 3;    // Ticks per blink phase
+    static const int BLINK_INTERVAL = 1;    // Ticks per blink phase
     
     PostExplosion() : timer(ANIMATION_TICKS) {}
     PostExplosion(const std::vector<Point>& explosionCells) 

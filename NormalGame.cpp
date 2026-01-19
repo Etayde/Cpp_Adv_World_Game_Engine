@@ -23,7 +23,7 @@ NormalGame::NormalGame(int argc, char* argv[]) : NormalGame()
     clrscr();
     consoleInitialized = true;
 
-    bool saveMode = false;
+    saveMode = false;
 
     for (int i = 1; i < argc; i++)
     {
@@ -111,6 +111,7 @@ void NormalGame::run()
 
     case GameState::victory:
       showVictory();
+      closeRecordingFiles();
       Renderer::gotoxy(20, 18);
       Renderer::print("Press any key to return to main menu");
       while (check_kbhit())
@@ -124,6 +125,7 @@ void NormalGame::run()
 
     case GameState::gameOver:
       showGameOver();
+      closeRecordingFiles();
       Renderer::gotoxy(20, 12);
       Renderer::print("Press any key to return to main menu");
       while (check_kbhit())
@@ -369,6 +371,7 @@ void NormalGame::handlePauseInput()
     else if (choice == 'h' || choice == 'H')
     {
       reportQuit();
+      closeRecordingFiles();
       gameInitialized = false;
       currentState = GameState::mainMenu;
     }
@@ -468,4 +471,55 @@ void NormalGame::toggleColorModeBanner()
   Renderer::gotoxy(47, 10);
   std::cout << (colorMode ? "(ON)" : "(OFF)");
   std::cout.flush();
+}
+
+//////////////////////////////////////////     closeRecordingFiles     /////////////////////////////////////////////
+
+void NormalGame::closeRecordingFiles()
+{
+    if (!saveMode) return;
+    
+    disableRecording();
+    if (resultFile.is_open()) resultFile.close();
+}
+
+//////////////////////////////////////////     resetRecordingFiles     /////////////////////////////////////////////
+
+void NormalGame::resetRecordingFiles()
+{
+    if (!saveMode) return;
+
+    closeRecordingFiles();
+
+    // Re-open files (truncating them)
+    enableRecording("adv-world.steps.txt");
+    resultFile.open("adv-world.result.txt");
+
+    // Generate new seed
+    randomSeed = std::random_device{}();
+
+    // Write header with new seed
+    writeStepsHeader();
+}
+
+//////////////////////////////////////////     startNewGame     /////////////////////////////////////////////
+
+void NormalGame::startNewGame()
+{
+    if (saveMode && (!isGameInitialized() || !recordFile.is_open()))
+    {
+        resetRecordingFiles();
+        // initializeRooms needs the seed if we want it used, though strictly 
+        // initializeRooms(seed) is called in constructor. 
+        // When resetting, we might want to re-shuffle.
+        // base Game::startNewGame() calls initializeRooms() if rooms are empty.
+        // But here we want to force re-initialization if needed or just update the seed.
+        
+        // Actually, Game::startNewGame resets cycleCount and re-inits players.
+        // If we want new rooms/riddles based on new seed, we might need to clear rooms.
+        rooms.clear();
+        initializeRooms(randomSeed);
+    }
+    
+    Game::startNewGame();
 }
