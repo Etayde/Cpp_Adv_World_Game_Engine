@@ -46,8 +46,8 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer, Game *gam
 
     displayFeedback(correct);
 
-    playExitAnimation();
-
+    playRiddleAnimation();
+    
     if (room != nullptr) room->draw();
 
     if (correct) return RiddleResult::SOLVED;
@@ -155,22 +155,18 @@ void Riddle::displayFeedback(bool correct) const
 
 void Riddle::playRiddleAnimation() const 
 { 
-    // Clear any pending keyboard input
     while (check_kbhit()) get_char_nonblocking();
     
     if (!Renderer::shouldRender()) return;
     
-    // Animation parameters matching displayRiddleQuestion positioning
     const int startX = 11;
     const int startY = 4;
-    const int frameHeight = 16;
-    const int frameWidth = 56;  // Length of riddlePopupScreen rows
-    const int waveDelay = 30;   // Delay between each row appearing
+    const int frameHeight = 16; // Number of riddlePopupScreen rows (in Layouts.h)
+    const int frameWidth = 56;  // Length of riddlePopupScreen rows (in Layouts.h)
+    const int waveDelay = 30;
     
-    // Wave animation: draw rows one by one, then clear, twice
     for (int pulse = 0; pulse < 2; pulse++)
     {
-        // Wave in: draw each row from top to bottom with delay
         for (int i = 0; i < frameHeight; i++)
         {
             Renderer::printAt(startX, startY + i, riddlePopupScreen[i]);
@@ -178,9 +174,8 @@ void Riddle::playRiddleAnimation() const
             Renderer::sleep_ms(waveDelay);
         }
         
-        Renderer::sleep_ms(100);  // Brief pause at full display
+        Renderer::sleep_ms(100);
         
-        // Wave out: clear each row from top to bottom with delay
         for (int i = 0; i < frameHeight; i++)
         {
             Renderer::gotoxy(startX, startY + i);
@@ -190,51 +185,9 @@ void Riddle::playRiddleAnimation() const
             Renderer::sleep_ms(waveDelay);
         }
         
-        Renderer::sleep_ms(80);  // Brief pause before next wave
-    }
+        Renderer::sleep_ms(80);
     
-    // Small pause before showing the actual riddle content
     Renderer::sleep_ms(100);
-}
-
-//////////////////////////////////////////     playExitAnimation       //////////////////////////////////////////
-
-void Riddle::playExitAnimation() const
-{
-    if (!Renderer::shouldRender()) return;
-    
-    // Animation parameters matching displayRiddleQuestion positioning
-    const int startX = 11;
-    const int startY = 4;
-    const int frameHeight = 16;
-    const int frameWidth = 56;  // Length of riddlePopupScreen rows
-    const int waveDelay = 30;   // Delay between each row appearing
-    
-    // Wave animation: draw rows one by one, then clear, twice
-    for (int pulse = 0; pulse < 2; pulse++)
-    {
-        // Wave in: draw each row from top to bottom with delay
-        for (int i = 0; i < frameHeight; i++)
-        {
-            Renderer::printAt(startX, startY + i, riddlePopupScreen[i]);
-            Renderer::flush();
-            Renderer::sleep_ms(waveDelay);
-        }
-        
-        Renderer::sleep_ms(100);  // Brief pause at full display
-        
-        // Wave out: clear each row from top to bottom with delay
-        for (int i = 0; i < frameHeight; i++)
-        {
-            Renderer::gotoxy(startX, startY + i);
-            for (int j = 0; j < frameWidth; j++)
-                Renderer::print(' ');
-            Renderer::flush();
-            Renderer::sleep_ms(waveDelay);
-        }
-        
-        Renderer::sleep_ms(80);  // Brief pause before next wave
-    }
 }
 
 //////////////////////////////////////////        checkAnswer           //////////////////////////////////////////

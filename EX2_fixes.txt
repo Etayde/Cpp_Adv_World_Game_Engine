@@ -1,0 +1,8 @@
+EX2 Fixes
+=========
+
+Issue: Hardcoded screen file identifiers (fileNumber starting from 1 in Game::initializeRooms)
+
+Fix: Added LevelLoader::discoverLevelFiles() which uses std::filesystem to dynamically 
+discover all .screen and .screen.txt files in the working directory. The game now 
+supports adding/removing/renaming screen files without code changes.

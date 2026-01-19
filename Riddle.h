@@ -45,7 +45,6 @@ public:
     bool displayRiddleQuestion();
     int getPlayerAnswer(const Game* gameContext = nullptr) const;
     void displayFeedback(bool correct) const;
-    void playExitAnimation() const;
     bool checkAnswer(int playerAnswer) const;
     void reset()
     {
