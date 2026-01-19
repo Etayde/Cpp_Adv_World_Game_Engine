@@ -279,7 +279,6 @@ void Player::draw(Room *room)
 
   if (isRespawning() && respawnTimer % 2 != 0) return;
   Renderer::print(sprite);
-  Renderer::flush();
 }
 
 //////////////////////////////////////////        pickupItem       /////////////////////////////////////////////

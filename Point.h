@@ -29,13 +29,11 @@ public:
     void draw() const
     {
         Renderer::printAt(x, y, sprite);
-        Renderer::flush();
     }
 
     void draw(char c) const
     {
         Renderer::printAt(x, y, c);
-        Renderer::flush();
     }
 
     void move();

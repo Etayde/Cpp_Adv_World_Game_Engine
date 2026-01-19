@@ -13,15 +13,12 @@ std::vector<std::string> LevelLoader::discoverLevelFiles()
 {
   std::vector<std::string> files;
   
-  // Use std::filesystem to iterate over the current directory
-  // We use error_code to prevent crashing if the directory doesn't exist (though "." always should)
   std::error_code ec;
   for (const auto& entry : fs::directory_iterator(".", ec))
   {
       if (entry.is_regular_file())
       {
           std::string filename = entry.path().filename().string();
-          // Check for .screen extension logic
           if (filename.length() >= 7 && 
               filename.substr(filename.length() - 7) == ".screen")
           {
