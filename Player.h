@@ -46,7 +46,6 @@ static const int NUM_KEY_BINDINGS =
 // Represents a player character
 class Player
 {
-private:
   Point pos;
   GameObject *inventory;
   int playerId;

@@ -12,8 +12,7 @@ bool RiddleDatabase::isActive = false;
 
 void RiddleDatabase::initialize()
 {
-  if (isActive)
-    return;
+  if (isActive) return;
 
   std::ifstream file("riddle.txt");
   if (!file.is_open())
@@ -30,19 +29,13 @@ void RiddleDatabase::initialize()
     if (line.find("---RIDDLE---") != std::string::npos)
     {
       std::string question;
-      if (!std::getline(file, question))
-        break;
+      if (!std::getline(file, question)) break;
 
       std::string opts[4];
-      for (int i = 0; i < 4; i++)
-      {
-        if (!std::getline(file, opts[i]))
-          break;
-      }
+      for (int i = 0; i < 4; i++) if (!std::getline(file, opts[i])) break;
 
       std::string answerLine;
-      if (!std::getline(file, answerLine))
-        break;
+      if (!std::getline(file, answerLine)) break;
 
       int correctAnswer = std::stoi(answerLine) - 1;
 
@@ -61,11 +54,7 @@ const RiddleData *RiddleDatabase::getRiddle(int riddleId)
 {
   initialize();
 
-  for (const RiddleData &r : riddles)
-  {
-    if (r.riddleId == riddleId)
-      return &r;
-  }
+  for (const RiddleData &r : riddles) if (r.riddleId == riddleId) return &r;
 
   return nullptr;
 }

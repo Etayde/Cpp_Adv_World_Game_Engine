@@ -79,33 +79,58 @@ struct DoorRequirements
 // Represents a single game room
 class Room
 {
-private:
+  struct WallCheckResult
+  {
+    bool valid;
+    Direction projectionDirection;
+    Point anchorPosition;
+
+    WallCheckResult()
+        : valid(false), projectionDirection(Direction::STAY),
+          anchorPosition(-1, -1) {}
+  };
+
   int roomId;
   Point legendTopLeft;
   bool active;
   bool completed;
-
   const Screen *baseLayout;
   std::vector<Modification> mods;
-
   std::vector<GameObject *> objects;
   std::vector<Spring *> springs;
   std::vector<Obstacle *> obstacles;
-
   int totalKeysInRoom;
   int keysCollected;
   int activeSwitches;
   int totalSwitches;
-
   std::vector<DoorRequirements> doorReqs;
-
   int nextRoomId;
   int prevRoomId;
   Point spawnPoint;
   Point spawnPointFromNext;
-
   std::vector<DarkZone> darkZones;
   bool visibilityMap[MAX_Y][MAX_X];
+
+  void copyObjectsFrom(const Room &other);
+  void deleteAllObjects();
+  void initVisibility();
+
+  char getCharAt(int x, int y) const;
+
+  Point findSmartSpawn(Point base);
+
+  Direction detectOrientation(const std::vector<Point> &positions);
+  std::vector<Point> sortPositions(const std::vector<Point> &positions,
+                                   Direction orientation);
+  WallCheckResult checkWallAdjacency(const std::vector<Point> &sorted,
+                                     Direction orientation);
+  void scanAndCreateSprings();
+  void createMultiCellObject(const std::vector<Point> &allObjCells);
+  void createSpringFromGroup(const std::vector<Point> &group);
+  void createObstacleFromGroup(
+      const std::vector<Point> &group,
+      std::unordered_map<Point, std::vector<Point>> &neighbors);
+
 
 public:
   Room();
@@ -199,9 +224,6 @@ public:
   Point getSpawnPoint(int playerId);
   Point getSpawnPointFromNext(int playerId);
 
-private:
-
-public:
   // Collision & movement
   bool isBlocked(int x, int y);
   bool hasLineOfSight(int x1, int y1, int x2, int y2);
@@ -221,36 +243,4 @@ public:
   void updateVisibility(Player *p1, Player *p2);
   void lightRadius(int centerX, int centerY, int radius);
   bool isVisible(int x, int y) const;
-
-private:
-  void copyObjectsFrom(const Room &other);
-  void deleteAllObjects();
-  void initVisibility();
-
-  char getCharAt(int x, int y) const;
-
-  struct WallCheckResult
-  {
-    bool valid;
-    Direction projectionDirection;
-    Point anchorPosition;
-
-    WallCheckResult()
-        : valid(false), projectionDirection(Direction::STAY),
-          anchorPosition(-1, -1) {}
-  };
-
-  Point findSmartSpawn(Point base);
-
-  Direction detectOrientation(const std::vector<Point> &positions);
-  std::vector<Point> sortPositions(const std::vector<Point> &positions,
-                                   Direction orientation);
-  WallCheckResult checkWallAdjacency(const std::vector<Point> &sorted,
-                                     Direction orientation);
-  void scanAndCreateSprings();
-  void createMultiCellObject(const std::vector<Point> &allObjCells);
-  void createSpringFromGroup(const std::vector<Point> &group);
-  void createObstacleFromGroup(
-      const std::vector<Point> &group,
-      std::unordered_map<Point, std::vector<Point>> &neighbors);
 };

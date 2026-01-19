@@ -7,8 +7,7 @@
 
 void Torch::illuminate(Room *room, int playerX, int playerY) const
 {
-    if (room == nullptr)
-        return;
+    if (room == nullptr) return;
 
     if (room->isInDarkZone(playerX, playerY))
     {

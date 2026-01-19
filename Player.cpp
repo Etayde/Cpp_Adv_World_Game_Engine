@@ -84,30 +84,19 @@ void Player::clearInventory()
 
 void Player::copyInventoryFrom(const Player &other)
 {
-  if (other.inventory != nullptr)
-  {
-    inventory = other.inventory->clone();
-  }
+  if (other.inventory != nullptr) inventory = other.inventory->clone();
 }
 
 //////////////////////////////////////////     Movement Helpers       /////////////////////////////////////////////
 
-bool Player::isStationary() const
-{
-  return (pos.getDiffX() == 0 && pos.getDiffY() == 0);
-}
+bool Player::isStationary() const{ return (pos.getDiffX() == 0 && pos.getDiffY() == 0); }
 
-bool Player::isWithinAbsoluteBounds(int x, int y) const
-{
-  return (x >= 0 && x < MAX_X && y >= 1 && y < MAX_Y - 1);
-}
+bool Player::isWithinAbsoluteBounds(int x, int y) const{ return (x >= 0 && x < MAX_X && y >= 1 && y < MAX_Y - 1); }
 
-bool Player::canMoveToBoundaryPosition(int x, int y, Room *room) const
-{
+bool Player::canMoveToBoundaryPosition(int x, int y, Room *room) const{
   bool atBoundaryColumn = (x < 1 || x >= MAX_X - 1);
 
-  if (!atBoundaryColumn)
-    return true;
+  if (!atBoundaryColumn) return true;
 
   GameObject *obj = room->getObjectAt(x, y);
   return (obj != nullptr && obj->getType() == ObjectType::DOOR);
@@ -125,15 +114,11 @@ void Player::erase(Room *room)
   GameObject *obj = room->getObjectAt(pos.getX(), pos.getY());
 
   char restoreChar;
-  if (obj != nullptr && obj->getType() == ObjectType::DOOR)
-  {
-    restoreChar = obj->getSprite();
-  }
+  if (obj != nullptr && obj->getType() == ObjectType::DOOR) restoreChar = obj->getSprite();
   else
   {
     char currentChar = static_cast<char>(currentType);
-    restoreChar =
-        (currentChar == ' ' || currentChar == sprite) ? ' ' : currentChar;
+    restoreChar = (currentChar == ' ' || currentChar == sprite) ? ' ' : currentChar;
   }
 
   Renderer::printAt(pos.getX(), pos.getY(), restoreChar);
@@ -141,13 +126,9 @@ void Player::erase(Room *room)
 
 //////////////////////////////////////////  Respawn and Death Helpers       /////////////////////////////////////////////
 
-void Player::startRespawn()
-{
-  respawnTimer = PlayerConstants::RESPAWN_DURATION_FRAMES;
-}
+void Player::startRespawn(){ respawnTimer = PlayerConstants::RESPAWN_DURATION_FRAMES; }
 
-void Player::respawn(Room *room)
-{
+void Player::respawn(Room *room){
 
   erase(room);
 
@@ -155,13 +136,11 @@ void Player::respawn(Room *room)
   springMomentum.resetMomentum();
   if (room)
   {
-    if (getInventory() != nullptr)
-    {
-      dropItem(room);
-    }
+    if (getInventory() != nullptr) dropItem(room);
+    
     Point spawn = room->getSpawnPoint(playerId);
-    if (playerId == 2)
-      spawn.setY(spawn.getY() + 1);
+    
+    if (playerId == 2) spawn.setY(spawn.getY() + 1);
     pos = spawn;
   }
 
@@ -173,9 +152,7 @@ void Player::loseLife(Room *room, Game *game)
 {
   decreaseLives();
   respawn(room);
-  if (game != nullptr) {
-    game->reportLifeLost(playerId);
-  }
+  if (game != nullptr) game->reportLifeLost(playerId);
 }
 
 void Player::decreaseLives()
@@ -297,13 +274,7 @@ void Player::draw(Room *room)
 
   if (waitingAtDoor)
   {
-    // If waiting at a "Forward" door (not previous room), disappear (Wait State).
-    // If waiting at "Backward" door (previous room), stay visible (Legacy behavior).
-    if (doorId != room->getPrevRoomId())
-    {
-      erase(room);
-      return;
-    }
+    if (doorId != room->getPrevRoomId()) { erase(room); return; }
   }
 
   if (isRespawning() && respawnTimer % 2 != 0) return;
@@ -377,14 +348,14 @@ Point Player::dropItem(Room *room)
     dropPos.setX(dropX);
     dropPos.setY(dropY);
 
-    if (inventory->getType() == ObjectType::KEY)
-      keyCount--;
+    if (inventory->getType() == ObjectType::KEY) keyCount--;
 
     clearInventory();
     clearInventory();
 
     Renderer::printAt(dropX, dropY, droppedItem->getSprite());
   }
+
   else delete droppedItem;
 
   return dropPos;
@@ -399,8 +370,8 @@ void Player::performAction(Action action, Room *room)
   if (frames > 0)
   {
     Direction inputDir = actionToDirection(action);
-
     if (canApplyInputDuringLaunch(inputDir)) applyPerpendicularVelocity(inputDir);
+    
     return;
   }
 

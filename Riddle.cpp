@@ -65,8 +65,7 @@ bool Riddle::displayRiddleQuestion()
     int startX = 11;
     int startY = 4;
     int endY = 16;
-    for (int i = 0; i < endY; i++)
-        Renderer::printAt(startX, startY + i, riddlePopupScreen[i]);
+    for (int i = 0; i < endY; i++) Renderer::printAt(startX, startY + i, riddlePopupScreen[i]);
 
     Renderer::gotoxy(13, 6);
     Renderer::print(data->question);
@@ -154,10 +153,41 @@ void Riddle::displayFeedback(bool correct) const
 
 //////////////////////////////////////////    playRiddleAnimation      //////////////////////////////////////////
 
-void Riddle::playRiddleAnimation() const
-{
-    while (check_kbhit())
-        get_char_nonblocking();
+void Riddle::playRiddleAnimation() const 
+{ 
+    // Clear any pending keyboard input
+    while (check_kbhit()) get_char_nonblocking();
+    
+    if (!Renderer::shouldRender()) return;
+    
+    // Animation parameters matching displayRiddleQuestion positioning
+    const int startX = 11;
+    const int startY = 4;
+    const int frameHeight = 16;
+    const int frameWidth = 56;  // Length of riddlePopupScreen rows
+    
+    // Pulse animation: draw and clear the empty popup frame twice
+    for (int pulse = 0; pulse < 2; pulse++)
+    {
+        // Draw the popup frame (without content)
+        for (int i = 0; i < frameHeight; i++)
+            Renderer::printAt(startX, startY + i, riddlePopupScreen[i]);
+        Renderer::flush();
+        Renderer::sleep_ms(120);
+        
+        // Clear the popup area (restore with spaces)
+        for (int i = 0; i < frameHeight; i++)
+        {
+            Renderer::gotoxy(startX, startY + i);
+            for (int j = 0; j < frameWidth; j++)
+                Renderer::print(' ');
+        }
+        Renderer::flush();
+        Renderer::sleep_ms(80);
+    }
+    
+    // Small pause before showing the actual riddle content
+    Renderer::sleep_ms(50);
 }
 
 //////////////////////////////////////////     playExitAnimation       //////////////////////////////////////////

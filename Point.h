@@ -12,7 +12,6 @@
 // 2D point
 class Point
 {
-private:
     int x;
     int y;
     int diff_x;

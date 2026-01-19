@@ -115,10 +115,8 @@ Room &Room::operator=(const Room &other)
 void Room::copyObjectsFrom(const Room &other)
 {
   objects.clear();
-  for (GameObject *obj : other.objects)
-  {
+  for (GameObject *obj : other.objects) 
     if (obj != nullptr) objects.push_back(obj->clone());
-  }
 
   springs.clear();
   std::unordered_map<Spring *, Spring *> springMap;
@@ -203,10 +201,8 @@ void Room::loadObjects(const std::vector<int> *riddleIds, int *riddleIndex)
       if (ch == '?')
       {
         if (riddleIds != nullptr && riddleIndex != nullptr &&
-            *riddleIndex < static_cast<int>(riddleIds->size()))
-        {
-             riddleId = (*riddleIds)[(*riddleIndex)++];
-        }
+             *riddleIndex < static_cast<int>(riddleIds->size()))
+          riddleId = (*riddleIds)[(*riddleIndex)++];
         else continue;
       }
 

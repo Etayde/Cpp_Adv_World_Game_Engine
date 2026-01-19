@@ -13,10 +13,7 @@ void Obstacle::initialize(const std::vector<ObstacleBlock *> &obstacleBlocks,
 {
     blocks = obstacleBlocks;
     weight = static_cast<int>(blocks.size());
-    for (size_t i = 0; i < blocks.size(); i++)
-    {
-        blocks[i]->setBlockIndex(static_cast<int>(i));
-    }
+    for (size_t i = 0; i < blocks.size(); i++) blocks[i]->setBlockIndex(static_cast<int>(i));
     initEdges(neighbors);
 }
 
@@ -24,11 +21,8 @@ void Obstacle::initialize(const std::vector<ObstacleBlock *> &obstacleBlocks,
 
 bool Obstacle::move(Direction dir, Room *room, int force)
 {
-    if (movedThisFrame)
-        return false;
-
-    if (force < weight)
-        return false;
+    if (movedThisFrame) return false;
+    if (force < weight) return false;
 
     int dx = 0, dy = 0;
     switch (dir)
@@ -52,10 +46,7 @@ bool Obstacle::move(Direction dir, Room *room, int force)
     for (ObstacleBlock *block : edges[dir])
     {
         Point pos = block->getPosition();
-        if (room->isBlocked(pos.getX() + dx, pos.getY() + dy))
-        {
-            return false;
-        }
+        if (room->isBlocked(pos.getX() + dx, pos.getY() + dy)) return false;
     }
 
     for (ObstacleBlock *block : blocks)
@@ -85,13 +76,11 @@ std::vector<Direction> ObstacleBlock::neighborsToEdgeDirections(std::unordered_m
     std::vector<Direction> edgeDirections;
     std::vector<Point> neighborPositions = neighbors[Point(x, y)];
 
-    if (neighborPositions.empty())
-        return {};
+    if (neighborPositions.empty()) return {};
 
     for (const Point &np : neighborPositions)
     {
-        if (np.getX() == x && np.getY() == y - 1)
-            edgeDirections.push_back(Direction::UP);
+        if (np.getX() == x && np.getY() == y - 1) edgeDirections.push_back(Direction::UP);
         else if (np.getX() == x && np.getY() == y + 1)
             edgeDirections.push_back(Direction::DOWN);
         else if (np.getX() == x - 1 && np.getY() == y)
@@ -112,10 +101,8 @@ void Obstacle::initEdges(std::unordered_map<Point, std::vector<Point>> &neighbor
         if (neighbors.find(block->getPosition()) != neighbors.end())
         {
             std::vector<Direction> blockEdges = block->neighborsToEdgeDirections(neighbors);
-            for (const Direction &dir : blockEdges)
-            {
-                edges[dir].push_back(block);
-            }
+            
+            for (const Direction &dir : blockEdges) edges[dir].push_back(block);
         }
     }
 }
@@ -162,10 +149,7 @@ bool Obstacle::tryPush(Direction dir, int force, Room *room, Player *pusher)
 
 bool ObstacleBlock::onExplosion()
 {
-    if (parentObstacle)
-    {
-        parentObstacle->markForReconstruction();
-    }
+    if (parentObstacle) parentObstacle->markForReconstruction();
     return true;
 }
 
@@ -176,14 +160,10 @@ void Obstacle::reconstruct(Room *room)
     std::vector<ObstacleBlock *> remaining;
     for (ObstacleBlock *block : blocks)
     {
-        if (block && block->isActive())
-            remaining.push_back(block);
+        if (block && block->isActive()) remaining.push_back(block);
     }
 
-    if (remaining.empty())
-    {
-        return;
-    }
+    if (remaining.empty()) return;
 
     std::vector<std::vector<ObstacleBlock *>> components = findConnectedComponents(remaining);
 
@@ -191,11 +171,10 @@ void Obstacle::reconstruct(Room *room)
     {
         blocks = remaining;
         weight = static_cast<int>(blocks.size());
-        for (size_t i = 0; i < blocks.size(); i++)
-        {
-            blocks[i]->setBlockIndex(static_cast<int>(i));
-        }
+        for (size_t i = 0; i < blocks.size(); i++) blocks[i]->setBlockIndex(static_cast<int>(i));
+        
         std::unordered_map<Point, std::vector<Point>> neighbors = buildNeighborsMap(remaining);
+        
         initEdges(neighbors);
         resetPushState();
     }
@@ -203,11 +182,10 @@ void Obstacle::reconstruct(Room *room)
     {
         blocks = components[0];
         weight = static_cast<int>(blocks.size());
-        for (size_t i = 0; i < blocks.size(); i++)
-        {
-            blocks[i]->setBlockIndex(static_cast<int>(i));
-        }
+        for (size_t i = 0; i < blocks.size(); i++) blocks[i]->setBlockIndex(static_cast<int>(i));
+        
         std::unordered_map<Point, std::vector<Point>> neighbors = buildNeighborsMap(components[0]);
+        
         initEdges(neighbors);
         resetPushState();
 
@@ -301,8 +279,7 @@ std::unordered_map<Point, std::vector<Point>> Obstacle::buildNeighborsMap(
 
     for (ObstacleBlock *block : blocks)
     {
-        if (!block)
-            continue;
+        if (!block) continue;
 
         Point pos = block->getPosition();
         Point adjacent[4] = {
@@ -321,10 +298,7 @@ std::unordered_map<Point, std::vector<Point>> Obstacle::buildNeighborsMap(
                 }
             }
 
-            if (!isObstacle)
-            {
-                neighbors[pos].push_back(adj);
-            }
+            if (!isObstacle) neighbors[pos].push_back(adj);
         }
     }
 

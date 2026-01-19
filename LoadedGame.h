@@ -18,6 +18,23 @@ class LoadedGame : public Game {
     std::string testFailureDetails;
     long quitCycle;
 
+private:
+    ErrorCode loadActions(const string& filename) { return steps.loadFromFile(filename); }
+    ErrorCode loadExpectedResults(const string& filename);
+    bool verifyEvent(const GameEvent& actual);
+    void testFailed(const std::string& details);
+    void checkMissedEvents();
+    void showQuitScreen();
+    bool shouldQuit() const { return (quitCycle >= 0 && cycleCount >= static_cast<unsigned long>(quitCycle)); }
+
+protected:
+    void reportScreenChange(int roomId) override;
+    void reportLifeLost(int playerId) override;
+    void onRiddleAttempt(const std::string& question, int answer, bool correct) override;
+    void reportQuit() override;
+    int getRiddleInput(unsigned long cycle) override;
+    void reportRiddleAnswer(int answer) override { (void)answer; }
+
 public:
     LoadedGame(const string &filename, bool silent = false);
     LoadedGame(int argc, char* argv[]);
@@ -27,20 +44,4 @@ public:
     void gameLoop() override;
     void changeRoom(int newRoomId, bool goingForward) override;
 
-protected:
-    void reportScreenChange(int roomId) override;
-    void reportLifeLost(int playerId) override;
-    void onRiddleAttempt(const std::string& question, int answer, bool correct) override;
-    void reportQuit() override;
-    int getRiddleInput(unsigned long cycle) override;
-    void reportRiddleAnswer(int answer) override { (void)answer; } // No-op for load mode recording override
-
-private:
-    ErrorCode loadActions(const string& filename) { return steps.loadFromFile(filename); }
-    ErrorCode loadExpectedResults(const string& filename);
-    bool verifyEvent(const GameEvent& actual);
-    void testFailed(const std::string& details);
-    void checkMissedEvents();
-    void showQuitScreen();
-    bool shouldQuit() const { return (quitCycle >= 0 && cycleCount >= static_cast<unsigned long>(quitCycle)); }
 };

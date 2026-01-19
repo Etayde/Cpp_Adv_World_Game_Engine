@@ -19,16 +19,16 @@ private:
   std::string ownedData[MAX_Y];
 
 public:
-  Screen(const char *layout[MAX_Y])
-  {
-    for (int i = 0; i < MAX_Y; i++)
-      screen[i] = layout[i];
-  }
-
   Screen()
   {
     for (int i = 0; i < MAX_Y; i++)
       screen[i] = nullptr;
+  }
+
+  Screen(const char *layout[MAX_Y])
+  {
+    for (int i = 0; i < MAX_Y; i++)
+      screen[i] = layout[i];
   }
 
   Screen(const std::string layout[MAX_Y])
@@ -56,22 +56,5 @@ public:
 
   ObjectType objectIs(const Point &p) const;
 
-  void draw() const
-  {
-    Renderer::clrscr();
-    Renderer::gotoxy(0, 0);
-
-    for (int i = 0; i < MAX_Y - 1; ++i)
-    {
-      if (screen[i] != nullptr)
-      {
-        Renderer::print(screen[i]);
-        Renderer::print('\n');
-      }
-    }
-
-    if (screen[MAX_Y - 1] != nullptr)
-      Renderer::print(screen[MAX_Y - 1]);
-    Renderer::flush();
-  }
+  void draw() const;
 };

@@ -17,9 +17,7 @@ private:
 
 public:
     Momentum()
-        : activeState(false), dx(0), dy(0), launchFramesRemaining(0), launchDir(Direction::STAY)
-    {
-    }
+        : activeState(false), dx(0), dy(0), launchFramesRemaining(0), launchDir(Direction::STAY) {}
 
     Momentum &operator=(const Momentum &other);
     Momentum(const Momentum &other)

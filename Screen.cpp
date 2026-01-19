@@ -5,17 +5,11 @@
 
 //////////////////////////////////////////         getCharAt          //////////////////////////////////////////
 
-char Screen::getCharAt(const Point &p) const
-{
-    return getCharAt(p.getX(), p.getY());
-}
+char Screen::getCharAt(const Point &p) const { return getCharAt(p.getX(), p.getY()); }
 
 //////////////////////////////////////////          isWall            //////////////////////////////////////////
 
-bool Screen::isWall(const Point &p) const
-{
-    return getCharAt(p) == 'W';
-}
+bool Screen::isWall(const Point &p) const { return getCharAt(p) == 'W'; }
 
 //////////////////////////////////////////         isObject           //////////////////////////////////////////
 
@@ -63,4 +57,25 @@ ObjectType Screen::objectIs(const Point &p) const
     default:
         return ObjectType::AIR;
     }
+}
+
+//////////////////////////////////////////          draw            //////////////////////////////////////////
+
+void Screen::draw() const
+{
+    Renderer::clrscr();
+    Renderer::gotoxy(0, 0);
+
+    for (int i = 0; i < MAX_Y - 1; ++i)
+    {
+      if (screen[i] != nullptr)
+      {
+        Renderer::print(screen[i]);
+        Renderer::print('\n');
+      }
+    }
+
+    if (screen[MAX_Y - 1] != nullptr)
+      Renderer::print(screen[MAX_Y - 1]);
+    Renderer::flush();
 }

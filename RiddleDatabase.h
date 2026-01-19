@@ -21,8 +21,7 @@ struct RiddleData
       : riddleId(id), correctAnswerIndex(correct)
   {
     question = q;
-    for (int i = 0; i < 4; i++)
-      options[i] = opt[i];
+    for (int i = 0; i < 4; i++) options[i] = opt[i];
   }
 };
 
@@ -30,7 +29,6 @@ struct RiddleData
 
 class RiddleDatabase
 {
-private:
   static std::vector<RiddleData> riddles;
   static bool isActive;
 

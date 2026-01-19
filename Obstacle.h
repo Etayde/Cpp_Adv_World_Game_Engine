@@ -16,7 +16,6 @@ class Obstacle;
 
 class ObstacleBlock : public StaticObject
 {
-private:
     Obstacle *parentObstacle;
     int blockIndex;
     bool is_edge;
@@ -44,16 +43,13 @@ public:
 // A movable object that blocks movement
 class Obstacle
 {
-private:
     std::vector<ObstacleBlock *> blocks;
     std::unordered_map<Direction, std::vector<ObstacleBlock *>> edges;
     int weight = blocks.size();
-
     int accumulatedForce;
     Direction pushDirection;
     std::vector<Player *> pushers;
     bool movedThisFrame;
-
     bool needsReconstructionFlag = false;
 
     static std::vector<std::vector<ObstacleBlock *>> findConnectedComponents(

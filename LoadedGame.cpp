@@ -49,10 +49,7 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
     {
         std::string arg(argv[i]);
 
-        if (arg == "-silent")
-        {
-            silent = true;
-        }
+        if (arg == "-silent") silent = true;
     }
 
     silentMode = silent;
@@ -103,21 +100,16 @@ void LoadedGame::handleInput()
 
 void LoadedGame::gameLoop()
 {
-    if (getCurrentRoomId() == 0 && cycleCount == 0)
-    {
-        reportScreenChange(0);
-    }
+    if (getCurrentRoomId() == 0 && cycleCount == 0) reportScreenChange(0);
 
     Room *room = getCurrentRoom();
 
-    if (room)
-    {
-        room->draw();
-    }
+    if (room) room->draw();
+    
     player1.draw(room);
     player2.draw(room);
-    if (room)
-        room->drawLegend(&player1, &player2);
+    
+    if (room) room->drawLegend(&player1, &player2);
 
     while (currentState == GameState::inGame)
     {
@@ -152,15 +144,10 @@ void LoadedGame::run()
       if (silentMode)
       {
         if (testPassed && expectedEventIndex < expectedEvents.size())
-        {
           testFailed("Expected more events (got " + std::to_string(expectedEventIndex) +
                      ", expected " + std::to_string(expectedEvents.size()) + ")");
-        }
 
-        if (testPassed)
-        {
-          std::cout << "Test passed" << std::endl;
-        }
+        if (testPassed) std::cout << "Test passed" << std::endl;
         else
         {
           std::cout << "Test not passed" << std::endl;
@@ -200,18 +187,13 @@ void LoadedGame::run()
     case GameState::quit:
       if (silentMode)
       {
-        reportQuit();  // Verify quit event against expected
+        reportQuit();
 
         if (testPassed && expectedEventIndex < expectedEvents.size())
-        {
           testFailed("Expected more events (got " + std::to_string(expectedEventIndex) +
                      ", expected " + std::to_string(expectedEvents.size()) + ")");
-        }
 
-        if (testPassed)
-        {
-          std::cout << "Test passed" << std::endl;
-        }
+        if (testPassed) std::cout << "Test passed" << std::endl;
         else
         {
           std::cout << "Test not passed" << std::endl;
@@ -256,10 +238,7 @@ ErrorCode LoadedGame::loadExpectedResults(const string& filename)
             return ErrorCode::READ_ERROR;
         }
 
-        if (event.type == GameEventType::QUIT)
-        {
-            quitCycle = static_cast<long>(event.cycle);
-        }
+        if (event.type == GameEventType::QUIT) quitCycle = static_cast<long>(event.cycle);
 
         expectedEvents.push_back(event);
     }
@@ -275,9 +254,8 @@ void LoadedGame::changeRoom(int newRoomId, bool goingForward)
 {
     Game::changeRoom(newRoomId, goingForward);
     
-    if (newRoomId >= 0 && newRoomId < static_cast<int>(rooms.size())) {
+    if (newRoomId >= 0 && newRoomId < static_cast<int>(rooms.size())) 
         reportScreenChange(newRoomId);
-    }
 }
 
 ///////////////////////////////////////////    verifyEvent    /////////////////////////////////////////////
@@ -368,8 +346,7 @@ void LoadedGame::checkMissedEvents()
 
 void LoadedGame::reportScreenChange(int roomId)
 {
-    if (!silentMode)
-        return;
+    if (!silentMode) return;
 
     GameEvent actual(cycleCount, roomId);
     verifyEvent(actual);
@@ -379,8 +356,7 @@ void LoadedGame::reportScreenChange(int roomId)
 
 void LoadedGame::reportLifeLost(int playerId)
 {
-    if (!silentMode)
-        return;
+    if (!silentMode) return;
 
     GameEvent actual(cycleCount, currentRoomId, playerId);
     verifyEvent(actual);
@@ -390,8 +366,7 @@ void LoadedGame::reportLifeLost(int playerId)
 
 void LoadedGame::onRiddleAttempt(const std::string& question, int answer, bool correct)
 {
-    if (!silentMode)
-        return;
+    if (!silentMode) return;
 
     GameEvent actual(cycleCount, currentRoomId, question, answer, correct);
     verifyEvent(actual);
@@ -401,8 +376,7 @@ void LoadedGame::onRiddleAttempt(const std::string& question, int answer, bool c
 
 void LoadedGame::reportQuit()
 {
-    if (!silentMode)
-        return;
+    if (!silentMode) return;
 
     GameEvent actual(cycleCount, currentRoomId, GameEventType::QUIT);
     verifyEvent(actual);
@@ -423,10 +397,7 @@ int LoadedGame::getRiddleInput(unsigned long cycle)
     vector<ActionRecord> actions = steps.getActionsForCycle(cycle);
     for (const auto& action : actions)
     {
-        if (action.action == Action::ANSWER_RIDDLE)
-        {
-            return action.answer;
-        }
+        if (action.action == Action::ANSWER_RIDDLE) return action.answer;
     }
     return -1;
 }

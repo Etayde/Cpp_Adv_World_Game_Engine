@@ -2,6 +2,8 @@
 
 #include "Game.h"
 
+//////////////////////////////////////////////      MAIN       //////////////////////////////////////////
+
 int main(int argc, char* argv[])
 {
     Game* game = Game::createFromArgs(argc, argv);

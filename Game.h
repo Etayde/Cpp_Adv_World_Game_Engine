@@ -31,8 +31,6 @@ protected:
   int initErrorRoomId;
   GameOverMessege gameOverMessege;
   unsigned long cycleCount;
-
-
   GameState currentState;
   std::vector<Room> rooms;
   int currentRoomId;

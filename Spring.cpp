@@ -47,9 +47,7 @@ bool Spring::canCompressLink(int linkIndex, Direction playerDir) const
     if (linkIndex == 0) return true;
 
     for (int i = 0; i < linkIndex; i++)
-    {
         if (!links[i]->isCollapsed()) return false;
-    }
 
     if (links[linkIndex]->isCollapsed()) return false;
 
@@ -67,10 +65,7 @@ void Spring::compressLink(int linkIndex, Room *room)
 
 //////////////////////////////////////////  isFullyCompressed       //////////////////////////////////////////
 
-bool Spring::isFullyCompressed() const
-{
-    return compressedCount >= static_cast<int>(links.size());
-}
+bool Spring::isFullyCompressed() const { return compressedCount >= static_cast<int>(links.size()); }
 
 //////////////////////////////////////////   calculateLaunch        //////////////////////////////////////////
 

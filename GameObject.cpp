@@ -17,8 +17,7 @@ class Player;
 bool Switch::onInteract(Player *player, Room *room)
 {
 
-  if (player == nullptr || room == nullptr)
-    return false;
+  if (player == nullptr || room == nullptr) return false;
 
   toggle();
   draw();

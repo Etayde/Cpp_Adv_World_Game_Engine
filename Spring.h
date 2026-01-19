@@ -16,11 +16,25 @@ class Player;
 // Spring manager class
 class Spring
 {
-private:
     std::vector<SpringLink *> links;
     Point anchorPosition;
     Direction compressionDir;
     int compressedCount;
+
+    bool canCompressLink(int linkIndex, Direction playerDir) const;
+
+    void compressLink(int linkIndex, Room *room);
+
+    bool isFullyCompressed() const;
+    int getCompressionLevel() const { return compressedCount; }
+    int getLinkCount() const { return static_cast<int>(links.size()); }
+    bool playerSTAYcheck(Player &p, SpringLink &link) const;
+
+    Momentum calculateLaunchMomentum() const;
+    void resetCompression(Room *room);
+
+    // Getters
+    SpringLink *getPrevLink(const SpringLink *current) const;
 
 public:
     struct LaunchData
@@ -59,19 +73,5 @@ public:
     bool allLinksInactive() const;
 
 private:
-    bool canCompressLink(int linkIndex, Direction playerDir) const;
-
-    void compressLink(int linkIndex, Room *room);
-
-    bool isFullyCompressed() const;
-    int getCompressionLevel() const { return compressedCount; }
-    int getLinkCount() const { return static_cast<int>(links.size()); }
-    bool playerSTAYcheck(Player &p, SpringLink &link) const;
-
     LaunchData calculateLaunch() const;
-    Momentum calculateLaunchMomentum() const;
-    void resetCompression(Room *room);
-
-    // Getters
-    SpringLink *getPrevLink(const SpringLink *current) const;
 };

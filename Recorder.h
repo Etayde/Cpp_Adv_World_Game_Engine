@@ -21,16 +21,10 @@ struct GameEvent {
     unsigned long cycle;
     GameEventType type;
     int roomId;
-
-    // For LIFE_LOST
     int playerId;
-
-    // For RIDDLE_ANSWERED
     std::string question;
-    int answerGiven;  // 1-4
+    int answerGiven;
     bool wasCorrect;
-
-    // Default constructor
     GameEvent() : cycle(0), type(GameEventType::SCREEN_CHANGE), roomId(0),
                   playerId(0), answerGiven(0), wasCorrect(false) {}
 
@@ -67,7 +61,6 @@ struct ActionRecord
     unsigned long cycle;
     int playerId;
     Action action;
-
     int answer;
 
     ActionRecord() : cycle(0), playerId(0), action(Action::STAY), answer(-1) {}
@@ -85,31 +78,20 @@ struct ActionRecord
 class RecordedSteps
 {
 private:
+    unsigned int randomSeed = 0;
     vector<ActionRecord> actions;
     size_t currActionIndex;
 
 public:
     RecordedSteps() : currActionIndex(0) {}
-
     void addAction(const ActionRecord& record) { actions.push_back(record); }
-
     ErrorCode loadFromFile(const string& filename);
-
     const ActionRecord* getCurrentAction() const;
-
     void advanceToNextAction() { if (currActionIndex < actions.size()) currActionIndex++; }
-
     bool hasMoreActions() const { return currActionIndex < actions.size(); }
-
     vector<ActionRecord> getActionsForCycle(unsigned long cycle) const;
-
     ActionRecord getActionAt(size_t index) const { return actions[index]; }
-
     size_t getCurrIndex() const { return currActionIndex; }
-
     void setRandomSeed(unsigned int seed) { randomSeed = seed; }
     unsigned int getRandomSeed() const { return randomSeed; }
-
-private:
-    unsigned int randomSeed = 0;
 };

@@ -82,10 +82,7 @@ void NormalGame::run()
       break;
 
     case GameState::inGame:
-      if (!gameInitialized)
-      {
-        startNewGame(); // Base implements this, but we can override if needed
-      }
+      if (!gameInitialized) startNewGame();
       gameLoop();
       break;
 
