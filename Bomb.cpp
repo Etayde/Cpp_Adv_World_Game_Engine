@@ -110,6 +110,9 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
             if (static_cast<char>(type) >= '0' && static_cast<char>(type) <= '9')
                 continue;
 
+            // Add ALL valid cells to animation (not just destroyed ones)
+            explosionCells.push_back(Point(x, y));
+
             if (p1 && p1->getX() == x && p1->getY() == y)
                 result.player1Hit = true;
             if (p2 && p2->getX() == x && p2->getY() == y)
@@ -127,7 +130,6 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
                 if (obj->onExplosion())
                 {
                     currentRoom->setCharAt(x, y, ' ');
-                    explosionCells.push_back(Point(x, y));
                     obj->setActive(false);
                     result.objectsDestroyed++;
                 }
@@ -135,13 +137,11 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
             else if (type == ObjectType::BREAKABLE_WALL)
             {
                 currentRoom->setCharAt(x, y, ' ');
-                explosionCells.push_back(Point(x, y));
                 result.objectsDestroyed++;
             }
             else if (type != ObjectType::AIR && type != ObjectType::WALL)
             {
                 currentRoom->setCharAt(x, y, ' ');
-                explosionCells.push_back(Point(x, y));
                 result.objectsDestroyed++;
             }
         }
