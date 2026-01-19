@@ -284,6 +284,7 @@ void Game::update()
   room->drawLegend(&player1, &player2);
   player1.draw(room);
   player2.draw(room);
+  room->drawExplosions();
 
   checkRoomTransitions();
 

@@ -290,48 +290,6 @@ void Room::draw()
   }
 
   drawDarkness();
-
-  // Draw and update explosion animations
-  for (auto it = explosions.begin(); it != explosions.end(); )
-  {
-    PostExplosion& explosion = *it;
-    
-    // Draw based on blink phase
-    if (explosion.shouldShowWave())
-    {
-      set_color(Color::Yellow);
-      for (const Point& cell : explosion.cells)
-      {
-        Renderer::printAt(cell.getX(), cell.getY(), '~');
-      }
-      reset_color();
-    }
-    else
-    {
-      for (const Point& cell : explosion.cells)
-      {
-        Renderer::printAt(cell.getX(), cell.getY(), ' ');
-      }
-    }
-    
-    // Decrement timer
-    explosion.timer--;
-    
-    // Remove finished explosions
-    if (explosion.isFinished())
-    {
-      // Final clear
-      for (const Point& cell : explosion.cells)
-      {
-        Renderer::printAt(cell.getX(), cell.getY(), ' ');
-      }
-      it = explosions.erase(it);
-    }
-    else
-    {
-      ++it;
-    }
-  }
 }
 
 //////////////////////////////////////////        drawDarkness       /////////////////////////////////////////////
@@ -1369,4 +1327,49 @@ Point Room::getSpawnPointFromNext(int playerId)
 void Room::addExplosion(const PostExplosion& explosion)
 {
     explosions.push_back(explosion);
+}
+
+
+void Room::drawExplosions()
+{
+  for (auto it = explosions.begin(); it != explosions.end(); )
+  {
+    PostExplosion& explosion = *it;
+    
+    // Draw based on blink phase
+    if (explosion.shouldShowWave())
+    {
+      set_color(Color::Yellow);
+      for (const Point& cell : explosion.cells)
+      {
+        Renderer::printAt(cell.getX(), cell.getY(), '~');
+      }
+      reset_color();
+    }
+    else
+    {
+      for (const Point& cell : explosion.cells)
+      {
+        Renderer::printAt(cell.getX(), cell.getY(), ' ');
+      }
+    }
+    
+    // Decrement timer
+    explosion.timer--;
+    
+    // Remove finished explosions
+    if (explosion.isFinished())
+    {
+      // Final clear
+      for (const Point& cell : explosion.cells)
+      {
+        Renderer::printAt(cell.getX(), cell.getY(), ' ');
+      }
+      it = explosions.erase(it);
+    }
+    else
+    {
+      ++it;
+    }
+  }
 }

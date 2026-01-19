@@ -187,6 +187,7 @@ public:
   void draw();
   void drawDarkness(Player *p1 = nullptr, Player *p2 = nullptr);
   void drawVisibleObjects();
+  void drawExplosions();
 
   // Legend
   void drawLegend(Player *p1, Player *p2);
