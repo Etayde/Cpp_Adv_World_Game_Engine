@@ -19,6 +19,12 @@ class Riddle : public InteractableObject
     int riddleId;
     int correctAnswer;
 
+    enum class DelayRate
+    {
+        SLOW = 1,
+        FAST = 2,
+    };
+
 public:
 
     Riddle() : InteractableObject(), firstAttempt(true), solvingPlayerSprite(' '),
@@ -41,7 +47,7 @@ public:
     bool onExplosion() override { return true; }
 
     RiddleResult enterRiddle(Room *room, Player *triggeringPlayer, Game *game = nullptr);
-    void playRiddleAnimation() const;
+    void playRiddleAnimation(DelayRate delayRate = DelayRate::SLOW) const;
     bool displayRiddleQuestion();
     int getPlayerAnswer(const Game* gameContext = nullptr) const;
     void displayFeedback(bool correct) const;

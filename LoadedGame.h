@@ -26,6 +26,7 @@ private:
     void checkMissedEvents();
     void showQuitScreen();
     bool shouldQuit() const { return (quitCycle >= 0 && cycleCount >= static_cast<unsigned long>(quitCycle)); }
+    void showSilentPrompt();
 
 protected:
     void reportScreenChange(int roomId) override;
@@ -43,5 +44,4 @@ public:
     void run() override;
     void gameLoop() override;
     void changeRoom(int newRoomId, bool goingForward) override;
-
 };

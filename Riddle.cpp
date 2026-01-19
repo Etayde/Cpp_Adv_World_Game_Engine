@@ -16,7 +16,7 @@ using namespace std;
 
 RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer, Game *game)
 {
-    playRiddleAnimation();
+    playRiddleAnimation(DelayRate::SLOW);
 
     if (!displayRiddleQuestion()) return RiddleResult::NO_RIDDLE;
 
@@ -46,7 +46,7 @@ RiddleResult Riddle::enterRiddle(Room *room, Player *triggeringPlayer, Game *gam
 
     displayFeedback(correct);
 
-    playRiddleAnimation();
+    playRiddleAnimation(DelayRate::FAST);
     
     if (room != nullptr) room->draw();
 
@@ -153,7 +153,7 @@ void Riddle::displayFeedback(bool correct) const
 
 //////////////////////////////////////////    playRiddleAnimation      //////////////////////////////////////////
 
-void Riddle::playRiddleAnimation() const 
+void Riddle::playRiddleAnimation(DelayRate delayRate) const 
 { 
     while (check_kbhit()) get_char_nonblocking();
     
@@ -163,7 +163,7 @@ void Riddle::playRiddleAnimation() const
     const int startY = 4;
     const int frameHeight = 16; // Number of riddlePopupScreen rows (in Layouts.h)
     const int frameWidth = 56;  // Length of riddlePopupScreen rows (in Layouts.h)
-    const int waveDelay = 30;
+    const int waveDelay = 30 / delayRate;
     
     for (int pulse = 0; pulse < 2; pulse++)
     {

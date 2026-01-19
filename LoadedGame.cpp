@@ -1,3 +1,5 @@
+//////////////////////////////////////       INCLUDES & FORWARDS       //////////////////////////////////////////
+
 #include "LoadedGame.h"
 #include "Recorder.h"
 #include "Layouts.h"
@@ -6,6 +8,8 @@
 #include <iostream>
 
 using namespace std;
+
+///////////////////////////////////////////    CONSTRUCTORS    /////////////////////////////////////////////
 
 LoadedGame::LoadedGame(const string& filename, bool silent) : Game(), steps(),
     expectedEventIndex(0), testPassed(true), quitCycle(-1)
@@ -82,6 +86,8 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
     }
 }
 
+///////////////////////////////////////////    HANDLE INPUT    /////////////////////////////////////////////
+
 void LoadedGame::handleInput()
 {
     const ActionRecord* curr = steps.getCurrentAction();
@@ -97,6 +103,8 @@ void LoadedGame::handleInput()
         curr = steps.getCurrentAction();
     }
 }
+
+///////////////////////////////////////////    GAME LOOP    /////////////////////////////////////////////
 
 void LoadedGame::gameLoop()
 {
@@ -125,6 +133,8 @@ void LoadedGame::gameLoop()
     }
 }
 
+///////////////////////////////////////////    RUN    /////////////////////////////////////////////
+
 void LoadedGame::run()
 {
   bool running = true;
@@ -141,19 +151,7 @@ void LoadedGame::run()
 
     case GameState::victory:
     case GameState::gameOver:
-      if (silentMode)
-      {
-        if (testPassed && expectedEventIndex < expectedEvents.size())
-          testFailed("Expected more events (got " + std::to_string(expectedEventIndex) +
-                     ", expected " + std::to_string(expectedEvents.size()) + ")");
-
-        if (testPassed) std::cout << "Test passed" << std::endl;
-        else
-        {
-          std::cout << "Test not passed" << std::endl;
-          std::cout << testFailureDetails << std::endl;
-        }
-      }
+      if (silentMode) showSilentPrompt();
       else
       {
         if (currentState == GameState::victory)
@@ -163,15 +161,11 @@ void LoadedGame::run()
         Renderer::sleep_ms(2000);
       }
       gameInitialized = false;
-      currentState = GameState::quit;
+      running = false;
       break;
 
     case GameState::error:
-      if (silentMode)
-      {
-        std::cout << "Test not passed" << std::endl;
-        std::cout << "Error during initialization" << std::endl;
-      }
+      if (silentMode) showSilentPrompt();
       else
       {
         showErrorScreen();
@@ -182,24 +176,9 @@ void LoadedGame::run()
       break;
 
     case GameState::paused:
-
       break;
     case GameState::quit:
-      if (silentMode)
-      {
-        reportQuit();
-
-        if (testPassed && expectedEventIndex < expectedEvents.size())
-          testFailed("Expected more events (got " + std::to_string(expectedEventIndex) +
-                     ", expected " + std::to_string(expectedEvents.size()) + ")");
-
-        if (testPassed) std::cout << "Test passed" << std::endl;
-        else
-        {
-          std::cout << "Test not passed" << std::endl;
-          std::cout << testFailureDetails << std::endl;
-        }
-      }
+      if (silentMode) showSilentPrompt();
       else
       {
         showQuitScreen();
@@ -400,4 +379,50 @@ int LoadedGame::getRiddleInput(unsigned long cycle)
         if (action.action == Action::ANSWER_RIDDLE) return action.answer;
     }
     return -1;
+}
+
+/////////////////////////////////////////    showSilentPrompt    /////////////////////////////////////////////
+
+void LoadedGame::showSilentPrompt()
+{
+    switch (currentState)
+    {
+    case GameState::victory:
+    case GameState::gameOver:
+        if (testPassed && expectedEventIndex < expectedEvents.size())
+          testFailed("Expected more events (got " + std::to_string(expectedEventIndex) +
+                     ", expected " + std::to_string(expectedEvents.size()) + ")");
+
+        if (testPassed) std::cout << "Test passed" << std::endl;
+        else
+        {
+          std::cout << "Test not passed" << std::endl;
+          std::cout << testFailureDetails << std::endl;
+        }
+        break;
+
+    case GameState::error:
+        std::cout << "Test not passed" << std::endl;
+        std::cout << "Error during initialization" << std::endl;
+        break;
+    
+    case GameState::quit:
+        reportQuit();
+
+        if (testPassed && expectedEventIndex < expectedEvents.size())
+            testFailed("Expected more events (got " + std::to_string(expectedEventIndex) +
+                       ", expected " + std::to_string(expectedEvents.size()) + ")");
+
+        if (testPassed) std::cout << "Test passed" << std::endl;
+        else
+        {
+            std::cout << "Test not passed" << std::endl;
+            std::cout << testFailureDetails << std::endl;
+        }
+        break;
+
+    default:
+        break;
+    }
+    
 }
