@@ -136,18 +136,18 @@ void Bomb::draw() const
     {
         if ((blinkCounter % BLINK_RATE) < 5) 
         {
-            set_color(Color::LightRed);
+            set_color(Color::Green);
             Renderer::print('@');
         }
         else 
         {
-            set_color(Color::White); // Flash white
+            set_color(Color::LightGreen); // Flash light green
             Renderer::print('*');
         }
     }
     else 
     {
-        set_color(Color::LightRed);
+        set_color(Color::Green);
         Renderer::print(sprite);
     }
     reset_color();

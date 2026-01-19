@@ -74,13 +74,16 @@ void Screen::draw() const
         {
             char c = screen[i][j];
             
-            // Basic static map coloring
-            if (c == 'W' || c == '|' || c == '-' || c == '=')
-            {
-                if (c == '=') set_color(Color::Gray);
-                else set_color(Color::BrightWhite);
-            }
-            // For other static chars like floors or HUD text, keep default (White) or set specific
+            // Color walls and borders white
+            if (c == 'W' || c == 'w' || c == 'Z' || c == '|' || c == '-' || c == '=')
+                set_color(Color::White);
+            else if (c == '!') set_color(Color::LightYellow);
+            else if (c == 'K' || c == '/' || c == '\\') set_color(Color::LightPurple);
+            else if (c == '@') set_color(Color::Green);
+            else if (c >= '0' && c <= '9') set_color(Color::Purple);
+            else if (c == '#' || c == '*') set_color(Color::Gray);
+            else if (c == '?') set_color(Color::LightBlue);
+            // Don't color spaces or unknown chars
             
             Renderer::print(c);
             reset_color();

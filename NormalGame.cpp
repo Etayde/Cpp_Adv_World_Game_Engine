@@ -460,9 +460,8 @@ void NormalGame::handleMainMenuInput()
     case '2':
       colorMode = !colorMode;
       setColorEnabled(colorMode);
-      // Redraw immediately to show change
-      showMainMenu();
-      // Update header immediately too? Why not.
+      std::cout << (colorMode ? "ON " : "OFF");
+      std::cout.flush();
       writeStepsHeader();
       break;
     case '8':

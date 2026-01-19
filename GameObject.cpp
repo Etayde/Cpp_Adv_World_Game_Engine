@@ -81,44 +81,33 @@ void GameObject::draw() const
     switch (type)
     {
     case ObjectType::WALL:
-        set_color(Color::BrightWhite);
-        break;
     case ObjectType::BREAKABLE_WALL:
-        set_color(Color::Gray);
-        break;
     case ObjectType::SWITCH_WALL:
-        set_color(Color::LightAqua);
+        set_color(Color::White);
         break;
     case ObjectType::TORCH:
         set_color(Color::LightYellow);
         break;
     case ObjectType::BOMB:
-        set_color(Color::LightRed);
-        break;
-    case ObjectType::KEY:
-        set_color(Color::Yellow);
-        break;
-    case ObjectType::DOOR:
-        set_color(Color::LightBlue);
-        break;
-    case ObjectType::RIDDLE:
-        set_color(Color::LightGreen);
-        break;
-    case ObjectType::SPRING:
-    // case ObjectType::SPRING_LINK: // Identical value to SPRING
         set_color(Color::Green);
         break;
+    case ObjectType::KEY:
     case ObjectType::SWITCH_ON:
-        set_color(Color::LightGreen);
-        break;
     case ObjectType::SWITCH_OFF:
-        set_color(Color::Gray); // Or Red?
+        set_color(Color::LightPurple);
         break;
+    case ObjectType::DOOR:
+        set_color(Color::Purple);
+        break;
+    case ObjectType::RIDDLE:
+        set_color(Color::LightBlue);
+        break;
+    case ObjectType::SPRING:
     case ObjectType::OBSTACLE_BLOCK:
         set_color(Color::Gray);
         break;
     default:
-        set_color(Color::White);
+        // No coloring for unknown/air/disappeared objects
         break;
     }
 
