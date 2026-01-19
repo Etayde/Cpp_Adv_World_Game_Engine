@@ -49,7 +49,7 @@ LoadedGame::LoadedGame(const string& filename, bool silent) : Game(), steps(),
     if (currentState == GameState::inGame)
     {
         ErrorCode resultError = loadExpectedResults("adv-world.result.txt");
-        if (silentMode && resultError != ErrorCode::NONE)
+        if (resultError != ErrorCode::NONE)
         {
             initErrorMessage = resultError;
             currentState = GameState::error;
@@ -110,7 +110,7 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
     if (currentState == GameState::inGame)
     {
         ErrorCode resultError = loadExpectedResults("adv-world.result.txt");
-        if (silentMode && resultError != ErrorCode::NONE)
+        if (resultError != ErrorCode::NONE)
         {
             initErrorMessage = resultError;
             currentState = GameState::error;
@@ -338,6 +338,13 @@ void LoadedGame::testFailed(const std::string& details)
     {
         testPassed = false;
         testFailureDetails = details;
+        
+        // In non-silent mode, halt immediately on mismatch
+        if (!silentMode)
+        {
+            initErrorMessage = ErrorCode::RESULT_MISMATCH;
+            currentState = GameState::error;
+        }
     }
 }
 
@@ -357,8 +364,6 @@ void LoadedGame::checkMissedEvents()
 
 void LoadedGame::reportScreenChange(int roomId)
 {
-    if (!silentMode) return;
-
     GameEvent actual(cycleCount, roomId);
     verifyEvent(actual);
 }
@@ -367,8 +372,6 @@ void LoadedGame::reportScreenChange(int roomId)
 
 void LoadedGame::reportLifeLost(int playerId)
 {
-    if (!silentMode) return;
-
     GameEvent actual(cycleCount, currentRoomId, playerId);
     verifyEvent(actual);
 }
@@ -377,8 +380,6 @@ void LoadedGame::reportLifeLost(int playerId)
 
 void LoadedGame::onRiddleAttempt(const std::string& question, int answer, bool correct)
 {
-    if (!silentMode) return;
-
     GameEvent actual(cycleCount, currentRoomId, question, answer, correct);
     verifyEvent(actual);
 }
@@ -387,8 +388,6 @@ void LoadedGame::onRiddleAttempt(const std::string& question, int answer, bool c
 
 void LoadedGame::reportQuit()
 {
-    if (!silentMode) return;
-
     GameEvent actual(cycleCount, currentRoomId, GameEventType::QUIT);
     verifyEvent(actual);
 }

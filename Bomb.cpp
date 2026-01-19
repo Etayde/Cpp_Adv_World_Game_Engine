@@ -22,35 +22,6 @@ ExplosionResult Bomb::update(Player *p1, Player *p2)
 {
     ExplosionResult result;
 
-    if (state == BombState::ANIMATING)
-    {
-        animationTimer--;
-
-        // Check if players enter explosion zone during animation
-        for (const Point& cell : explosionCells)
-        {
-            if (p1 && p1->getX() == cell.getX() && p1->getY() == cell.getY())
-                result.player1Hit = true;
-            if (p2 && p2->getX() == cell.getX() && p2->getY() == cell.getY())
-                result.player2Hit = true;
-        }
-
-        if (animationTimer <= 0)
-        {
-            // Animation finished - clear all explosion cells
-            for (const Point& cell : explosionCells)
-            {
-                Renderer::printAt(cell.getX(), cell.getY(), ' ');
-            }
-            Renderer::flush();
-            explosionCells.clear();
-            state = BombState::EXPLODED;
-            active = false;
-        }
-
-        return result;
-    }
-
     if (state != BombState::TICKING)
         return result;
 
@@ -60,6 +31,8 @@ ExplosionResult Bomb::update(Player *p1, Player *p2)
     if (fuseTimer <= 0)
     {
         result = explode(p1, p2);
+        state = BombState::EXPLODED;
+        active = false;
         return result;
     }
 
@@ -75,7 +48,6 @@ ExplosionResult Bomb::update(Player *p1, Player *p2)
 ExplosionResult Bomb::explode(Player *p1, Player *p2)
 {
     ExplosionResult result;
-    explosionCells.clear();
 
     if (!currentRoom)
         return result;
@@ -83,8 +55,9 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
     int centerX = getX();
     int centerY = getY();
 
+    // Add center cell to exploded cells
     currentRoom->setCharAt(centerX, centerY, ' ');
-    explosionCells.push_back(Point(centerX, centerY));
+    result.explodedCells.push_back(Point(centerX, centerY));
 
     for (int dy = -EXPLOSION_RADIUS; dy <= EXPLOSION_RADIUS; dy++)
     {
@@ -100,6 +73,7 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
             if (distance > EXPLOSION_RADIUS)
                 continue;
 
+            // Line of sight check - cells behind walls are sheltered
             if (!currentRoom->hasLineOfSight(centerX, centerY, x, y))
                 continue;
 
@@ -107,12 +81,11 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
             if (type == ObjectType::WALL)
                 continue;
 
+            // Skip doors
             if (static_cast<char>(type) >= '0' && static_cast<char>(type) <= '9')
                 continue;
 
-            // Add ALL valid cells to animation (not just destroyed ones)
-            explosionCells.push_back(Point(x, y));
-
+            // Check player hits
             if (p1 && p1->getX() == x && p1->getY() == y)
                 result.player1Hit = true;
             if (p2 && p2->getX() == x && p2->getY() == y)
@@ -130,6 +103,7 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
                 if (obj->onExplosion())
                 {
                     currentRoom->setCharAt(x, y, ' ');
+                    result.explodedCells.push_back(Point(x, y));
                     obj->setActive(false);
                     result.objectsDestroyed++;
                 }
@@ -137,19 +111,23 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
             else if (type == ObjectType::BREAKABLE_WALL)
             {
                 currentRoom->setCharAt(x, y, ' ');
+                result.explodedCells.push_back(Point(x, y));
                 result.objectsDestroyed++;
             }
-            else if (type != ObjectType::AIR && type != ObjectType::WALL)
+            else if (type == ObjectType::AIR)
             {
+                // Add air cells that are within line of sight (not sheltered)
+                result.explodedCells.push_back(Point(x, y));
+            }
+            else if (type != ObjectType::WALL)
+            {
+                // Other destroyable non-wall, non-air cells
                 currentRoom->setCharAt(x, y, ' ');
+                result.explodedCells.push_back(Point(x, y));
                 result.objectsDestroyed++;
             }
         }
     }
-
-    // Start animation
-    state = BombState::ANIMATING;
-    animationTimer = ANIMATION_DURATION;
 
     return result;
 }
@@ -163,20 +141,6 @@ void Bomb::draw() const
 
     if (state == BombState::PLACED && currentRoom && !currentRoom->isVisible(getX(), getY()))
         return;
-
-    if (state == BombState::ANIMATING)
-    {
-        // Blink '~' in yellow: show for 5 ticks, hide for 5 ticks
-        bool showExplosion = (animationTimer / 5) % 2 == 0;
-        set_color(Color::Yellow);
-        for (const Point& cell : explosionCells)
-        {
-            Renderer::printAt(cell.getX(), cell.getY(), showExplosion ? '~' : ' ');
-        }
-        reset_color();
-        Renderer::flush();
-        return;
-    }
 
     Renderer::gotoxy(getX(), getY());
 
