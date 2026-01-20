@@ -12,14 +12,14 @@ struct ExplosionResult;
 
 //////////////////////////////////////////       PostExplosion         //////////////////////////////////////////
 
-// Represents an active explosion animation independent of the bomb object
+// Represents an active explosion animation
 struct PostExplosion
 {
     std::vector<Point> cells;
     int timer;
     
-    static const int ANIMATION_TICKS = 10;  // Total animation duration
-    static const int BLINK_INTERVAL = 1;    // Ticks per blink phase
+    static const int ANIMATION_TICKS = 6;
+    static const int BLINK_INTERVAL = 1;
     
     PostExplosion() : timer(ANIMATION_TICKS) {}
     PostExplosion(const std::vector<Point>& explosionCells) 

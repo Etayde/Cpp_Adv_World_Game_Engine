@@ -8,8 +8,13 @@ This document describes the formats for the "Steps" file (used for recording and
 The steps file records player inputs and actions. Each line represents a single action taken by a player at a specific game cycle.
 
 General Format:
-[RANDOM_SEED: <seed_value>]
-CYCLE: <cycle_number> PLAYER: <player_id> ACTION: <action_name> [ANSWER: <value>]
+- First line:
+--- [RANDOM_SEED: <seed_value>]
+--- [SCREENS: <screen_1>,<screen_2>,...,<screen_n>]
+--- [COLOR_MODE: <ON/OFF>] (if does not exist, default is OFF)
+- Next lines (for each line):
+--- CYCLE: <cycle_number> PLAYER: <player_id> ACTION: <action_name> [ANSWER: <value>]
+
 
 Fields:
 - [RANDOM_SEED: <seed_value>]: Optional first line. <seed_value> is an unsigned integer used to seed the random number generator for replay synchronization.
@@ -27,6 +32,7 @@ Fields:
 - [ANSWER: <value>]: Optional field, present ONLY when ACTION is ANSWER_RIDDLE. <value> is the integer answer provided.
 
 Examples:
+RANDOM_SEED: 809266453 SCREENS: adv-world01.screen.txt,adv-world02.screen.txt,adv-world03.screen.txt COLOR_MODE: ON
 CYCLE: 15 PLAYER: 1 ACTION: MOVE_RIGHT
 CYCLE: 15 PLAYER: 2 ACTION: MOVE_UP
 CYCLE: 120 PLAYER: 1 ACTION: DROP_ITEM

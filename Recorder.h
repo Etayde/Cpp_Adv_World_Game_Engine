@@ -77,10 +77,11 @@ struct ActionRecord
 
 class RecordedSteps
 {
-private:
     unsigned int randomSeed = 0;
     vector<ActionRecord> actions;
     size_t currActionIndex;
+    std::vector<std::string> screenNames;
+    bool colorMode = false;
 
 public:
     RecordedSteps() : currActionIndex(0) {}
@@ -95,13 +96,8 @@ public:
     void setRandomSeed(unsigned int seed) { randomSeed = seed; }
     unsigned int getRandomSeed() const { return randomSeed; }
     
-    // New members
     const std::vector<std::string>& getScreenNames() const { return screenNames; }
     
     void setColorMode(bool enabled) { colorMode = enabled; }
     bool getColorMode() const { return colorMode; }
-
-private:
-     std::vector<std::string> screenNames;
-     bool colorMode = false;
 };

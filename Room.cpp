@@ -314,7 +314,6 @@ void Room::drawDarkness(Player *p1, Player *p2)
           char c = getCharAt(x, y);
           
           if (c != ' ') {
-              // CLOSE uses original color, INNER=Yellow, EDGE=LightYellow
               if (visibilityMap[y][x] == VisibilityState::CLOSE) setColorForChar(c);
               else if (visibilityMap[y][x] == VisibilityState::EDGE) set_color(Color::LightYellow);
               else if (visibilityMap[y][x] == VisibilityState::INNER) set_color(Color::Yellow);
@@ -340,7 +339,6 @@ void Room::drawVisibleObjects()
     int x = obj->getX();
     int y = obj->getY();
 
-    // Bombs always use their own draw() method (for explosion animation)
     if (obj->getType() == ObjectType::BOMB)
     {
       obj->draw();
@@ -353,12 +351,11 @@ void Room::drawVisibleObjects()
       continue;
     }
 
-    // In dark zones: CLOSE=original color, INNER=Yellow, EDGE=LightYellow
     if (isInDarkZone(x, y) && visibilityMap[y][x] != VisibilityState::DARK)
     {
       if (visibilityMap[y][x] == VisibilityState::CLOSE)
       {
-        obj->draw(); // original color
+        obj->draw();
       }
       else
       {
@@ -377,16 +374,6 @@ void Room::drawVisibleObjects()
 
 //////////////////////////////////////////         getCharAt       /////////////////////////////////////////////
 
-
-// ... existing code ...
-
-//////////////////////////////////////////      findSmartSpawn       /////////////////////////////////////////////
-
-
-
-// Note: I will append these methods at the end of Room.cpp or finding a good spot.
-// Since I can't guarantee "Add to end" easily with context, I'll replace a known block or add before valid method.
-// Let's verify Room.cpp content first.
 char Room::getCharAt(int x, int y) const
 {
   for (const Modification &mod : mods)
@@ -501,13 +488,7 @@ void Room::addObstacle(Obstacle *obs) { if (obs != nullptr) obstacles.push_back(
 
 //////////////////////////////////////////   resetAllObstaclePushStates   /////////////////////////////////////////////
 
-void Room::resetAllObstaclePushStates()
-{
-  for (Obstacle *obstacle : obstacles)
-  {
-    obstacle->resetPushState();
-  }
-}
+void Room::resetAllObstaclePushStates() { for (Obstacle *obstacle : obstacles) obstacle->resetPushState(); }
 
 //////////////////////////////////////////          getDoors       /////////////////////////////////////////////
 
@@ -515,12 +496,8 @@ std::vector<Door *> Room::getDoors()
 {
   std::vector<Door *> doors;
   for (GameObject *obj : objects)
-  {
-    if (obj != nullptr && obj->getType() == ObjectType::DOOR)
-    {
+    if (obj != nullptr && obj->getType() == ObjectType::DOOR) 
       doors.push_back(static_cast<Door *>(obj));
-    }
-  }
   return doors;
 }
 
@@ -530,13 +507,9 @@ std::vector<Switch *> Room::getSwitches()
 {
   std::vector<Switch *> switches;
   for (GameObject *obj : objects)
-  {
     if (obj != nullptr && (obj->getType() == ObjectType::SWITCH_ON ||
                            obj->getType() == ObjectType::SWITCH_OFF))
-    {
       switches.push_back(static_cast<Switch *>(obj));
-    }
-  }
   return switches;
 }
 
@@ -855,6 +828,7 @@ std::vector<Point> Room::sortPositions(const std::vector<Point> &positions,
               [](const Point &a, const Point &b)
               { return a.getX() < b.getX(); });
   }
+
   else
   {
     std::sort(sorted.begin(), sorted.end(),
@@ -904,6 +878,7 @@ Room::WallCheckResult Room::checkWallAdjacency(const std::vector<Point> &sorted,
       return result;
     }
   }
+
   else
   {
     char topChar = baseLayout->getCharAt(first.getX(), first.getY() - 1);
@@ -1012,9 +987,9 @@ void Room::scanAndCreateSprings()
                                  wallCheck.projectionDirection);
               springs.push_back(spring);
             }
+
             else
             {
-              // Clean up successfully added links on failure
               for (SpringLink *sl : springLinks)
               {
                 removeObjectAt(sl->getX(), sl->getY());
@@ -1066,6 +1041,7 @@ void Room::createMultiCellObject(const std::vector<Point> &allObjCells)
           {
             if (ch == '*') edges[group[i]].push_back(neighbor);
           }
+
           else
           {
             group.push_back(neighbor);
@@ -1134,13 +1110,10 @@ void Room::createSpringFromGroup(const std::vector<Point> &group)
                                wallCheck.projectionDirection);
             springs.push_back(spring);
           }
+
           else
           {
-            // Clean up successfully added links on failure
-            for (SpringLink *sl : springLinks)
-            {
-              removeObjectAt(sl->getX(), sl->getY());
-            }
+            for (SpringLink *sl : springLinks) removeObjectAt(sl->getX(), sl->getY());
             delete spring;
           }
         }
@@ -1214,10 +1187,12 @@ void Room::drawPlayerStats(Player *p)
   DrawLives(p);
 
   Renderer::gotoxy(startX + 17, lineY);
-  if (p->hasItem()) {
+  if (p->hasItem()) 
+  {
     const GameObject* inv = p->getInventory();
     if (inv) Renderer::print(inv->getSprite());
   }
+
   else Renderer::print(" ");
 }
 
@@ -1265,11 +1240,8 @@ bool Room::isVacantSpot(int x, int y)
 
 Point Room::findSmartSpawn(Point base)
 {
-    // 1. Determine Desired Point (Target)
-    // "player 2 will spawn in the position 2 points below player 1's position"
     Point target(base.getX(), base.getY() + 2);
 
-    // Helper lambda to check validity
     auto isValid = [&](Point p) {
         if (p.getX() < 0 || p.getX() >= MAX_X || p.getY() < 0 || p.getY() >= MAX_Y) return false;
         if (isWallAt(p.getX(), p.getY())) return false;
@@ -1278,13 +1250,10 @@ Point Room::findSmartSpawn(Point base)
 
     if (isValid(target)) return target;
 
-    // 2. Search neighbors of Desired Point (Target)
-    // "check for a legit spawn point 1 point above/under/on the right/on the left of the desired point"
-    
     std::vector<Point> offsets = {
-        Point(0, -1), Point(0, 1), Point(-1, 0), Point(1, 0),   // Radius 1: Up, Down, Left, Right
-        Point(0, -2), Point(0, 2), Point(-2, 0), Point(2, 0),   // Radius 2
-        Point(-1, -1), Point(-1, 1), Point(1, -1), Point(1, 1)  // Diagonals
+        Point(0, -1), Point(0, 1), Point(-1, 0), Point(1, 0),
+        Point(0, -2), Point(0, 2), Point(-2, 0), Point(2, 0),
+        Point(-1, -1), Point(-1, 1), Point(1, -1), Point(1, 1)
     };
 
     for (const auto& offset : offsets)
@@ -1293,7 +1262,6 @@ Point Room::findSmartSpawn(Point base)
         if (isValid(p)) return p;
     }
 
-    // Fallback: just return base (overlap)
     return base; 
 }
 
@@ -1302,12 +1270,7 @@ Point Room::findSmartSpawn(Point base)
 
 Point Room::getSpawnPoint(int playerId)
 {
-    // Player 1: Always use metadata spawn point
     if (playerId == 1) return spawnPoint;
-
-    // Player 2: Smart Spawn Logic
-    // 1. Try (x, y+2) from P1's spawn
-    // 2. If blocked, search neighbors of THAT target point
     return findSmartSpawn(spawnPoint);
 }
 
@@ -1315,10 +1278,7 @@ Point Room::getSpawnPoint(int playerId)
 
 Point Room::getSpawnPointFromNext(int playerId)
 {
-    // Player 1: Always use metadata spawn point
     if (playerId == 1) return spawnPointFromNext;
-
-    // Player 2: Smart Spawn Logic relative to P1's spawn
     return findSmartSpawn(spawnPointFromNext);
 }
 
@@ -1336,40 +1296,23 @@ void Room::drawExplosions()
   {
     PostExplosion& explosion = *it;
     
-    // Draw based on blink phase
     if (explosion.shouldShowWave())
     {
       set_color(Color::Yellow);
-      for (const Point& cell : explosion.cells)
-      {
-        Renderer::printAt(cell.getX(), cell.getY(), '~');
-      }
+      for (const Point& cell : explosion.cells) Renderer::printAt(cell.getX(), cell.getY(), '~');
       reset_color();
     }
-    else
-    {
-      for (const Point& cell : explosion.cells)
-      {
-        Renderer::printAt(cell.getX(), cell.getY(), ' ');
-      }
-    }
+
+    else for (const Point& cell : explosion.cells) Renderer::printAt(cell.getX(), cell.getY(), ' ');
     
-    // Decrement timer
     explosion.timer--;
     
-    // Remove finished explosions
     if (explosion.isFinished())
     {
-      // Final clear
-      for (const Point& cell : explosion.cells)
-      {
-        Renderer::printAt(cell.getX(), cell.getY(), ' ');
-      }
+      for (const Point& cell : explosion.cells) Renderer::printAt(cell.getX(), cell.getY(), ' ');
       it = explosions.erase(it);
     }
-    else
-    {
-      ++it;
-    }
+    
+    else ++it;
   }
 }

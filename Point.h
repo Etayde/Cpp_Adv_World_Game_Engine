@@ -26,16 +26,8 @@ public:
     Point(const Point &other)
         : x(other.x), y(other.y), diff_x(other.diff_x), diff_y(other.diff_y), sprite(other.sprite) {}
 
-    void draw() const
-    {
-        Renderer::printAt(x, y, sprite);
-    }
-
-    void draw(char c) const
-    {
-        Renderer::printAt(x, y, c);
-    }
-
+    void draw() const { Renderer::printAt(x, y, sprite); }
+    void draw(char c) const { Renderer::printAt(x, y, c); }
     void move();
 
     void setDirection(Direction dir, int speed = 1);
@@ -55,14 +47,7 @@ public:
     void setSprite(char c) { sprite = c; }
     void stopMovement() { diff_x = 0; diff_y = 0; }
 
-    void operator=(const Point &other)
-    {
-        x = other.x;
-        y = other.y;
-        diff_x = other.diff_x;
-        diff_y = other.diff_y;
-        sprite = other.sprite;
-    }
+    void operator=(const Point &other);
 
     bool operator==(const Point &other) const { return x == other.x && y == other.y; }
     bool operator!=(const Point &other) const { return !(*this == other); }
@@ -74,9 +59,7 @@ namespace std
     template <>
     struct hash<Point>
     {
-        size_t operator()(const Point &p) const
-        {
-            return hash<int>()(p.getX()) ^ (hash<int>()(p.getY()) << 1);
-        }
+        size_t operator()(const Point &p) const 
+         { return hash<int>()(p.getX()) ^ (hash<int>()(p.getY()) << 1);  }
     };
 }

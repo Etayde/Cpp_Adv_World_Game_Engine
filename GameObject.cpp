@@ -5,26 +5,10 @@
 #include "Door.h"
 #include "Items.h"
 #include "Riddle.h"
-#include "Room.h"
-#include "Spring.h"
 #include "StaticObjects.h"
 #include "Switch.h"
 
 class Player;
-
-//////////////////////////////////////////     Switch::onInteract    /////////////////////////////////////////////
-
-bool Switch::onInteract(Player *player, Room *room)
-{
-
-  if (player == nullptr || room == nullptr) return false;
-
-  toggle();
-  draw();
-  room->updatePuzzleState();
-
-  return true;
-}
 
 //////////////////////////////////////////    createObjectFromChar       /////////////////////////////////////////////
 
@@ -107,7 +91,6 @@ void GameObject::draw() const
         set_color(Color::Gray);
         break;
     default:
-        // No coloring for unknown/air/disappeared objects
         break;
     }
 

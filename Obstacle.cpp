@@ -6,6 +6,18 @@
 #include "Player.h"
 #include "Renderer.h"
 
+//////////////////////////////////////////         Constructor         /////////////////////////////////////////////
+
+Obstacle::Obstacle() : blocks(), accumulatedForce(0), pushDirection(Direction::STAY), movedThisFrame(false)
+    {
+        edges = {
+            {Direction::UP, {}},
+            {Direction::DOWN, {}},
+            {Direction::LEFT, {}},
+            {Direction::RIGHT, {}}};
+        pushers.reserve(2);
+    };
+
 //////////////////////////////////////////        initialize       /////////////////////////////////////////////
 
 void Obstacle::initialize(const std::vector<ObstacleBlock *> &obstacleBlocks,
@@ -159,9 +171,7 @@ void Obstacle::reconstruct(Room *room)
 {
     std::vector<ObstacleBlock *> remaining;
     for (ObstacleBlock *block : blocks)
-    {
         if (block && block->isActive()) remaining.push_back(block);
-    }
 
     if (remaining.empty()) return;
 
@@ -178,6 +188,7 @@ void Obstacle::reconstruct(Room *room)
         initEdges(neighbors);
         resetPushState();
     }
+    
     else
     {
         blocks = components[0];

@@ -72,34 +72,29 @@ bool GameEvent::read(std::istream& in)
     else if (eventType == "LIFE_LOST") 
     {
         type = GameEventType::LIFE_LOST;
-        if (!(in >> dummy >> playerId)) 
-            return false;
+        if (!(in >> dummy >> playerId)) return false;
     }
     else if (eventType == "RIDDLE") 
     {
         type = GameEventType::RIDDLE_ANSWERED;
-        if (!(in >> dummy)) 
-            return false;
+        if (!(in >> dummy)) return false;
         char c;
         while (in.get(c) && c != '"') {}
+        
         question.clear();
-        while (in.get(c) && c != '"') {
-            question += c;
-        }
-        if (!(in >> dummy >> answerGiven)) 
-            return false;
+        
+        while (in.get(c) && c != '"') question += c;
+        
+        if (!(in >> dummy >> answerGiven)) return false;
         
         std::string correctStr;
-        if (!(in >> dummy >> correctStr)) 
-            return false;
+        if (!(in >> dummy >> correctStr)) return false;
         
         wasCorrect = (correctStr == "YES");
     }
-    else if (eventType == "QUIT") 
-        type = GameEventType::QUIT;
+    else if (eventType == "QUIT") type = GameEventType::QUIT;
     
-    else 
-        return false;  // Unknown event type
+    else return false;  // Unknown event type
 
     return true;
 }

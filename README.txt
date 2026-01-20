@@ -133,6 +133,6 @@ DARK_ZONE <tl_x> <tl_y> <br_x> <br_y>
   - Generated in Save Mode: The game creates this file to record key events.
   - Not needed for Normal Mode or Load Mode (unless verifying).
 
-** Note 1: There's a folder called "Different Steps And Results" containing 3 different recordings of steps and results files for the game to use.
+** Note 1: There's a folder called "Different Steps And Results" containing 3 different gameplay recordings for the game to use.
            You can use them to test the game in Load/Silent Mode.
            To do so, choose a gameplay, and place its steps and results files in the same directory as the game executable.

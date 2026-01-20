@@ -2,6 +2,17 @@
 
 #include "Point.h"
 
+//////////////////////////////////////////       operator=         //////////////////////////////////////////
+
+void Point::operator=(const Point &other)
+{
+    x = other.x;
+    y = other.y;
+    diff_x = other.diff_x;
+    diff_y = other.diff_y;
+    sprite = other.sprite;
+}
+
 //////////////////////////////////////////           move             //////////////////////////////////////////
 
 void Point::move()

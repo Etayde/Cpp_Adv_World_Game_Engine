@@ -84,6 +84,8 @@ bool Riddle::displayRiddleQuestion()
     return true;
 }
 
+//////////////////////////////////////////     getPlayerAnswer     //////////////////////////////////////////
+
 int Riddle::getPlayerAnswer(const Game* gameContext) const
 {
     if (gameContext != nullptr)
@@ -118,7 +120,6 @@ int Riddle::getPlayerAnswer(const Game* gameContext) const
         }
     }
 }
-
 
 //////////////////////////////////////////       displayFeedback        //////////////////////////////////////////
 

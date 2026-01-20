@@ -32,10 +32,7 @@ Game::Game()
 }
 
 // Free function used by Console.h to check color mode in OOP way
-bool isGameColorEnabled()
-{
-  return Game::isColorEnabled();
-}
+bool isGameColorEnabled() { return Game::isColorEnabled(); }
 
 //////////////////////////////////////////      Game Destructor       /////////////////////////////////////////////
 
@@ -75,17 +72,12 @@ Game* Game::createFromArgs(int argc, char* argv[])
 
 ErrorCode Game::validateLegendPlacement(Room &room)
 {
-  if (room.getBaseLayout() == nullptr)
-    return ErrorCode::NONE;
+  if (room.getBaseLayout() == nullptr) return ErrorCode::NONE;
 
   std::vector<Point> lMarkers;
   for (int y = 0; y < MAX_Y; y++)
-  {
     for (int x = 0; x < MAX_X; x++)
-    {
       if (room.getBaseLayout()->getCharAt(x, y) == 'L') lMarkers.push_back(Point(x, y));
-    }
-  }
 
   if (lMarkers.empty()) return ErrorCode::L_NOT_FOUND;
 
@@ -191,6 +183,7 @@ void Game::gameLoop()
 
         break;
       };
+      
       if (result == RiddleResult::SOLVED)
       {
         room->removeObjectAt(aRiddle.riddle->getX(), aRiddle.riddle->getY());
@@ -324,20 +317,15 @@ bool Game::canPassThroughDoor(Room *room, int doorId)
 
   int targetRoom = room->getDoorTargetRoomId(doorId);
 
-  // If explicit target is set, check requirements
   if (targetRoom != -1)
-  {
-      return room->isDoorUnlocked(doorId) ||
-             room->canOpenDoor(doorId, player1.getKeyCount(),
-                               player2.getKeyCount());
-  }
-
-  if (doorId == room->getNextRoomId() || doorId == static_cast<int>(rooms.size()))
-  {
     return room->isDoorUnlocked(doorId) ||
            room->canOpenDoor(doorId, player1.getKeyCount(),
                              player2.getKeyCount());
-  }
+
+  if (doorId == room->getNextRoomId() || doorId == static_cast<int>(rooms.size()))
+    return room->isDoorUnlocked(doorId) ||
+           room->canOpenDoor(doorId, player1.getKeyCount(),
+                             player2.getKeyCount());
   else if (doorId == room->getPrevRoomId()) return true;
   
   return false;
@@ -353,10 +341,8 @@ void Game::checkRoomTransitions()
   auto updateWaitState = [&](Player &p) {
       if (p.isAtDoor())
       {
-           if (canPassThroughDoor(room, p.getDoorId()))
-           {
-               if (!p.isWaitingAtDoor()) p.setWaitingAtDoor(true);
-           }
+        if (canPassThroughDoor(room, p.getDoorId()))
+          if (!p.isWaitingAtDoor()) p.setWaitingAtDoor(true);
       }
       else p.setWaitingAtDoor(false);
   };

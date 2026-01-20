@@ -9,6 +9,7 @@ namespace fs = std::filesystem;
 
 //////////////////////////////////////////     discoverLevelFiles     /////////////////////////////////////////////
 
+// Made with AI
 std::vector<std::string> LevelLoader::discoverLevelFiles()
 {
   std::vector<std::string> files;
@@ -21,14 +22,10 @@ std::vector<std::string> LevelLoader::discoverLevelFiles()
           std::string filename = entry.path().filename().string();
           if (filename.length() >= 7 && 
               filename.substr(filename.length() - 7) == ".screen")
-          {
-             files.push_back(filename);
-          }
+            files.push_back(filename);
           else if (filename.length() >= 11 &&
                    filename.substr(filename.length() - 11) == ".screen.txt")
-          {
             files.push_back(filename);
-          }
       }
   }
 

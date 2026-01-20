@@ -14,7 +14,6 @@ class NormalGame : public Game
     ofstream resultFile;
     unsigned int randomSeed = 0;
 
-private:
     void recordAction(const PlayerKeyBinding& binding);
     void writeStepsHeader();
     void toggleColorModeBanner();

@@ -26,7 +26,6 @@ LoadedGame::LoadedGame(const string& filename, bool silent) : Game(), steps(),
         return;
     }
     
-    // Apply recorded color mode
     colorMode = steps.getColorMode();
     
     unsigned int seed = steps.getRandomSeed();
@@ -36,7 +35,6 @@ LoadedGame::LoadedGame(const string& filename, bool silent) : Game(), steps(),
         return;
     }
     
-    // Validate screen files
     if (validateScreenNames() != ErrorCode::NONE) {
         initErrorMessage = ErrorCode::SCREEN_MISMATCH;
         currentState = GameState::error;
@@ -87,7 +85,6 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
         return;
     }
     
-    // Apply recorded color mode
     colorMode = steps.getColorMode();
     
     unsigned int seed = steps.getRandomSeed();
@@ -97,7 +94,6 @@ LoadedGame::LoadedGame(int argc, char* argv[]) : Game(), steps(),
         return;
     }
     
-    // Validate screen files
     if (validateScreenNames() != ErrorCode::NONE) {
         initErrorMessage = ErrorCode::SCREEN_MISMATCH;
         currentState = GameState::error;
@@ -186,10 +182,8 @@ void LoadedGame::run()
       if (silentMode) showSilentPrompt();
       else
       {
-        if (currentState == GameState::victory)
-          showVictory();
-        else
-          showGameOver();
+        if (currentState == GameState::victory) showVictory();
+        else showGameOver();
         Renderer::sleep_ms(2000);
       }
       gameInitialized = false;
@@ -339,7 +333,6 @@ void LoadedGame::testFailed(const std::string& details)
         testPassed = false;
         testFailureDetails = details;
         
-        // In non-silent mode, halt immediately on mismatch
         if (!silentMode)
         {
             initErrorMessage = ErrorCode::RESULT_MISMATCH;
@@ -406,9 +399,7 @@ int LoadedGame::getRiddleInput(unsigned long cycle)
 {
     vector<ActionRecord> actions = steps.getActionsForCycle(cycle);
     for (const auto& action : actions)
-    {
         if (action.action == Action::ANSWER_RIDDLE) return action.answer;
-    }
     return -1;
 }
 
@@ -467,13 +458,10 @@ ErrorCode LoadedGame::validateScreenNames()
 {
     std::vector<std::string> recordedScreens = steps.getScreenNames();
     
-    // If no screens were recorded (e.g. legacy file), we skip validation
     if (recordedScreens.empty()) return ErrorCode::NONE;
     
     std::vector<std::string> currentScreens = LevelLoader::discoverLevelFiles();
     
-    // Sort recorded screens to ensure order independence
-    // NOTE: currentScreens is already sorted by LevelLoader::discoverLevelFiles()
     std::sort(recordedScreens.begin(), recordedScreens.end());
     
     if (recordedScreens.size() != currentScreens.size()) return ErrorCode::SCREEN_MISMATCH;

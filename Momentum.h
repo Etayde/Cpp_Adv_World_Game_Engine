@@ -8,7 +8,6 @@
 // Momentum representation class
 class Momentum
 {
-private:
     bool activeState;
     int dx;
     int dy;
@@ -16,8 +15,7 @@ private:
     Direction launchDir;
 
 public:
-    Momentum()
-        : activeState(false), dx(0), dy(0), launchFramesRemaining(0), launchDir(Direction::STAY) {}
+    Momentum() : activeState(false), dx(0), dy(0), launchFramesRemaining(0), launchDir(Direction::STAY) {}
 
     Momentum &operator=(const Momentum &other);
     Momentum(const Momentum &other)

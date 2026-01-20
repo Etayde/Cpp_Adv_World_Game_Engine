@@ -14,39 +14,15 @@ class Point;
 
 class Screen
 {
-private:
   const char *screen[MAX_Y];
   std::string ownedData[MAX_Y];
 
 public:
-  Screen()
-  {
-    for (int i = 0; i < MAX_Y; i++)
-      screen[i] = nullptr;
-  }
-
-  Screen(const char *layout[MAX_Y])
-  {
-    for (int i = 0; i < MAX_Y; i++)
-      screen[i] = layout[i];
-  }
-
-  Screen(const std::string layout[MAX_Y])
-  {
-    for (int i = 0; i < MAX_Y; i++)
-    {
-      ownedData[i] = layout[i];
-      screen[i] = ownedData[i].c_str();
-    }
-  }
-
-  char getCharAt(int x, int y) const
-  {
-    if (x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y && screen[y] != nullptr)
-      return screen[y][x];
-    return 'W';
-  }
-
+  Screen();
+  Screen(const char *layout[MAX_Y]);
+  Screen(const std::string layout[MAX_Y]);
+  
+  char getCharAt(int x, int y) const;
   char getCharAt(const Point &p) const;
 
   bool isWall(int x, int y) const { return getCharAt(x, y) == 'W'; }

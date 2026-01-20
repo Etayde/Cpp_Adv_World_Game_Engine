@@ -18,7 +18,6 @@ class LoadedGame : public Game {
     std::string testFailureDetails;
     long quitCycle;
 
-private:
     ErrorCode validateScreenNames();
     ErrorCode loadActions(const string& filename) { return steps.loadFromFile(filename); }
     ErrorCode loadExpectedResults(const string& filename);

@@ -54,10 +54,7 @@ public:
 
   //////////////////////////////////////////      Virtual Methods      /////////////////////////////////////////////
 
-  virtual bool onInteract(Player * /*player*/, Room * /*room*/)
-  {
-    return false;
-  }
+  virtual bool onInteract(Player * /*player*/, Room * /*room*/) { return false; }
   virtual bool onExplosion() { return false; }
   virtual bool isAlwaysVisible() const { return false; }
 

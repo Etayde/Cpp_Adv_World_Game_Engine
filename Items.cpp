@@ -9,8 +9,5 @@ void Torch::illuminate(Room *room, int playerX, int playerY) const
 {
     if (room == nullptr) return;
 
-    if (room->isInDarkZone(playerX, playerY))
-    {
-        room->lightRadius(playerX, playerY, LIGHT_RADIUS);
-    }
+    if (room->isInDarkZone(playerX, playerY)) room->lightRadius(playerX, playerY, LIGHT_RADIUS);
 }

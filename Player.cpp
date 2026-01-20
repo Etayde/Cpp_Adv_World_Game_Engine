@@ -4,7 +4,6 @@
 #include "Bomb.h"
 #include "Game.h"
 #include "Renderer.h"
-
 #include "Door.h"
 #include "Obstacle.h"
 #include "Riddle.h"
@@ -47,7 +46,7 @@ Player::Player(const Player &other)
   copyInventoryFrom(other);
 }
 
-//////////////////////////////////////////  Player Assignment Operator       /////////////////////////////////////////////
+///////////////////////////////////////      Player Assignment Operator       /////////////////////////////////////////////
 
 Player &Player::operator=(const Player &other)
 {

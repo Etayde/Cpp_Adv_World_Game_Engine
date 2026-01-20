@@ -58,15 +58,7 @@ class Obstacle
         const std::vector<ObstacleBlock *> &blocks);
 
 public:
-    Obstacle() : blocks(), accumulatedForce(0), pushDirection(Direction::STAY), movedThisFrame(false)
-    {
-        edges = {
-            {Direction::UP, {}},
-            {Direction::DOWN, {}},
-            {Direction::LEFT, {}},
-            {Direction::RIGHT, {}}};
-        pushers.reserve(2);
-    };
+    Obstacle();
 
     void initialize(const std::vector<ObstacleBlock *> &obstacleBlocks,
                     std::unordered_map<Point, std::vector<Point>> &neighbors);

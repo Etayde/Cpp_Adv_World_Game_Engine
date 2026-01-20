@@ -2,7 +2,28 @@ EX2 Fixes
 =========
 
 Issue: Hardcoded screen file identifiers (fileNumber starting from 1 in Game::initializeRooms)
-
 Fix: Added LevelLoader::discoverLevelFiles() which uses std::filesystem to dynamically 
 discover all .screen and .screen.txt files in the working directory. The game now 
 supports adding/removing/renaming screen files without code changes.
+
+Issue: Riddles which appear on screen are picked from riddle file by order of appearance (a limiting implementation choice).
+Fix: Riddles are allocated randomly from a pool of riddles.
+
+Issue: Class data members should be made private.
+Fix: Class data members are now private and accessor methods are provided.
+
+Issue: Program crashes with a runtime error when no screen files are present in the working directory.
+Fix: If no screen files are present, the program will exit with an error message.
+
+Issue: One player should be able to move to a different room while other player stays in the same room.
+Fix: Once a door is open, if a player passes through it he leaves the current room.
+
+Issue: Need to support any number of rooms.
+Fix: Current implementation supports up to 10 rooms (doors can only range 0-9, and a door number can't be used more than once).
+
+Issue: methods or functions which are not fit to be inlined should be implemented in .cpp and not in header file (Screen::draw, Switch::toggle etc.).
+Fix: Screen::draw and Switch::toggle are now implemented in .cpp files as well as more method implementations.
+
+Issue: dynamically allocated memory never deleted (Room::scanAndCreateSprings - elements in springLinks).
+Fix: ScanAndCreateSprings should now delete all redundant springLinks.
+

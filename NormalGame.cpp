@@ -37,10 +37,7 @@ NormalGame::NormalGame(int argc, char* argv[]) : NormalGame()
         enableRecording("adv-world.steps.txt");
         resultFile.open("adv-world.result.txt");
         
-        // Generate seed
         randomSeed = std::random_device{}();
-        
-        // Write header
         writeStepsHeader();
         
         initializeRooms(randomSeed);
@@ -195,6 +192,7 @@ void NormalGame::gameLoop()
 
         break;
       };
+
       if (result == RiddleResult::SOLVED)
       {
         room->removeObjectAt(aRiddle.riddle->getX(), aRiddle.riddle->getY());
@@ -297,7 +295,7 @@ void NormalGame::handleInput()
   }
 }
 
-
+//////////////////////////////////////////        recordAction        /////////////////////////////////////////////
 
 void NormalGame::recordAction(const PlayerKeyBinding& binding)
 {
@@ -417,7 +415,6 @@ void NormalGame::writeStepsHeader()
 {
     if (!isRecording || !recordFile.is_open()) return;
     
-    // Rewind to start
     recordFile.seekp(0);
     
     recordFile << "RANDOM_SEED: " << randomSeed << " SCREENS: ";
@@ -429,7 +426,7 @@ void NormalGame::writeStepsHeader()
     }
     
     recordFile << " COLOR_MODE: " << (colorMode ? "ON" : "OFF");
-    recordFile << "           \n"; // Padding
+    recordFile << "           \n";
     recordFile.flush();
 }
 
@@ -443,7 +440,6 @@ void NormalGame::handleMainMenuInput()
     switch (choice)
     {
     case '1':
-      // Before starting game, ensure header saves correct color mode
       writeStepsHeader();
       currentState = GameState::inGame;
       break;
@@ -490,15 +486,9 @@ void NormalGame::resetRecordingFiles()
     if (!saveMode) return;
 
     closeRecordingFiles();
-
-    // Re-open files (truncating them)
     enableRecording("adv-world.steps.txt");
     resultFile.open("adv-world.result.txt");
-
-    // Generate new seed
     randomSeed = std::random_device{}();
-
-    // Write header with new seed
     writeStepsHeader();
 }
 
@@ -509,14 +499,6 @@ void NormalGame::startNewGame()
     if (saveMode && (!isGameInitialized() || !recordFile.is_open()))
     {
         resetRecordingFiles();
-        // initializeRooms needs the seed if we want it used, though strictly 
-        // initializeRooms(seed) is called in constructor. 
-        // When resetting, we might want to re-shuffle.
-        // base Game::startNewGame() calls initializeRooms() if rooms are empty.
-        // But here we want to force re-initialization if needed or just update the seed.
-        
-        // Actually, Game::startNewGame resets cycleCount and re-inits players.
-        // If we want new rooms/riddles based on new seed, we might need to clear rooms.
         rooms.clear();
         initializeRooms(randomSeed);
     }

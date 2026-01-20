@@ -52,7 +52,6 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
     int centerX = getX();
     int centerY = getY();
 
-    // Clear center cell immediately (original behavior)
     currentRoom->setCharAt(centerX, centerY, ' ');
     Renderer::printAt(centerX, centerY, ' ');
     explosionCells.push_back(Point(centerX, centerY));
@@ -71,7 +70,6 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
             if (distance > EXPLOSION_RADIUS)
                 continue;
 
-            // Line of sight check - cells behind walls are sheltered
             if (!currentRoom->hasLineOfSight(centerX, centerY, x, y))
                 continue;
 
@@ -79,11 +77,9 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
             if (type == ObjectType::WALL)
                 continue;
 
-            // Skip doors
             if (static_cast<char>(type) >= '0' && static_cast<char>(type) <= '9')
                 continue;
 
-            // Check player hits
             if (p1 && p1->getX() == x && p1->getY() == y)
                 result.player1Hit = true;
             if (p2 && p2->getX() == x && p2->getY() == y)
@@ -101,7 +97,7 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
                 if (obj->onExplosion())
                 {
                     currentRoom->setCharAt(x, y, ' ');
-                    Renderer::printAt(x, y, ' ');  // Immediate visual clear
+                    Renderer::printAt(x, y, ' ');
                     explosionCells.push_back(Point(x, y));
                     obj->setActive(false);
                     result.objectsDestroyed++;
@@ -110,30 +106,23 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
             else if (type == ObjectType::BREAKABLE_WALL)
             {
                 currentRoom->setCharAt(x, y, ' ');
-                Renderer::printAt(x, y, ' ');  // Immediate visual clear
+                Renderer::printAt(x, y, ' ');
                 explosionCells.push_back(Point(x, y));
                 result.objectsDestroyed++;
             }
-            else if (type == ObjectType::AIR)
-            {
-                // Add air cells for animation (not sheltered)
-                explosionCells.push_back(Point(x, y));
-            }
+            else if (type == ObjectType::AIR) explosionCells.push_back(Point(x, y));
             else if (type != ObjectType::WALL)
             {
                 currentRoom->setCharAt(x, y, ' ');
-                Renderer::printAt(x, y, ' ');  // Immediate visual clear
+                Renderer::printAt(x, y, ' ');
                 explosionCells.push_back(Point(x, y));
                 result.objectsDestroyed++;
             }
         }
     }
 
-    // Add explosion animation to room (visual effect only)
     if (!explosionCells.empty())
-    {
         currentRoom->addExplosion(PostExplosion(explosionCells));
-    }
 
     return result;
 }
@@ -142,11 +131,10 @@ ExplosionResult Bomb::explode(Player *p1, Player *p2)
 
 void Bomb::draw() const
 {
-    if (!active || state == BombState::IN_INVENTORY)
-        return;
+    if (!active || state == BombState::IN_INVENTORY) return;
 
-    if (state == BombState::PLACED && currentRoom && !currentRoom->isVisible(getX(), getY()))
-        return;
+    if (state == BombState::PLACED && currentRoom 
+        && !currentRoom->isVisible(getX(), getY())) return;
 
     Renderer::gotoxy(getX(), getY());
 
@@ -175,7 +163,4 @@ void Bomb::draw() const
 
 //////////////////////////////////////////       isPickable          //////////////////////////////////////////
 
-bool Bomb::isPickable() const
-{
-    return (state == BombState::PLACED);
-}
+bool Bomb::isPickable() const { return (state == BombState::PLACED); }

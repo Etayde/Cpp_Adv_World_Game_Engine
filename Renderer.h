@@ -5,7 +5,6 @@
 #include <string>
 
 class Renderer {
-private:
     inline static bool silentMode = false;
 
 public:
@@ -20,18 +19,6 @@ public:
     static inline void print(const std::string& str) { if (shouldRender()) std::cout << str; }
     static inline void print(int value) { if (shouldRender()) std::cout << value; }
     static inline void flush() { if (shouldRender()) std::cout << std::flush; }
-    
-    static inline void printAt(int x, int y, char c) {
-        if (shouldRender()) {
-            ::gotoxy(x, y);
-            std::cout << c;
-        }
-    }
-
-    static inline void printAt(int x, int y, const std::string& str) {
-        if (shouldRender()) {
-            ::gotoxy(x, y);
-            std::cout << str;
-        }
-    }
+    static inline void printAt(int x, int y, char c) { if (shouldRender()) { ::gotoxy(x, y); std::cout << c; } }
+    static inline void printAt(int x, int y, const std::string& str) { if (shouldRender()) { ::gotoxy(x, y); std::cout << str; } }
 };

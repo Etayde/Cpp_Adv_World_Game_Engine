@@ -3,7 +3,37 @@
 #include "Screen.h"
 #include "Point.h"
 
+//////////////////////////////////////////         constructors         //////////////////////////////////////////
+
+Screen::Screen()
+{
+    for (int i = 0; i < MAX_Y; i++)
+      screen[i] = nullptr;
+}
+
+Screen::Screen(const char *layout[MAX_Y])
+{
+    for (int i = 0; i < MAX_Y; i++)
+      screen[i] = layout[i];
+}
+
+Screen::Screen(const std::string layout[MAX_Y])
+{
+    for (int i = 0; i < MAX_Y; i++)
+    {
+      ownedData[i] = layout[i];
+      screen[i] = ownedData[i].c_str();
+    }
+}
+
 //////////////////////////////////////////         getCharAt          //////////////////////////////////////////
+
+char Screen::getCharAt(int x, int y) const
+{
+    if (x >= 0 && x < MAX_X && y >= 0 && y < MAX_Y && screen[y] != nullptr)
+      return screen[y][x];
+    return 'W';
+}
 
 char Screen::getCharAt(const Point &p) const { return getCharAt(p.getX(), p.getY()); }
 
@@ -87,7 +117,6 @@ void Screen::draw() const
       }
     }
 
-    // Print last line without trailing newline
     if (screen[MAX_Y - 1] != nullptr)
     {
         for (int j = 0; screen[MAX_Y - 1][j] != '\0'; ++j)

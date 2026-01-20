@@ -29,28 +29,9 @@ public:
     bool isBlocking() const override { return true; }
     bool onExplosion() override { return true; }
 
-    void toggle()
-    {
-        isOn = !isOn;
-        if (isOn)
-        {
-            sprite = '/';
-            type = ObjectType::SWITCH_ON;
-        }
-        else
-        {
-            sprite = '\\';
-            type = ObjectType::SWITCH_OFF;
-        }
-    }
+    void toggle();
 
     bool getIsOn() const { return isOn; }
-    void setIsOn(bool on)
-    {
-        isOn = on;
-        sprite = isOn ? '/' : '\\';
-        type = isOn ? ObjectType::SWITCH_ON : ObjectType::SWITCH_OFF;
-    }
-
+    void setIsOn(bool on);
     bool onInteract(Player *player, Room *room) override;
 };
