@@ -1,110 +1,244 @@
-# Two Player Cooperative Adventure
+<div align="center">
 
-## 🎮 Game Description
-This is a console-based Text Adventure World where two players cooperatively navigate through interconnected rooms. Players must solve puzzles, collect items (keys, torches, bombs), and interact with elements like springs and doors to progress. The game supports loading maps from text files and includes a custom physics and lighting system.
+# 🏰 Dungeon Co-op — Two-Player Console Adventure Engine
 
-### Team Member
-- **Etay De Beer** (319041612)
+**A fully-featured cooperative dungeon crawler built from scratch in C++17 — no game frameworks, no libraries, just raw systems programming.**
 
-## 🎯 Game Goal
-The players must work together to navigate through the rooms and reach the "Last Room" defined in the game files. The game ends successfully only when both players are present in the final room.
+`C++17` · `8,000+ Lines` · `40+ Source Files` · `Cross-Platform` · `macOS / Linux / Windows`
 
-## ⌨️ Instructions & Controls
-The game is played with two players on the same keyboard. Input is **case-insensitive**.
+<br/>
 
-| Action          | Player 1 | Player 2 |
-|-----------------|----------|----------|
-| **UP**          | `W`      | `I`      |
-| **LEFT**        | `A`      | `J`      |
-| **DOWN**        | `X`      | `M`      |
-| **RIGHT**       | `D`      | `L`      |
-| **STAY**        | `S`      | `K`      |
-| **DISPOSE ITEM**| `E`      | `O`      |
+<img src="assets/main_menu.png" alt="Main Menu" width="600"/>
 
-> **Note:** Press `ESC` to pause the game. Press it again to resume, or `H` to exit to the Main Menu.
+*Main menu — running in an 80×25 terminal window with color mode*
 
-## 🚀 Game Modes
-The game can be run in different modes using command-line arguments:
+</div>
 
-### 1. Normal Mode
-Standard gameplay. The user plays the game manually using the keyboard.
-```bash
-./game
+---
+
+## ⚡ Why This Project Stands Out
+
+This isn't a homework submission — it's an **engine**. Two players share a keyboard and cooperate in real-time across multi-room dungeons, solving puzzles, dodging explosions, and navigating fog-of-war darkness. Every system — rendering, physics, input, recording — was hand-built.
+
+| What I Built | Why It Matters |
+|---|---|
+| 🧪 **Deterministic replay & silent testing framework** | Record gameplay → replay with seeded RNG → verify events automatically. This is, fundamentally, an **automated game QA pipeline** — the exact problem space Duzz.ai operates in. |
+| 🏗️ **4-level OOP hierarchy with polymorphic dispatch** | `GameObject` → `StaticObject`/`PickableObject`/`InteractableObject` → 10+ concrete types. Factory pattern, virtual clone, clean separation of concerns. |
+| 🌑 **Fog-of-war visibility engine** | Dark zones with ray-traced line-of-sight, torch illumination radius, 4-level visibility states (`DARK` → `EDGE` → `INNER` → `CLOSE`). |
+| 🧲 **Custom physics system** | Momentum-based spring launchers, Bresenham line traversal for multi-step movement, force-based pushable obstacles. |
+| 💣 **Explosion system with LOS calculation** | Bombs with fuse timers, circular blast radius, wall occlusion via line-of-sight checks, chain destruction of breakable objects. |
+| 🖥️ **Cross-platform console abstraction** | Single codebase renders to Windows (`conio.h`), macOS, and Linux (`termios`) — clean `#ifdef` separation, ANSI escape codes, non-blocking I/O. |
+
+---
+
+## 🧪 The Testing Framework — Built for QA
+
+> *This is the system most relevant to Duzz.ai's mission of autonomous game testing.*
+
+The game has a built-in **record → replay → verify** pipeline — a miniature version of the automated QA systems that Duzz.ai builds at scale:
+
+```
+┌─────────────┐      ┌──────────────┐      ┌────────────────┐
+│  SAVE MODE  │ ───▶ │  LOAD MODE   │ ───▶ │  SILENT MODE   │
+│ Records all │      │ Replays from │      │ Headless run,  │
+│ player I/O  │      │ steps file   │      │ diffs results  │
+└─────────────┘      └──────────────┘      └────────────────┘
 ```
 
-### 2. Save Mode
-Identical to Normal Mode, but records all player actions and key game events (like moving, riddle answers, etc.) to files.
-- Saves actions to: `adv-world.steps.txt`
-- Saves events to: `adv-world.result.txt`
+- **Deterministic seeded RNG** ensures identical riddle assignment across record and replay.
+- **Screen file checksums** at replay time catch level-file drift between sessions.
+- **Event-level verification** — screen changes, life losses, riddle outcomes are diffed line-by-line.
+- **Factory pattern** (`Game::createFromArgs()`) instantiates `NormalGame` or `LoadedGame` from CLI args — zero coupling between play and test modes.
+
 ```bash
+# Record a session
 ./game -save
-```
 
-### 3. Load Mode
-Replays a recorded game session. The game reads actions from the provided steps file instead of the keyboard. This allows you to watch a previously played game automatically.
-```bash
+# Replay it visually
 ./game adv-world.steps.txt
+
+# Run headless verification (CI-friendly)
+./game adv-world.steps.txt -silent
+# → "Test passed" or "Test not passed"
 ```
 
-### 4. Silent Mode
-Runs the simulation as fast as possible without rendering any graphics to the console. This is used for automated testing.
-- It compares the events occurring in the simulation against the expected events in `adv-world.result.txt`.
-- Prints "Test passed" or "Test not passed" based on the comparison.
+---
+
+## 🏗️ Architecture
+
+```
+                        ┌──────────────┐
+                        │   GameObject │  ← abstract base (virtual clone, draw, update)
+                        └──────┬───────┘
+              ┌────────────────┼────────────────┐
+              ▼                ▼                ▼
+      ┌──────────────┐ ┌─────────────┐ ┌────────────────┐
+      │ StaticObject  │ │PickableObject│ │InteractableObj │
+      └──────┬───────┘ └──────┬──────┘ └───────┬────────┘
+             │                │                 │
+     ┌───┬───┴───┬───┐   ┌───┼───┐       ┌─────┼─────┐
+     │   │       │   │   │   │   │       │     │     │
+    Wall Break- Switch Air Key Torch   Door Switch Riddle
+         able   Wall          Bomb
+         Wall
+
+              ┌──────────┐
+              │   Game   │  ← abstract base (Factory pattern)
+              └────┬─────┘
+           ┌───────┴───────┐
+           ▼               ▼
+     ┌───────────┐  ┌────────────┐
+     │NormalGame  │  │ LoadedGame │  ← replay/silent testing
+     └───────────┘  └────────────┘
+```
+
+**Key design patterns**: Factory Method · Polymorphism · Virtual Clone · Template Method · Composition (Room ↔ GameObject) · Singleton-style static instance (`Game::currentInstance`)
+
+---
+
+## 🎮 Game Features
+
+### 🗝️ Cooperative Puzzle Rooms
+Both players must work together — collecting keys, activating switches, navigating doors, and solving multiple-choice riddles — to reach the final room. Each room is an 80×25 ASCII map loaded from `.screen.txt` files with metadata.
+
+### 🌑 Darkness & Torches
+Rooms can define rectangular dark zones. Without a torch, these areas are completely hidden. Picking up a torch creates a real-time illumination radius with graduated visibility.
+
+### 💣 Bombs & Explosions
+Placeable bombs with a 50-tick fuse and a 5-cell blast radius. Explosions check **line-of-sight** to avoid blasting through walls, can destroy breakable obstacles, trigger switches, and eliminate keys (causing game-over if critical items are lost). Includes a blinking fuse animation and post-explosion visual effect.
+
+### 🧲 Springs & Physics
+Multi-cell spring objects compressed by player movement. When fully compressed, they launch the player using a **momentum system** with Bresenham-based multi-step traversal — the player slides across the room until hitting a wall or obstacle.
+
+### 🧱 Pushable Obstacles
+Multi-block obstacles with computed edge detection and weight-based force requirements. Players push them by walking into them — heavier obstacles need more force (or springs).
+
+### ❓ Riddle Popups
+Walking into a `?` triggers an animated popup overlay with a multiple-choice question. Correct answers clear the path; wrong answers deduct a life.
+
+---
+
+## 🕹️ Controls
+
+Both players share one keyboard. Input is **case-insensitive**. Characters auto-move and will keep going until they hit a wall or press STAY.
+
+| Action | Player 1 (`$`) | Player 2 (`&`) |
+|---|:---:|:---:|
+| ↑ UP | `W` | `I` |
+| ↓ DOWN | `X` | `M` |
+| ← LEFT | `A` | `J` |
+| → RIGHT | `D` | `L` |
+| ■ STAY | `S` | `K` |
+| ⬇ DISPOSE | `E` | `O` |
+
+> `ESC` → Pause · `H` (from pause) → Main Menu
+
+<details>
+<summary><strong>📋 Instructions Screen</strong></summary>
+<br/>
+
+> The in-game instructions screen covers controls, map legend, and game rules — all rendered as ASCII art inside the 80×25 terminal grid.
+
+</details>
+
+---
+
+## 🛠️ Build & Run
+
 ```bash
+# Clone
+git clone https://github.com/YOUR_USERNAME/cpp_project_2025.git
+cd cpp_project_2025
+
+# Build (requires g++ with C++17 support)
+make
+
+# Play
+./game
+
+# Play with color mode
+# → Press [2] in the main menu to toggle color mode
+
+# Record a session for testing
+./game -save
+
+# Replay
+./game adv-world.steps.txt
+
+# Silent verification (headless, CI-ready)
 ./game adv-world.steps.txt -silent
 ```
 
-## 📁 File Formats
-The game uses specific text formats for recording and verifying sessions.
+**Requirements**: Any C++17-capable compiler (`g++`, `clang++`). No external dependencies.
 
-- **Steps File (`*.steps.txt`)**: Records every action taken by each player at every game cycle. This file is used to replay the game in Load Mode.
-  - *Example*: `CYCLE: 15 PLAYER: 1 ACTION: MOVE_RIGHT`
-- **Results File (`*.result.txt`)**: Records significant game milestones such as changing rooms, solving riddles, or losing lives. This file is used in Silent Mode to verify that the replay matches the original session.
-  - *Example*: `SCREEN_CHANGE CYCLE: 0 ROOM: 0`
+---
 
-## 🛠️ Map Creation Instructions
-To add new levels to the game, create a text file named `adv-worldXX.screen` (where XX is a number, e.g., 01, 02). Files are loaded in lexicographical order.
+## 🗺️ Level Editor
 
-### The Visual Map
-- Field layout: Exactly `80` characters wide and `25` rows high.
-- Include the character `L` (Legend Anchor) in the top-left area. This marks where the HUD (Score/Lives) will be drawn.
+Create custom rooms by adding `adv-worldXX.screen.txt` files (auto-discovered via `std::filesystem`). Each file is an 80×25 ASCII map followed by a metadata block:
 
-**Map Elements:**
-- `W` = Wall
-- `#` = Spring
-- `@` = Bomb
-- `K` = Key
-- `?` = Riddle
-- `1` - `9` = Door IDs
-- `$` / `&` = Players (Optional, strictly controlled by SPAWN metadata)
-- `(Space)` = Empty floor
-
-### The Metadata
-Immediately following the 25th row of the map, include the metadata section exactly as below to dictate the logic:
+| Symbol | Object | Behavior |
+|:---:|---|---|
+| `W` | Wall | Indestructible |
+| `w` | Breakable Wall | Destroyed by bombs |
+| `#` | Spring | Launches players |
+| `*` | Obstacle | Pushable block |
+| `Z` | Switch Wall | Removed when switches activate |
+| `K` | Key | Unlocks doors |
+| `!` | Torch | Illuminates dark zones |
+| `@` | Bomb | Pickup → place → explode |
+| `\` `/` | Switch | Toggles obstacles/doors |
+| `?` | Riddle | Multiple-choice puzzle |
+| `0-9` | Door | Requires keys/switches to pass |
+| `L` | Legend Anchor | HUD placement marker |
 
 ```text
 ---METADATA---
-SPAWN X Y
-SPAWN_PREV X Y
-NEXT_ROOM <next_room_id>
-PREV_ROOM <prev_room_id>
-DOOR <id> <keys_needed> <switches_needed>
-DARK_ZONE <tl_x> <tl_y> <br_x> <br_y>
+SPAWN 3 10                     # Player spawn point
+SPAWN_PREV 75 17               # Spawn when returning from next room
+NEXT_ROOM 1                    # Next room ID (-1 = final room)
+PREV_ROOM -1                   # Previous room ID (-1 = first room)
+DOOR 1 2 0                     # Door 1 needs 2 keys, 0 switches
+DARK_ZONE 20 5 46 14           # Dark rectangle (top-left → bottom-right)
 ```
 
-#### Metadata Dictionary
-- `SPAWN X Y`: Coordinates (Column, Row) where players appear when entering from the Previous Room.
-- `SPAWN_PREV X Y`: Coordinates where players appear when returning to this room from the Next Room.
-- `NEXT_ROOM`: The ID number of the next room file. Use `-1` if this is the Final Room.
-- `PREV_ROOM`: The ID number of the previous room file. Use `-1` if this is the First Room.
-- `DOOR ID KEYS SWITCHES`:
-  - ID: The digit (1-9) corresponding to the door character.
-  - KEYS: The number of keys required.
-  - SWITCHES: The number of active switches required.
-- `DARK_ZONE TL_X TL_Y BR_X BR_Y`: Defines a rectangular area hidden unless a player has a Torch. (Multiple lines permitted).
+---
 
-## 🗂️ Additional Files
-- `riddles.txt`: Must be present in the working directory. Contains the riddles and answers corresponding to `?` characters on the map.
-- `adv-world.steps.txt` / `adv-world.result.txt`: Used for automated testing and replaying features.
+## 📂 Project Structure
 
-> **Note:** There's a folder called "Different Steps And Results" containing 3 different gameplay recordings. You can use them to test the game in Load/Silent Mode by placing their steps and results files in the same directory as the game executable.
+```
+.
+├── main.cpp                    # Entry point
+├── Game.h/cpp                  # Abstract base — state machine, room management
+├── NormalGame.h/cpp            # Live gameplay + recording mode
+├── LoadedGame.h/cpp            # Replay + silent verification mode
+├── Player.h/cpp                # Movement, physics, inventory, collisions
+├── Room.h/cpp                  # Room state, visibility, object management
+├── GameObject.h/cpp            # Abstract game object base class
+├── Bomb.h/cpp                  # Explosive with fuse timer + LOS blast
+├── Spring.h/cpp                # Compressible launcher with momentum
+├── Obstacle.h/cpp              # Multi-block pushable physics objects
+├── Riddle.h/cpp                # Animated popup quiz system
+├── Recorder.h/cpp              # Action serialization / deserialization
+├── LevelLoader.h/cpp           # Map parser + std::filesystem discovery
+├── Console.h                   # Cross-platform terminal abstraction
+├── Renderer.h                  # Silent-mode-aware rendering proxy
+├── Momentum.h/cpp              # Velocity / launch frame tracking
+├── Makefile                    # Build configuration
+├── riddle.txt                  # Riddle question database
+└── adv-world*.screen.txt       # Level files (3 included)
+```
+
+---
+
+## 👤 Author
+
+**Etay De Beer**
+
+Built as a C++ university course project — evolved into a full game engine with QA automation, physics, fog-of-war, and extensible level design.
+
+---
+
+<div align="center">
+<sub>Built with ❤️, raw C++, and zero game frameworks.</sub>
+</div>
